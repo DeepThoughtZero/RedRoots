@@ -17,14 +17,24 @@ class GameRenderer {
         const container = this.canvas.parentElement;
         const rect = container.getBoundingClientRect();
         
-        // Max size based on available space, keeping aspect ratio
+        // Full viewport canvas
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+        
+        // Calculate cell size keeping aspect ratio
         const aspectX = rect.width / this.gameState.cols;
         const aspectY = rect.height / this.gameState.rows;
         
         this.cellSize = Math.max(5, Math.floor(Math.min(aspectX, aspectY) * 0.95));
         
-        this.canvas.width = this.gameState.cols * this.cellSize;
-        this.canvas.height = this.gameState.rows * this.cellSize;
+        const gridPixelWidth = this.gameState.cols * this.cellSize;
+        const gridPixelHeight = this.gameState.rows * this.cellSize;
+        
+        // Center the grid initially
+        if (this.camera.zoom === 1 && this.camera.x === 0 && this.camera.y === 0) {
+            this.camera.x = (rect.width - gridPixelWidth) / 2;
+            this.camera.y = (rect.height - gridPixelHeight) / 2;
+        }
         
         this.render();
     }

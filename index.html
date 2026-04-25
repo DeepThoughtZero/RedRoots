@@ -46,7 +46,7 @@
     <div class="fixed inset-0 z-[-1] stars-bg opacity-30"></div>
 
     <!-- Main Application Container -->
-    <div id="app" class="relative w-full h-screen flex flex-col">
+    <div id="app" class="relative w-full h-[100dvh] flex flex-col">
 
         <!-- Top Bar: Game Info -->
         <header
@@ -113,8 +113,8 @@
 
             <!-- Start Menu Overlay (visible initially) -->
             <div id="startMenu"
-                class="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300">
-                <div class="glass-panel w-full max-w-2xl p-8 rounded-2xl shadow-2xl border border-white/10">
+                class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
+                <div class="glass-panel w-full max-w-2xl p-6 sm:p-8 rounded-2xl shadow-2xl border border-white/10 max-h-[90dvh] overflow-y-auto">
                     <h2 class="text-3xl font-bold mb-6 text-center text-white">Missions-Setup</h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
