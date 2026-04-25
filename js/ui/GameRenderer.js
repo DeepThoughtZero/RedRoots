@@ -119,7 +119,8 @@ class GameRenderer {
     drawCells() {
         for (let r = 0; r < this.gameState.rows; r++) {
             for (let c = 0; c < this.gameState.cols; c++) {
-                const owner = this.gameState.grid.cells[r][c].owner;
+                const cell = this.gameState.grid.cells[r][c];
+                const owner = cell.owner;
                 if (owner !== CONSTANTS.OWNER_NONE) {
                     const color = owner === CONSTANTS.OWNER_NEUTRAL 
                                   ? CONSTANTS.NEUTRAL_COLOR 
@@ -131,16 +132,21 @@ class GameRenderer {
 
                     this.ctx.fillStyle = color;
                     this.ctx.shadowColor = shadowColor;
-                    this.ctx.shadowBlur = 8;
+                    this.ctx.shadowBlur = cell.isOld ? 15 : 8; // glow more if old
                     
-                    // Draw cell slightly smaller than cell size for margin
                     const margin = 1;
-                    this.ctx.fillRect(
-                        c * this.cellSize + margin, 
-                        r * this.cellSize + margin, 
-                        this.cellSize - 2 * margin, 
-                        this.cellSize - 2 * margin
-                    );
+                    const x = c * this.cellSize + margin;
+                    const y = r * this.cellSize + margin;
+                    const s = this.cellSize - 2 * margin;
+
+                    this.ctx.fillRect(x, y, s, s);
+
+                    if (cell.isOld && this.gameState.phase !== CONSTANTS.PHASE_SIMULATION) {
+                        // Draw a thick border for old cells
+                        this.ctx.strokeStyle = '#ffffff';
+                        this.ctx.lineWidth = 2;
+                        this.ctx.strokeRect(x, y, s, s);
+                    }
                     
                     this.ctx.shadowBlur = 0; // Reset
                 }
@@ -152,6 +158,18 @@ class GameRenderer {
         if (inputHandler.hoverRow === -1 || inputHandler.hoverCol === -1) return;
 
         const pId = this.gameState.currentPlayer;
+
+        if (inputHandler.isEraserMode) {
+            const r = inputHandler.hoverRow;
+            const c = inputHandler.hoverCol;
+            const cell = this.gameState.grid.getCell(r, c);
+            const canErase = cell && cell.owner === pId && !cell.isOld;
+            
+            this.ctx.fillStyle = canErase ? 'rgba(239, 68, 68, 0.8)' : 'rgba(100, 100, 100, 0.4)';
+            this.ctx.fillRect(c * this.cellSize, r * this.cellSize, this.cellSize, this.cellSize);
+            return;
+        }
+
         const pattern = inputHandler.currentPattern;
         const valid = this.gameState.canPlacePattern(pattern, inputHandler.hoverRow, inputHandler.hoverCol);
         

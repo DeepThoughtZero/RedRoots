@@ -13,7 +13,7 @@ class Grid {
         for (let r = 0; r < this.rows; r++) {
             const row = [];
             for (let c = 0; c < this.cols; c++) {
-                row.push({ owner: CONSTANTS.OWNER_NONE });
+                row.push({ owner: CONSTANTS.OWNER_NONE, isOld: false });
             }
             grid.push(row);
         }
@@ -27,9 +27,10 @@ class Grid {
         return null;
     }
 
-    setCell(r, c, ownerId) {
+    setCell(r, c, ownerId, isOld = false) {
         if (r >= 0 && r < this.rows && c >= 0 && c < this.cols) {
             this.cells[r][c].owner = ownerId;
+            this.cells[r][c].isOld = isOld;
         }
     }
 
@@ -71,20 +72,33 @@ class Grid {
                     // Conway Rule 1 & 3: Underpopulation (<2) or Overpopulation (>3) -> Dies
                     if (count < 2 || count > 3) {
                         nextGrid[r][c].owner = CONSTANTS.OWNER_NONE;
+                        nextGrid[r][c].isOld = false;
                     } else {
                         // Conway Rule 2: Survives
                         nextGrid[r][c].owner = currentCell.owner;
+                        nextGrid[r][c].isOld = currentCell.isOld;
                     }
                 } else {
                     // Conway Rule 4: Reproduction (=3)
                     if (count === 3) {
                         nextGrid[r][c].owner = this.determineNewCellOwner(ownerCounts);
+                        nextGrid[r][c].isOld = false;
                     }
                 }
             }
         }
 
         this.cells = nextGrid;
+    }
+
+    markAllOld() {
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                if (this.cells[r][c].owner !== CONSTANTS.OWNER_NONE) {
+                    this.cells[r][c].isOld = true;
+                }
+            }
+        }
     }
 
     determineNewCellOwner(ownerCounts) {

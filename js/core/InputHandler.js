@@ -10,6 +10,7 @@ class InputHandler {
         this.currentPattern = CONSTANTS.PATTERNS['cell'].pattern;
         this.hoverRow = -1;
         this.hoverCol = -1;
+        this.isEraserMode = false;
 
         this.initEvents();
     }
@@ -32,6 +33,11 @@ class InputHandler {
         this.activePatternKey = key;
         this.currentPattern = CONSTANTS.PATTERNS[key].pattern;
         this.uiManager.render(); // force update hover
+    }
+
+    setEraserMode(enabled) {
+        this.isEraserMode = enabled;
+        this.uiManager.render();
     }
 
     rotatePattern() {
@@ -88,16 +94,22 @@ class InputHandler {
 
         const { r, c } = this.getGridCoords(e);
         
+        if (this.isEraserMode) {
+            const cell = this.gameState.grid.getCell(r, c);
+            if (cell && cell.owner === this.gameState.currentPlayer && !cell.isOld) {
+                this.gameState.grid.setCell(r, c, CONSTANTS.OWNER_NONE, false);
+                this.gameState.budgets[this.gameState.currentPlayer] += 1;
+                this.gameState.notifyStateUpdate();
+            }
+            return;
+        }
+
         const success = this.gameState.placePattern(this.currentPattern, r, c);
         if (success) {
-            // Check if budget is 0, if so, we can auto-end turn or let them click end turn.
-            // Let them click end turn to review, or auto end if budget < minimum cost.
             const minCost = Math.min(...Object.values(CONSTANTS.PATTERNS).map(p => p.cost));
             if (this.gameState.budgets[this.gameState.currentPlayer] < minCost) {
                 // Not enough budget for anything, could auto-end turn
             }
-        } else {
-            // Show error flash or sound
         }
     }
 

@@ -9,7 +9,8 @@ class GameState {
         this.playerCount = config.playerCount;
         this.humansCount = config.humansCount;
         this.radius = config.radius;
-        this.baseBudget = config.budget || 300;
+        this.budgetFactor = config.budgetFactor || 10;
+        this.aiStrength = config.aiStrength || 'medium';
         
         this.phase = CONSTANTS.PHASE_SETUP;
         this.currentRound = 1;
@@ -19,10 +20,11 @@ class GameState {
         this.territory = new Territory(this.rows, this.cols, this.playerCount);
         
         // Budgets: Array of integers
-        this.budgets = Array(this.playerCount).fill(this.baseBudget);
+        this.budgets = Array(this.playerCount).fill(0);
         
         // Initial setup
         this.territory.setInitialTerritories();
+        this.calculateBudgets();
         this.winner = null;
 
         // Callbacks for UI updates
@@ -148,14 +150,18 @@ class GameState {
             // Dynamic delay for visualization
             if (this.simSpeedMs > 0) {
                 await new Promise(resolve => setTimeout(resolve, this.simSpeedMs)); 
+            } else if (step % 5 === 0) {
+                // Yield to main thread every few steps when running at max speed
+                await new Promise(resolve => setTimeout(resolve, 0));
             }
         }
 
         // End of round
+        this.grid.markAllOld();
         this.territory.updateTerritories(this.grid.cells, this.radius);
         
-        // Reset budgets
-        this.budgets.fill(this.baseBudget);
+        // Reset budgets dynamically
+        this.calculateBudgets();
 
         this.currentRound++;
         if (this.currentRound > this.maxRounds) {
@@ -194,5 +200,23 @@ class GameState {
 
     notifyStateUpdate() {
         if (this.onStateUpdate) this.onStateUpdate();
+    }
+
+    calculateBudgets() {
+        const counts = Array(this.playerCount).fill(0);
+        
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                const owner = this.territory.getOwnerAt(r, c);
+                if (owner !== null && owner !== CONSTANTS.OWNER_NEUTRAL) {
+                    counts[owner]++;
+                }
+            }
+        }
+
+        for (let i = 0; i < this.playerCount; i++) {
+            // Give 1 budget per 'budgetFactor' territory tiles, min budget of 1 to avoid soft locks completely
+            this.budgets[i] = Math.max(1, Math.floor(counts[i] / this.budgetFactor));
+        }
     }
 }

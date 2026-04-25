@@ -147,6 +147,8 @@ class Territory {
 
     getOwnerAt(r, c) {
         if (r >= 0 && r < this.rows && c >= 0 && c < this.cols) {
+            const campOwner = this.isCamp(r, c);
+            if (campOwner !== null) return campOwner;
             return this.territoryMap[r][c];
         }
         return null;
