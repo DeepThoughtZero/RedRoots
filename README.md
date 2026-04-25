@@ -8,8 +8,10 @@ RedRoots ist ein rundenbasiertes, kompetitives Strategiespiel, das auf **Conway'
 
 - **Kompetitiver Multiplayer:** Spiele gegen bis zu 3 Freunde im Hot-Seat-Modus an einem Gerät oder trete gegen Computergegner (KI) an.
 - **Strategische Runden:** Nutze ein zugeteiltes Zell-Budget, um komplexe Figuren (Gleiter, Raumschiffe, R-Pentominos) in deinem eigenen Territorium zu platzieren.
+- **Marsfelsen & Gebirge:** Prozedural generierte Bergketten blockieren die Vegetation und erfordern kluges Umschiffen der natürlichen Barrieren.
 - **Dynamische Territorien:** Nach jeder Runde erobern überlebende Zellen automatisch neues Gebiet für dich (mit definierbarem Radius). Überschneiden sich Einflussbereiche, entsteht Niemandsland.
 - **Auto-Stopp & Echtzeit-Kontrolle:** Ein Slider erlaubt die Kontrolle der Geschwindigkeit während der Simulation. Endlosschleifen (periodische Zustände) werden automatisch erkannt und übersprungen.
+- **Undo & Touch-Support:** Volle Undo-Funktionalität (`Strg+Z`) und optimiert für Tablets (Pinch-to-Zoom, Wischen & Tippen).
 - **Neon Mars Theme:** Modernes, visuell ansprechendes Design mit Glassmorphismus, leuchtenden Laserlinien (Brennlinien) und Neon-Akzenten.
 
 ## 🚀 Spielstart
@@ -24,7 +26,8 @@ Das Spiel besteht aus purem HTML, CSS und JavaScript. Es werden keine externen S
 ## 🎮 Spielregeln & Steuerung
 
 - **Ziel:** Platziere deine Zellen so, dass sie sich nach den Game of Life-Regeln vermehren und bewege deine Organismen bis in das feindliche, schraffiert markierte Lager (in den Ecken oder an der Grundlinie). Wer das feindliche Lager erreicht, gewinnt sofort!
-- **Platzieren:** Klicke mit der linken Maustaste in dein farbig markiertes Gebiet. Figuren können mit `R` oder `Rechtsklick` vor dem Setzen rotiert werden.
+- **Steuerung (Maus):** Klicke mit der linken Maustaste, um Figuren zu platzieren. Drücke das Mausrad zum Verschieben der Kamera und scrolle zum Zoomen. Figuren rotierst du mit `R` oder `Rechtsklick`. Mit `Strg+Z` machst du Schritte rückgängig.
+- **Steuerung (Touch/Tablet):** Tippe auf das Spielfeld, um eine Figur zu platzieren. Nutze zwei Finger zum Verschieben (Wischen) und Zoomen (Pinch) der Kamera. Figuren können über die UI-Buttons rechts rotiert und rückgängig gemacht werden.
 - **Überleben:** Conway's Game of Life Kernregeln gelten:
   1. Zelle mit < 2 Nachbarn stirbt (Unterbevölkerung).
   2. Zelle mit 2 oder 3 Nachbarn überlebt.

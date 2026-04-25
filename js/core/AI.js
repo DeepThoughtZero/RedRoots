@@ -30,11 +30,13 @@ class AI {
                 if (budget >= 5 && Math.random() > 0.5) chosenKey = 'glider';
                 else if (budget >= 4 && Math.random() > 0.5) chosenKey = 'block';
             } else if (this.gameState.aiStrength === 'medium') {
-                if (budget >= 5 && Math.random() > 0.3) chosenKey = 'glider';
+                if (budget >= 5 && Math.random() > 0.5) chosenKey = 'r_pentomino';
+                else if (budget >= 5 && Math.random() > 0.3) chosenKey = 'glider';
                 else if (budget >= 7 && Math.random() > 0.8) chosenKey = 'herschel';
                 else if (budget >= 4) chosenKey = 'block';
             } else if (this.gameState.aiStrength === 'hard') {
                 if (budget >= 36 && Math.random() > 0.5) chosenKey = 'glider_gun';
+                else if (budget >= 5 && Math.random() > 0.3) chosenKey = 'r_pentomino';
                 else if (budget >= 7 && Math.random() > 0.4) chosenKey = 'herschel';
                 else if (budget >= 5 && Math.random() > 0.1) chosenKey = 'glider';
                 else if (budget >= 4) chosenKey = 'block';
@@ -72,13 +74,42 @@ class AI {
                         }
 
                         if (this.gameState.canPlacePattern(currentPattern, r, c)) {
-                            // Weighting could be added here.
                             let weight = 1;
+
+                            // Line of sight check to avoid shooting into mountains
+                            if (chosenKey === 'glider_gun' || chosenKey === 'glider') {
+                                let dr = 1, dc = 1;
+                                if (rotations === 1) { dr = 1; dc = -1; }
+                                else if (rotations === 2) { dr = -1; dc = -1; }
+                                else if (rotations === 3) { dr = -1; dc = 1; }
+                                
+                                let hitRock = false;
+                                let checkR = r + (dr * 5); // Start slightly ahead
+                                let checkC = c + (dc * 5);
+                                
+                                // Check next 25 cells in trajectory
+                                for (let dist = 0; dist < 25; dist++) {
+                                    if (checkR < 0 || checkR >= this.gameState.rows || checkC < 0 || checkC >= this.gameState.cols) break;
+                                    const cellOwner = this.gameState.grid.getCell(checkR, checkC).owner;
+                                    if (cellOwner === -3) { // CONSTANTS.OWNER_ROCK
+                                        hitRock = true;
+                                        break;
+                                    }
+                                    checkR += dr;
+                                    checkC += dc;
+                                }
+                                
+                                if (hitRock) weight = 0;
+                            }
+
                             if (this.gameState.aiStrength === 'hard' && chosenKey === 'glider') {
                                 // Prefer edges of territory to shoot out
-                                weight = 10;
+                                if (weight > 0) weight = 10;
                             }
-                            for (let w = 0; w < weight; w++) validSpots.push({r, c, pattern: currentPattern});
+                            
+                            if (weight > 0) {
+                                for (let w = 0; w < weight; w++) validSpots.push({r, c, pattern: currentPattern});
+                            }
                         }
                     }
                 }

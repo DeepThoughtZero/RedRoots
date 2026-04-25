@@ -26,6 +26,7 @@ class UIManager {
         this.elBtnFinishTurn = document.getElementById('btnFinishTurn');
         this.elBtnRotate = document.getElementById('btnRotate');
         this.elBtnEraser = document.getElementById('btnEraser');
+        this.elBtnUndo = document.getElementById('btnUndo');
         this.elPatternList = document.getElementById('patternList');
         
         this.elBtnSettings = document.getElementById('btnSettings');
@@ -176,6 +177,14 @@ class UIManager {
                 this.inputHandler.setEraserMode(true);
             }
         });
+
+        if (this.elBtnUndo) {
+            this.elBtnUndo.addEventListener('click', () => {
+                if (this.gameState && this.gameState.undoLastAction()) {
+                    this.render();
+                }
+            });
+        }
         
         // Populate patterns
         this.elPatternList.innerHTML = '';

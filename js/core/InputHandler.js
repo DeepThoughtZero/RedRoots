@@ -16,6 +16,12 @@ class InputHandler {
         this.lastMouseX = 0;
         this.lastMouseY = 0;
 
+        // Touch tracking
+        this.initialPinchDist = 0;
+        this.initialZoom = 1;
+        this.lastTouchCenter = null;
+        this.hasMovedWithTouch = false;
+
         this.initEvents();
     }
 
@@ -26,6 +32,12 @@ class InputHandler {
         this.canvas.addEventListener('contextmenu', this.onContextMenu.bind(this));
         this.canvas.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
         window.addEventListener('mouseup', this.onMouseUp.bind(this));
+        
+        // Touch events
+        this.canvas.addEventListener('touchstart', this.onTouchStart.bind(this), { passive: false });
+        this.canvas.addEventListener('touchmove', this.onTouchMove.bind(this), { passive: false });
+        this.canvas.addEventListener('touchend', this.onTouchEnd.bind(this), { passive: false });
+        this.canvas.addEventListener('touchcancel', this.onTouchEnd.bind(this), { passive: false });
         
         // Keyboard mapping
         window.addEventListener('keydown', (e) => {
@@ -161,7 +173,13 @@ class InputHandler {
         if (e.button !== 0) return; // Only left click
 
         const { r, c } = this.getGridCoords(e);
-        
+        this.placeCurrentPattern(r, c);
+    }
+
+    placeCurrentPattern(r, c) {
+        if (this.gameState.phase !== CONSTANTS.PHASE_PLACEMENT) return;
+        if (!this.gameState.isCurrentPlayerHuman()) return;
+
         if (this.isEraserMode) {
             this.gameState.eraseCell(r, c);
             return;
@@ -184,6 +202,125 @@ class InputHandler {
     onMouseUp(e) {
         if (e.button === 1) {
             this.isDragging = false;
+        }
+    }
+
+    getTouchCenter(touches) {
+        let x = 0, y = 0;
+        for (let i = 0; i < touches.length; i++) {
+            x += touches[i].clientX;
+            y += touches[i].clientY;
+        }
+        return { x: x / touches.length, y: y / touches.length };
+    }
+
+    getTouchDistance(touches) {
+        if (touches.length < 2) return 0;
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    onTouchStart(e) {
+        e.preventDefault();
+        this.hasMovedWithTouch = false;
+        
+        if (e.touches.length === 2) {
+            this.initialPinchDist = this.getTouchDistance(e.touches);
+            this.initialZoom = this.uiManager.renderer.camera.zoom;
+            this.lastTouchCenter = this.getTouchCenter(e.touches);
+        } else if (e.touches.length === 1) {
+            this.lastTouchCenter = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            // Simulate mouse hover
+            const { r, c } = this.getGridCoords(e.touches[0]);
+            this.hoverRow = r;
+            this.hoverCol = c;
+            this.uiManager.render();
+        }
+    }
+
+    onTouchMove(e) {
+        e.preventDefault();
+        
+        if (e.touches.length === 2) {
+            this.hasMovedWithTouch = true;
+            const currentDist = this.getTouchDistance(e.touches);
+            const currentCenter = this.getTouchCenter(e.touches);
+            
+            const renderer = this.uiManager.renderer;
+            const cam = renderer.camera;
+            
+            // Handle Zoom
+            if (this.initialPinchDist > 0) {
+                const zoomFactor = currentDist / this.initialPinchDist;
+                const newZoom = Math.max(0.2, Math.min(5, this.initialZoom * zoomFactor));
+                
+                const rect = this.canvas.getBoundingClientRect();
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                const rawX = (currentCenter.x - rect.left) * scaleX;
+                const rawY = (currentCenter.y - rect.top) * scaleY;
+                
+                const logicalX = (rawX - cam.x) / cam.zoom;
+                const logicalY = (rawY - cam.y) / cam.zoom;
+                
+                cam.zoom = newZoom;
+                cam.x = rawX - logicalX * cam.zoom;
+                cam.y = rawY - logicalY * cam.zoom;
+            }
+            
+            // Handle Pan
+            if (this.lastTouchCenter) {
+                const dx = currentCenter.x - this.lastTouchCenter.x;
+                const dy = currentCenter.y - this.lastTouchCenter.y;
+                
+                const rect = this.canvas.getBoundingClientRect();
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                
+                cam.x += dx * scaleX;
+                cam.y += dy * scaleY;
+            }
+            
+            this.lastTouchCenter = currentCenter;
+            this.uiManager.render();
+            
+        } else if (e.touches.length === 1) {
+            const currentTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            
+            // If moved more than 10px, count as move
+            if (this.lastTouchCenter) {
+                const dx = currentTouch.x - this.lastTouchCenter.x;
+                const dy = currentTouch.y - this.lastTouchCenter.y;
+                if (Math.sqrt(dx*dx + dy*dy) > 10) {
+                    this.hasMovedWithTouch = true;
+                }
+            }
+            
+            // Update hover
+            const { r, c } = this.getGridCoords(e.touches[0]);
+            this.hoverRow = r;
+            this.hoverCol = c;
+            this.uiManager.render();
+        }
+    }
+
+    onTouchEnd(e) {
+        e.preventDefault();
+        
+        if (e.touches.length === 0) {
+            if (!this.hasMovedWithTouch && this.lastTouchCenter) {
+                // Simulate click
+                this.placeCurrentPattern(this.hoverRow, this.hoverCol);
+            }
+            this.lastTouchCenter = null;
+            this.initialPinchDist = 0;
+            this.hoverRow = -1;
+            this.hoverCol = -1;
+            this.uiManager.render();
+        } else if (e.touches.length === 1) {
+            // Down to one finger, reset center to avoid jumping
+            this.lastTouchCenter = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         }
     }
 }
