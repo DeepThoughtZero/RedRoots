@@ -23,9 +23,12 @@ class GameState {
         this.budgets = Array(this.playerCount).fill(0);
         
         // Initial setup
+        this.generateRocks(config.rocks);
         this.territory.setInitialTerritories();
         this.calculateBudgets();
-        this.winner = null;
+        this.history = []; // for periodicity detection
+        this.undoStack = []; // for undoing placements
+        this.simSpeedMs = 250; // default speed 
 
         // Callbacks for UI updates
         this.onPhaseChange = null;
@@ -54,7 +57,10 @@ class GameState {
     }
 
     nextPlayerTurn() {
+        this.undoStack = []; // Clear undo stack at the end of turn
         this.currentPlayer++;
+        
+        // Skip dead players / handle end of rotation
         if (this.currentPlayer >= this.playerCount) {
             // All players placed, run simulation
             this.currentPlayer = -1; // No active player during sim
@@ -95,13 +101,63 @@ class GameState {
     placePattern(pattern, baseR, baseC) {
         if (!this.canPlacePattern(pattern, baseR, baseC)) return false;
 
+        const delta = {
+            type: 'placement',
+            cost: pattern.length,
+            cells: []
+        };
+
         for (const [dr, dc] of pattern) {
             const r = baseR + dr;
             const c = baseC + dc;
+            const existingCell = this.grid.getCell(r, c);
+            delta.cells.push({ r, c, owner: existingCell.owner, isOld: existingCell.isOld });
+            
             this.grid.setCell(r, c, this.currentPlayer);
         }
 
+        if (!this.undoStack) this.undoStack = [];
+        this.undoStack.push(delta);
+
         this.budgets[this.currentPlayer] -= pattern.length;
+        this.notifyStateUpdate();
+        return true;
+    }
+
+    eraseCell(r, c) {
+        if (this.phase !== CONSTANTS.PHASE_PLACEMENT) return false;
+        const cell = this.grid.getCell(r, c);
+        if (cell && cell.owner === this.currentPlayer && !cell.isOld) {
+            const delta = {
+                type: 'erase',
+                cost: -1, // since we add 1 to budget when erasing, undoing it costs 1
+                cells: [{ r, c, owner: cell.owner, isOld: cell.isOld }]
+            };
+            if (!this.undoStack) this.undoStack = [];
+            this.undoStack.push(delta);
+            
+            this.grid.setCell(r, c, CONSTANTS.OWNER_NONE, false);
+            this.budgets[this.currentPlayer] += 1;
+            this.notifyStateUpdate();
+            return true;
+        }
+        return false;
+    }
+
+    undoLastAction() {
+        if (this.phase !== CONSTANTS.PHASE_PLACEMENT) return false;
+        if (!this.undoStack || this.undoStack.length === 0) return false;
+
+        const delta = this.undoStack.pop();
+        
+        // Restore cells
+        for (const cellData of delta.cells) {
+            this.grid.setCell(cellData.r, cellData.c, cellData.owner, cellData.isOld);
+        }
+        
+        // Restore budget
+        this.budgets[this.currentPlayer] += delta.cost;
+        
         this.notifyStateUpdate();
         return true;
     }
@@ -192,6 +248,46 @@ class GameState {
             }
         }
         return false;
+    }
+
+    generateRocks(count) {
+        if (!count || count <= 0) return;
+        
+        let rocksPlaced = 0;
+        let attempts = 0;
+        const maxAttempts = count * 20;
+        
+        while (rocksPlaced < count && attempts < maxAttempts) {
+            attempts++;
+            // Pick random start for cluster
+            let r = Math.floor(Math.random() * this.rows);
+            let c = Math.floor(Math.random() * this.cols);
+            
+            // Random cluster size
+            const clusterSize = Math.min(count - rocksPlaced, Math.floor(Math.random() * 20) + 5);
+            let clusterPlaced = 0;
+            
+            while (clusterPlaced < clusterSize && attempts < maxAttempts) {
+                attempts++;
+                // Check if valid to place rock here (not in a camp, not already a rock)
+                if (this.grid.getCell(r, c).owner !== CONSTANTS.OWNER_ROCK) {
+                    if (this.territory.isCamp(r, c) === null) {
+                        this.grid.setCell(r, c, CONSTANTS.OWNER_ROCK, true);
+                        rocksPlaced++;
+                        clusterPlaced++;
+                    }
+                }
+                
+                // Random walk
+                const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
+                const dir = dirs[Math.floor(Math.random() * dirs.length)];
+                r += dir[0];
+                c += dir[1];
+                
+                r = Math.max(0, Math.min(this.rows - 1, r));
+                c = Math.max(0, Math.min(this.cols - 1, c));
+            }
+        }
     }
 
     notifyPlayerChange() {

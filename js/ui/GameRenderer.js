@@ -8,6 +8,7 @@ class GameRenderer {
         
         // Calculate cell size to fit window nicely
         this.cellSize = 10; 
+        this.camera = { x: 0, y: 0, zoom: 1 };
         this.resize();
         window.addEventListener('resize', this.resize.bind(this));
     }
@@ -32,6 +33,10 @@ class GameRenderer {
         // Clear background
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        this.ctx.save();
+        this.ctx.translate(this.camera.x, this.camera.y);
+        this.ctx.scale(this.camera.zoom, this.camera.zoom);
+
         // 1. Draw Territories (Background colors)
         this.drawTerritories();
 
@@ -48,6 +53,8 @@ class GameRenderer {
         if (inputHandler && this.gameState.phase === CONSTANTS.PHASE_PLACEMENT && this.gameState.isCurrentPlayerHuman()) {
             this.drawHoverPreview(inputHandler);
         }
+
+        this.ctx.restore();
     }
 
     drawTerritories() {
@@ -122,17 +129,21 @@ class GameRenderer {
                 const cell = this.gameState.grid.cells[r][c];
                 const owner = cell.owner;
                 if (owner !== CONSTANTS.OWNER_NONE) {
-                    const color = owner === CONSTANTS.OWNER_NEUTRAL 
-                                  ? CONSTANTS.NEUTRAL_COLOR 
-                                  : CONSTANTS.PLAYER_COLORS[owner].main;
+                    let color, shadowColor;
+                    if (owner === CONSTANTS.OWNER_ROCK) {
+                        color = '#6b7280'; // Tailwind gray-500
+                        shadowColor = 'rgba(0,0,0,0.5)';
+                    } else if (owner === CONSTANTS.OWNER_NEUTRAL) {
+                        color = CONSTANTS.NEUTRAL_COLOR;
+                        shadowColor = 'rgba(255,255,255,0.2)';
+                    } else {
+                        color = CONSTANTS.PLAYER_COLORS[owner].main;
+                        shadowColor = CONSTANTS.PLAYER_COLORS[owner].shadow;
+                    }
                     
-                    const shadowColor = owner === CONSTANTS.OWNER_NEUTRAL 
-                                        ? 'rgba(255,255,255,0.2)' 
-                                        : CONSTANTS.PLAYER_COLORS[owner].shadow;
-
                     this.ctx.fillStyle = color;
                     this.ctx.shadowColor = shadowColor;
-                    this.ctx.shadowBlur = cell.isOld ? 15 : 8; // glow more if old
+                    this.ctx.shadowBlur = owner === CONSTANTS.OWNER_ROCK ? 2 : 10; // Less glow for rocks
                     
                     const margin = 1;
                     const x = c * this.cellSize + margin;
@@ -141,7 +152,13 @@ class GameRenderer {
 
                     this.ctx.fillRect(x, y, s, s);
 
-                    if (cell.isOld && this.gameState.phase !== CONSTANTS.PHASE_SIMULATION) {
+                    // Reset shadow for inner drawings
+                    this.ctx.shadowBlur = 0;
+
+                    if (owner === CONSTANTS.OWNER_ROCK) {
+                        this.ctx.fillStyle = '#4b5563'; // gray-600
+                        this.ctx.fillRect(c * this.cellSize + 3, r * this.cellSize + 3, this.cellSize - 6, this.cellSize - 6);
+                    } else if (cell.isOld && this.gameState.phase !== CONSTANTS.PHASE_SIMULATION) {
                         // Draw a thick border for old cells
                         this.ctx.strokeStyle = '#ffffff';
                         this.ctx.lineWidth = 2;

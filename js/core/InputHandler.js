@@ -11,6 +11,10 @@ class InputHandler {
         this.hoverRow = -1;
         this.hoverCol = -1;
         this.isEraserMode = false;
+        
+        this.isDragging = false;
+        this.lastMouseX = 0;
+        this.lastMouseY = 0;
 
         this.initEvents();
     }
@@ -20,11 +24,18 @@ class InputHandler {
         this.canvas.addEventListener('mouseleave', this.onMouseLeave.bind(this));
         this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
         this.canvas.addEventListener('contextmenu', this.onContextMenu.bind(this));
+        this.canvas.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
+        window.addEventListener('mouseup', this.onMouseUp.bind(this));
         
-        // Keyboard mapping for rotation
+        // Keyboard mapping
         window.addEventListener('keydown', (e) => {
             if (e.key === 'r' || e.key === 'R') {
                 this.rotatePattern();
+            }
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+                if (this.gameState.undoLastAction()) {
+                    this.uiManager.render();
+                }
             }
         });
     }
@@ -57,19 +68,68 @@ class InputHandler {
         const rect = this.canvas.getBoundingClientRect();
         const scaleX = this.canvas.width / rect.width;
         const scaleY = this.canvas.height / rect.height;
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
+        const rawX = (e.clientX - rect.left) * scaleX;
+        const rawY = (e.clientY - rect.top) * scaleY;
         
-        // Render cellSize calculation is handled by GameRenderer.
-        // We need to fetch cellSize from uiManager.
-        const cellSize = this.uiManager.renderer.cellSize;
+        const renderer = this.uiManager.renderer;
+        const cam = renderer.camera;
+        const cellSize = renderer.cellSize;
         
-        const c = Math.floor(x / cellSize);
-        const r = Math.floor(y / cellSize);
+        // Inverse transform: (raw - cam) / zoom
+        const logicalX = (rawX - cam.x) / cam.zoom;
+        const logicalY = (rawY - cam.y) / cam.zoom;
+        
+        const c = Math.floor(logicalX / cellSize);
+        const r = Math.floor(logicalY / cellSize);
         return { r, c };
     }
 
+    onWheel(e) {
+        e.preventDefault();
+        const renderer = this.uiManager.renderer;
+        const cam = renderer.camera;
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        const rawX = (e.clientX - rect.left) * scaleX;
+        const rawY = (e.clientY - rect.top) * scaleY;
+        
+        const zoomDelta = e.deltaY < 0 ? 1.1 : 0.9;
+        const newZoom = Math.max(0.2, Math.min(5, cam.zoom * zoomDelta));
+        
+        // Adjust camera position to zoom towards cursor
+        const logicalX = (rawX - cam.x) / cam.zoom;
+        const logicalY = (rawY - cam.y) / cam.zoom;
+        
+        cam.zoom = newZoom;
+        cam.x = rawX - logicalX * cam.zoom;
+        cam.y = rawY - logicalY * cam.zoom;
+        
+        this.uiManager.render();
+    }
+
     onMouseMove(e) {
+        if (this.isDragging) {
+            const dx = e.clientX - this.lastMouseX;
+            const dy = e.clientY - this.lastMouseY;
+            this.lastMouseX = e.clientX;
+            this.lastMouseY = e.clientY;
+            
+            const renderer = this.uiManager.renderer;
+            const cam = renderer.camera;
+            
+            const rect = this.canvas.getBoundingClientRect();
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            
+            cam.x += dx * scaleX;
+            cam.y += dy * scaleY;
+            
+            this.uiManager.render();
+            return;
+        }
+
         if (this.gameState.phase !== CONSTANTS.PHASE_PLACEMENT) return;
         if (!this.gameState.isCurrentPlayerHuman()) return;
 
@@ -88,6 +148,14 @@ class InputHandler {
     }
 
     onMouseDown(e) {
+        if (e.button === 1) { // Middle click
+            e.preventDefault();
+            this.isDragging = true;
+            this.lastMouseX = e.clientX;
+            this.lastMouseY = e.clientY;
+            return;
+        }
+
         if (this.gameState.phase !== CONSTANTS.PHASE_PLACEMENT) return;
         if (!this.gameState.isCurrentPlayerHuman()) return;
         if (e.button !== 0) return; // Only left click
@@ -95,12 +163,7 @@ class InputHandler {
         const { r, c } = this.getGridCoords(e);
         
         if (this.isEraserMode) {
-            const cell = this.gameState.grid.getCell(r, c);
-            if (cell && cell.owner === this.gameState.currentPlayer && !cell.isOld) {
-                this.gameState.grid.setCell(r, c, CONSTANTS.OWNER_NONE, false);
-                this.gameState.budgets[this.gameState.currentPlayer] += 1;
-                this.gameState.notifyStateUpdate();
-            }
+            this.gameState.eraseCell(r, c);
             return;
         }
 
@@ -116,5 +179,11 @@ class InputHandler {
     onContextMenu(e) {
         e.preventDefault();
         this.rotatePattern();
+    }
+
+    onMouseUp(e) {
+        if (e.button === 1) {
+            this.isDragging = false;
+        }
     }
 }

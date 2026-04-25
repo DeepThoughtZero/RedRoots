@@ -47,7 +47,7 @@ class Grid {
                 
                 if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols) {
                     const neighborOwner = this.cells[nr][nc].owner;
-                    if (neighborOwner !== CONSTANTS.OWNER_NONE) {
+                    if (neighborOwner !== CONSTANTS.OWNER_NONE && neighborOwner !== CONSTANTS.OWNER_ROCK) {
                         count++;
                         if (neighborOwner !== CONSTANTS.OWNER_NEUTRAL) {
                             ownerCounts[neighborOwner] = (ownerCounts[neighborOwner] || 0) + 1;
@@ -65,6 +65,13 @@ class Grid {
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
                 const currentCell = this.cells[r][c];
+                
+                if (currentCell.owner === CONSTANTS.OWNER_ROCK) {
+                    nextGrid[r][c].owner = CONSTANTS.OWNER_ROCK;
+                    nextGrid[r][c].isOld = true;
+                    continue;
+                }
+
                 const isAlive = currentCell.owner !== CONSTANTS.OWNER_NONE;
                 const { count, ownerCounts } = this.getNeighborsData(r, c);
 

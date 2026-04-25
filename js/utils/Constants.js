@@ -17,6 +17,7 @@ const CONSTANTS = {
     // Cell/Map logic
     OWNER_NONE: null,
     OWNER_NEUTRAL: -1,
+    OWNER_ROCK: -3,
     
     // Game Phases
     PHASE_SETUP: 'SETUP',

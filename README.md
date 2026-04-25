@@ -1,5 +1,7 @@
 # 🔴 RedRoots: Mars Game of Life
 
+**[🚀 Jetzt direkt im Browser spielen!](https://deepthoughtzero.github.io/RedRoots/)**
+
 RedRoots ist ein rundenbasiertes, kompetitives Strategiespiel, das auf **Conway's Game of Life** aufbaut. Das Spielgeschehen ist in ein packendes Sci-Fi-Szenario auf dem Mars eingebettet: Spieler übernehmen die Rolle von Siedlern, die im Wettbewerb miteinander wuchern und versuchen, durch cleveres Platzieren von lebenden Zellen (Pflanzen) die Lager der gegnerischen Siedler zu überwuchern.
 
 ## ✨ Features

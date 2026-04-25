@@ -63,7 +63,19 @@ class UIManager {
                 if (c.humansCount) document.getElementById('cfgHumans').value = c.humansCount;
                 if (c.radius) document.getElementById('cfgRadius').value = c.radius;
                 if (c.collisionRule) document.getElementById('cfgCollision').value = c.collisionRule;
+                if (c.rocks !== undefined) {
+                    document.getElementById('cfgRocks').value = c.rocks;
+                    document.getElementById('valRocks').textContent = c.rocks;
+                }
             } catch(e) { console.error('Failed to parse saved config', e); }
+        }
+
+        const cfgRocks = document.getElementById('cfgRocks');
+        const valRocks = document.getElementById('valRocks');
+        if (cfgRocks && valRocks) {
+            cfgRocks.addEventListener('input', () => {
+                valRocks.textContent = cfgRocks.value;
+            });
         }
 
         document.getElementById('btnStartGame').addEventListener('click', () => {
@@ -86,12 +98,37 @@ class UIManager {
                 playerCount: parseInt(document.getElementById('cfgPlayerCount').value),
                 humansCount: parseInt(document.getElementById('cfgHumans').value),
                 radius: parseInt(document.getElementById('cfgRadius').value),
-                collisionRule: document.getElementById('cfgCollision').value
+                collisionRule: document.getElementById('cfgCollision').value,
+                rocks: parseInt(document.getElementById('cfgRocks').value)
             };
 
             localStorage.setItem('redroots_config', JSON.stringify(config));
             this.startGame(config);
         });
+
+        // Help Modal Events
+        const btnHelp = document.getElementById('btnHelp');
+        const btnHelpClose = document.getElementById('btnHelpClose');
+        const helpOverlay = document.getElementById('helpOverlay');
+        const helpBox = document.getElementById('helpBox');
+
+        if (btnHelp && btnHelpClose && helpOverlay && helpBox) {
+            btnHelp.addEventListener('click', () => {
+                helpOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    helpOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                    helpBox.classList.remove('scale-95');
+                }, 10);
+            });
+
+            btnHelpClose.addEventListener('click', () => {
+                helpOverlay.classList.add('opacity-0', 'pointer-events-none');
+                helpBox.classList.add('scale-95');
+                setTimeout(() => {
+                    helpOverlay.classList.add('hidden');
+                }, 300);
+            });
+        }
 
         if (this.elBtnRestartGame) {
             this.elBtnRestartGame.addEventListener('click', () => {
@@ -184,13 +221,10 @@ class UIManager {
         // Bind speed slider
         const updateSimSpeed = () => {
             const speedVal = parseInt(this.elSimSpeed.value);
-            // 1 to 100 map to 500ms to 0ms
-            // Exponential-like feel:
-            let delay;
-            if (speedVal === 100) delay = 0;
-            else if (speedVal > 80) delay = Math.max(1, 100 - speedVal);
-            else delay = 500 - (speedVal * 5);
-
+            // Cubic curve to map 1-100 to 500ms-0ms. Makes the middle position much faster (e.g., 50 -> ~62ms)
+            const x = speedVal / 100;
+            const delay = Math.round(500 * Math.pow(1 - x, 3));
+            
             this.gameState.simSpeedMs = delay;
         };
         this.elSimSpeed.addEventListener('input', updateSimSpeed);
@@ -225,7 +259,7 @@ class UIManager {
             this.elRoundDisplay.textContent = `${this.gameState.currentRound} / ${this.gameState.maxRounds}`;
             this.elRightPanel.classList.remove('translate-x-full');
             this.elSimSpeedContainer.classList.add('hidden');
-            this.elTerritoryBarContainer.classList.add('hidden');
+            this.elTerritoryBarContainer.classList.remove('hidden');
             this.logEvent(`Runde ${this.gameState.currentRound} beginnt.`);
             this.updateTerritoryBars();
         }

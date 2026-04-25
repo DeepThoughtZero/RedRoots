@@ -42,26 +42,43 @@ class AI {
             
             let pattern = CONSTANTS.PATTERNS[chosenKey].pattern;
             
-            // Rotate randomly
-            const rotations = Math.floor(Math.random() * 4);
-            for (let i = 0; i < rotations; i++) {
-                pattern = pattern.map(([r, c]) => [c, -r]);
-            }
-
             // Find all valid placement spots in own territory
             const validSpots = [];
             for (let r = 0; r < this.gameState.rows; r++) {
                 for (let c = 0; c < this.gameState.cols; c++) {
                     if (this.gameState.territory.getOwnerAt(r, c) === pId) {
-                        if (this.gameState.canPlacePattern(pattern, r, c)) {
-                            // Weighting could be added here. For simplicity, we just collect them.
-                            // In 'hard' mode, we could prefer spots closer to the enemy.
+                        
+                        // Calculate desired rotation to shoot towards center
+                        // Default shoots +row, +col (Bottom-Right)
+                        let rotations = 0;
+                        const centerR = this.gameState.rows / 2;
+                        const centerC = this.gameState.cols / 2;
+                        
+                        if (r < centerR && c < centerC) rotations = 0; // Top-Left -> shoot BR
+                        else if (r >= centerR && c >= centerC) rotations = 2; // Bottom-Right -> shoot TL
+                        else if (r >= centerR && c < centerC) rotations = 3; // Bottom-Left -> shoot TR
+                        else if (r < centerR && c >= centerC) rotations = 1; // Top-Right -> shoot BL
+                        
+                        // Add some randomness on easy/medium so it's not strictly robotic
+                        if (this.gameState.aiStrength === 'easy') {
+                            rotations = Math.floor(Math.random() * 4);
+                        } else if (this.gameState.aiStrength === 'medium' && Math.random() > 0.5) {
+                            rotations = Math.floor(Math.random() * 4);
+                        }
+                        
+                        let currentPattern = pattern;
+                        for (let i = 0; i < rotations; i++) {
+                            currentPattern = currentPattern.map(([pr, pc]) => [pc, -pr]);
+                        }
+
+                        if (this.gameState.canPlacePattern(currentPattern, r, c)) {
+                            // Weighting could be added here.
                             let weight = 1;
                             if (this.gameState.aiStrength === 'hard' && chosenKey === 'glider') {
                                 // Prefer edges of territory to shoot out
                                 weight = 10;
                             }
-                            for (let w = 0; w < weight; w++) validSpots.push({r, c});
+                            for (let w = 0; w < weight; w++) validSpots.push({r, c, pattern: currentPattern});
                         }
                     }
                 }
@@ -69,7 +86,7 @@ class AI {
 
             if (validSpots.length > 0) {
                 const spot = validSpots[Math.floor(Math.random() * validSpots.length)];
-                this.gameState.placePattern(pattern, spot.r, spot.c);
+                this.gameState.placePattern(spot.pattern, spot.r, spot.c);
                 budget = this.gameState.budgets[pId];
                 await new Promise(resolve => setTimeout(resolve, 200));
             }

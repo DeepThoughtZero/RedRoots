@@ -89,7 +89,7 @@ class Territory {
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
                 const owner = gridCells[r][c].owner;
-                if (owner !== CONSTANTS.OWNER_NONE && owner !== CONSTANTS.OWNER_NEUTRAL) {
+                if (owner !== CONSTANTS.OWNER_NONE && owner !== CONSTANTS.OWNER_NEUTRAL && owner !== CONSTANTS.OWNER_ROCK) {
                     queue.push({ r, c, owner, dist: 0 });
                     influenceMap[r][c] = { dist: 0, owners: new Set([owner]) };
                 }
