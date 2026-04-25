@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Conways Spiel des Lebens</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* touch-action: none; <- DIES WURDE ENTFERNT, UM SCROLLEN ZU ERLAUBEN */
+        }
+        canvas {
+            cursor: pointer;
+            border: 1px solid #ccc;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #f9fafb;
+            /* touch-action bleibt hier, um Scrollen/Zoomen der Seite zu verhindern, WÄHREND man auf dem Canvas ist */
+            touch-action: none; 
+        }
+        .controls-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem; /* 12px */
+            justify-content: center;
+            align-items: center;
+        }
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 0.5rem; /* 8px */
+        }
+        .control-item label {
+            margin-bottom: 0.25rem; /* 4px */
+            font-size: 0.875rem; /* 14px */
+        }
+        .canvas-container {
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .pattern-button.active, .eraser-button.active {
+            color: white;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+        .pattern-button.active {
+            background-color: #3B82F6; /* blue-500 */
+        }
+        .pattern-button.active:hover {
+            background-color: #2563EB; /* blue-600 */
+        }
+        .eraser-button.active {
+            background-color: #F59E0B; /* amber-500 */
+        }
+        .eraser-button.active:hover {
+            background-color: #D97706; /* amber-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-4xl my-4 mx-auto">
+        <h1 class="text-3xl font-bold text-center text-gray-700">Conways Spiel des Lebens</h1>
+        <p class="text-center text-gray-500 mb-4">Viel Spaß wünscht David</p>
+        
+        <div class="mb-4">
+            <label class="block text-center text-sm font-medium text-gray-600 mb-2">Werkzeug auswählen (Figur mit Rechtsklick drehen):</label>
+            <div id="patternToolbar" class="flex flex-wrap justify-center gap-2 p-2 bg-gray-100 rounded-lg">
+                <!-- Buttons werden dynamisch per JavaScript eingefügt -->
+            </div>
+        </div>
+
+        <div class="canvas-container mb-6">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <div class="controls-container mb-6">
+            <button id="startButton" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">Start</button>
+            <button id="stopButton" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">Stop</button>
+            <button id="eraserButton" class="eraser-button bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">Radierer</button>
+            <button id="resetButton" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">Zurücksetzen</button>
+        </div>
+
+        <div class="controls-container">
+            <div class="control-item">
+                <label for="speedRange" class="text-sm font-medium text-gray-600">Geschwindigkeit: <span id="speedValue">5</span></label>
+                <input type="range" id="speedRange" min="1" max="30" value="5" class="w-48 accent-blue-500">
+            </div>
+            <div class="control-item">
+                <label for="zoomRange" class="text-sm font-medium text-gray-600">Zoom: <span id="zoomValue">10</span>px</label>
+                <input type="range" id="zoomRange" min="2" max="30" value="10" class="w-48 accent-blue-500">
+            </div>
+             <div class="control-item">
+                <label for="gridSizeSelect" class="text-sm font-medium text-gray-600">Rastergröße:</label>
+                <select id="gridSizeSelect" class="border border-gray-300 rounded-md p-2 text-sm accent-blue-500">
+                    <option value="50">Mittel (50x30)</option>
+                    <option value="80">Groß (80x50)</option>
+                    <option value="120">Sehr Groß (120x80)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elemente
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const resetButton = document.getElementById('resetButton');
+        const eraserButton = document.getElementById('eraserButton');
+        const speedRange = document.getElementById('speedRange');
+        const speedValueDisplay = document.getElementById('speedValue');
+        const zoomRange = document.getElementById('zoomRange');
+        const zoomValueDisplay = document.getElementById('zoomValue');
+        const gridSizeSelect = document.getElementById('gridSizeSelect');
+        const patternToolbar = document.getElementById('patternToolbar');
+
+        // Spiel-Variablen
+        let cellSize = parseInt(zoomRange.value);
+        let numCols, numRows;
+        let grid;
+        let animationId = null;
+        let isRunning = false;
+        let generationsPerSecond = parseInt(speedRange.value);
+        let lastMouseGridPos = { row: -1, col: -1 };
+        let isEraserActive = false;
+        let isDrawing = false;
+        let initialPinchDistance = null; // Für Pinch-to-Zoom
+
+        // Farben
+        const cellColor = '#3B82F6'; 
+        const previewColor = '#93C5FD';
+        const gridColor = '#E5E7EB'; 
+        const deadCellColor = '#FFFFFF';
+
+        // Definition der Muster
+        const patterns = {
+            'cell': { name: 'Zelle', pattern: [[0, 0]] },
+            'glider': { name: 'Gleiter', pattern: [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]] },
+            'r_pentomino': { name: 'R-Pentomino', pattern: [[0, 1], [0, 2], [1, 0], [1, 1], [2, 1]] },
+            'herschel': { name: 'Herschel', pattern: [[0, 1], [0, 2], [1, 0], [1, 2], [2, 2], [2, 3], [2, 4]] },
+            'lwss': { name: 'Raumschiff', pattern: [[0, 1], [0, 4], [1, 0], [2, 0], [2, 4], [3, 0], [3, 1], [3, 2], [3, 3]] },
+            'eater': { name: 'Eater', pattern: [[0, 0], [0, 1], [1, 0], [2, 1], [3, 1], [3, 2]] },
+            'glider_gun': {
+                name: 'Gleiter-Kanone',
+                pattern: [[0,24],[1,22],[1,24],[2,12],[2,13],[2,20],[2,21],[2,34],[2,35],[3,11],[3,15],[3,20],[3,21],[3,34],[3,35],[4,0],[4,1],[4,10],[4,16],[4,20],[4,21],[5,0],[5,1],[5,10],[5,14],[5,16],[5,17],[5,22],[5,24],[6,10],[6,16],[6,24],[7,11],[7,15],[8,12],[8,13]]
+            }
+        };
+        let activePatternKey = 'cell';
+        let currentPattern = patterns['cell'].pattern;
+
+        function createPatternToolbar() {
+            patternToolbar.innerHTML = '';
+            Object.keys(patterns).forEach((key) => {
+                const button = document.createElement('button');
+                button.dataset.patternKey = key;
+                button.textContent = patterns[key].name;
+                button.className = 'pattern-button px-3 py-1 text-sm font-medium text-gray-700 bg-white rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition';
+                if (key === 'cell') button.classList.add('active');
+                patternToolbar.appendChild(button);
+            });
+        }
+
+        function initializeGrid() {
+            stopGame();
+            const selectedSize = gridSizeSelect.value;
+            if (selectedSize === "50") { numCols = 50; numRows = 30; }
+            else if (selectedSize === "80") { numCols = 80; numRows = 50; }
+            else if (selectedSize === "120") { numCols = 120; numRows = 80; }
+            else { numCols = 80; numRows = 50; }
+            canvas.width = numCols * cellSize;
+            canvas.height = numRows * cellSize;
+            grid = Array(numRows).fill(null).map(() => Array(numCols).fill(0));
+            drawGrid();
+        }
+
+        function drawGrid() {
+            ctx.fillStyle = gridColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (let row = 0; row < numRows; row++) {
+                for (let col = 0; col < numCols; col++) {
+                    ctx.fillStyle = grid[row][col] ? cellColor : deadCellColor;
+                    ctx.fillRect(col * cellSize, row * cellSize, cellSize - 1, cellSize - 1);
+                }
+            }
+            if (!isRunning && lastMouseGridPos.row !== -1 && !isEraserActive && activePatternKey !== 'cell') {
+                currentPattern.forEach(([rowOffset, colOffset]) => {
+                    const row = lastMouseGridPos.row + rowOffset;
+                    const col = lastMouseGridPos.col + colOffset;
+                    if (row >= 0 && row < numRows && col >= 0 && col < numCols) {
+                        ctx.fillStyle = previewColor;
+                        ctx.fillRect(col * cellSize, row * cellSize, cellSize - 1, cellSize - 1);
+                    }
+                });
+            }
+        }
+        
+        function rotatePattern(pattern) {
+            if (!pattern || pattern.length === 0) return [];
+            const rotated = pattern.map(([r, c]) => [c, -r]);
+            const minRow = Math.min(...rotated.map(p => p[0]));
+            const minCol = Math.min(...rotated.map(p => p[1]));
+            return rotated.map(([r, c]) => [r - minRow, c - minCol]);
+        }
+        
+        function eraseAt(event) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (event.clientX - rect.left) * scaleX;
+            const y = (event.clientY - rect.top) * scaleY;
+            const baseCol = Math.floor(x / cellSize);
+            const baseRow = Math.floor(y / cellSize);
+            
+            for (let r_off = -1; r_off <= 2; r_off++) {
+                for (let c_off = -1; c_off <= 2; c_off++) {
+                    const row = baseRow + r_off;
+                    const col = baseCol + c_off;
+                    if (row >= 0 && row < numRows && col >= 0 && col < numCols) {
+                        grid[row][col] = 0;
+                    }
+                }
+            }
+            drawGrid();
+        }
+
+        function handleCanvasClick(event) {
+            if (isRunning || isEraserActive) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (event.clientX - rect.left) * scaleX;
+            const y = (event.clientY - rect.top) * scaleY;
+            const baseCol = Math.floor(x / cellSize);
+            const baseRow = Math.floor(y / cellSize);
+            currentPattern.forEach(([rowOffset, colOffset]) => {
+                const row = baseRow + rowOffset;
+                const col = baseCol + colOffset;
+                if (row >= 0 && row < numRows && col >= 0 && col < numCols) {
+                    grid[row][col] = activePatternKey === 'cell' ? (grid[row][col] ? 0 : 1) : 1;
+                }
+            });
+            drawGrid();
+        }
+
+        function handleCanvasMouseMove(event) {
+            if (isRunning) return;
+            if (isDrawing && isEraserActive) {
+                 eraseAt(event);
+                 return;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (event.clientX - rect.left) * scaleX;
+            const y = (event.clientY - rect.top) * scaleY;
+            const col = Math.floor(x / cellSize);
+            const row = Math.floor(y / cellSize);
+            if (row !== lastMouseGridPos.row || col !== lastMouseGridPos.col) {
+                lastMouseGridPos = { row, col };
+                drawGrid();
+            }
+        }
+        
+        function handleCanvasMouseLeave() {
+            lastMouseGridPos = { row: -1, col: -1 };
+            isDrawing = false;
+            drawGrid();
+        }
+        
+        function handleCanvasRightClick(event) {
+            event.preventDefault(); 
+            if (isRunning || isEraserActive || activePatternKey === 'cell') return;
+            currentPattern = rotatePattern(currentPattern);
+            drawGrid(); 
+        }
+
+        function handleMouseDown(event) {
+            if (event.button !== 0 || isRunning) return;
+            if (isEraserActive) {
+                isDrawing = true;
+                eraseAt(event);
+            } else {
+                 handleCanvasClick(event);
+            }
+        }
+
+        function calculateNextGeneration() {
+            const nextGrid = Array(numRows).fill(null).map(() => Array(numCols).fill(0));
+            for (let row = 0; row < numRows; row++) {
+                for (let col = 0; col < numCols; col++) {
+                    const neighbors = countNeighbors(row, col);
+                    const isAlive = grid[row][col];
+                    if (isAlive && (neighbors === 2 || neighbors === 3)) {
+                        nextGrid[row][col] = 1;
+                    } else if (!isAlive && neighbors === 3) {
+                        nextGrid[row][col] = 1;
+                    }
+                }
+            }
+            grid = nextGrid;
+        }
+
+        function countNeighbors(r, c) {
+            let count = 0;
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    if (i === 0 && j === 0) continue;
+                    const newRow = r + i;
+                    const newCol = c + j;
+                    if (newRow >= 0 && newRow < numRows && newCol >= 0 && newCol < numCols) {
+                        count += grid[newRow][newCol];
+                    }
+                }
+            }
+            return count;
+        }
+
+        function gameLoop() {
+            if (!isRunning) return;
+            calculateNextGeneration();
+            drawGrid();
+            animationId = setTimeout(gameLoop, 1000 / generationsPerSecond);
+        }
+
+        function startGame() {
+            if (isRunning) return;
+            isRunning = true;
+            handleCanvasMouseLeave(); 
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            [resetButton, eraserButton, gridSizeSelect, zoomRange].forEach(el => el.disabled = true);
+            patternToolbar.style.pointerEvents = 'none';
+            gameLoop();
+        }
+
+        function stopGame() {
+            isRunning = false;
+            if (animationId) clearTimeout(animationId);
+            animationId = null;
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            [resetButton, eraserButton, gridSizeSelect, zoomRange].forEach(el => el.disabled = false);
+            patternToolbar.style.pointerEvents = 'auto';
+        }
+
+        function resetGame() {
+            stopGame();
+            initializeGrid();
+        }
+
+        // --- EVENT LISTENERS ---
+        startButton.addEventListener('click', startGame);
+        stopButton.addEventListener('click', stopGame);
+        resetButton.addEventListener('click', resetGame);
+        
+        // Maus-Events
+        canvas.addEventListener('mousedown', handleMouseDown);
+        canvas.addEventListener('mousemove', handleCanvasMouseMove);
+        canvas.addEventListener('mouseleave', handleCanvasMouseLeave);
+        canvas.addEventListener('contextmenu', handleCanvasRightClick);
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+        
+        // Touch-Events für Pinch-Zoom und Zeichnen
+        function getDistance(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        canvas.addEventListener('touchstart', (e) => {
+            // e.preventDefault() ist wichtig, damit der Browser nicht scrollt/zoomt
+            e.preventDefault();
+            if (e.touches.length === 2) {
+                initialPinchDistance = getDistance(e.touches);
+            } else if (e.touches.length === 1) {
+                const touch = e.touches[0];
+                if (isEraserActive) {
+                    isDrawing = true;
+                    eraseAt(touch);
+                } else {
+                    handleCanvasClick(touch);
+                }
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 2 && initialPinchDistance !== null) {
+                const newDist = getDistance(e.touches);
+                const zoomFactor = newDist / initialPinchDistance;
+                let newCellSize = Math.round(cellSize * zoomFactor);
+                
+                const minZoom = parseInt(zoomRange.min);
+                const maxZoom = parseInt(zoomRange.max);
+                newCellSize = Math.max(minZoom, Math.min(maxZoom, newCellSize));
+
+                if (newCellSize !== cellSize) {
+                    zoomRange.value = newCellSize;
+                    handleZoomChange();
+                    // Wichtig: Die Distanz für die nächste Bewegung neu setzen
+                    initialPinchDistance = newDist;
+                }
+            } else if (e.touches.length === 1 && isDrawing) {
+                 if (isEraserActive) eraseAt(e.touches[0]);
+            }
+        }, { passive: false });
+        
+        canvas.addEventListener('touchend', (e) => {
+            initialPinchDistance = null;
+            isDrawing = false;
+        });
+        
+        eraserButton.addEventListener('click', () => {
+            isEraserActive = !isEraserActive;
+            eraserButton.classList.toggle('active', isEraserActive);
+            if (isEraserActive) {
+                patternToolbar.querySelectorAll('.pattern-button').forEach(btn => btn.classList.remove('active'));
+            }
+        });
+
+        patternToolbar.addEventListener('click', (event) => {
+            const target = event.target.closest('button');
+            if (!target) return;
+            isEraserActive = false;
+            eraserButton.classList.remove('active');
+            patternToolbar.querySelectorAll('.pattern-button').forEach(btn => btn.classList.remove('active'));
+            target.classList.add('active');
+            activePatternKey = target.dataset.patternKey;
+            currentPattern = patterns[activePatternKey].pattern;
+            drawGrid();
+        });
+
+        speedRange.addEventListener('input', (e) => {
+            generationsPerSecond = parseInt(e.target.value);
+            speedValueDisplay.textContent = generationsPerSecond;
+            if (isRunning) { stopGame(); startGame(); }
+        });
+
+        const handleZoomChange = () => {
+             if (!isRunning) {
+                cellSize = parseInt(zoomRange.value);
+                zoomValueDisplay.textContent = cellSize;
+                initializeGrid();
+             }
+        };
+        zoomRange.addEventListener('input', () => { zoomValueDisplay.textContent = zoomRange.value; });
+        zoomRange.addEventListener('change', handleZoomChange);
+
+        gridSizeSelect.addEventListener('change', () => { if (!isRunning) initializeGrid(); });
+
+        window.addEventListener('load', () => {
+            gridSizeSelect.value = "80"; 
+            createPatternToolbar();
+            initializeGrid();
+            stopButton.disabled = true;
+        });
+    </script>
+</body>
+</html>
+
