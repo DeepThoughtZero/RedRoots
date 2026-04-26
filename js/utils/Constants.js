@@ -3,10 +3,10 @@
 const CONSTANTS = {
     // Player Colors (Neon aesthetic)
     PLAYER_COLORS: [
-        { name: 'Haus Marineris', strength: 'medium', main: '#00FFFF', bg: 'rgba(0, 255, 255, 0.1)', shadow: 'rgba(0, 255, 255, 0.5)', asset: 'assets/Marineris_Cyan.png' }, // P1: Cyan
-        { name: 'Haus Hellas', strength: 'easy', main: '#FF00FF', bg: 'rgba(255, 0, 255, 0.1)', shadow: 'rgba(255, 0, 255, 0.5)', asset: 'assets/Hellas_Pink.png' }, // P2: Pink
-        { name: 'Haus Viridion', strength: 'medium', main: '#39FF14', bg: 'rgba(57, 255, 20, 0.1)', shadow: 'rgba(57, 255, 20, 0.5)', asset: 'assets/Viridion_Green.png' }, // P3: Green
-        { name: 'Haus Tharsis', strength: 'hard', main: '#FFFF00', bg: 'rgba(255, 255, 0, 0.1)', shadow: 'rgba(255, 255, 0, 0.5)', asset: 'assets/Tharsis_Yellow.png' }  // P4: Yellow
+        { name: 'Haus Marineris', strength: 'medium', main: '#00FFFF', bg: 'rgba(0, 255, 255, 0.1)', shadow: 'rgba(0, 255, 255, 0.5)', asset: 'assets/Marineris_Cyan_small.png' }, // P1: Cyan
+        { name: 'Haus Hellas', strength: 'easy', main: '#FF00FF', bg: 'rgba(255, 0, 255, 0.1)', shadow: 'rgba(255, 0, 255, 0.5)', asset: 'assets/Hellas_Pink_small.png' }, // P2: Pink
+        { name: 'Haus Viridion', strength: 'medium', main: '#39FF14', bg: 'rgba(57, 255, 20, 0.1)', shadow: 'rgba(57, 255, 20, 0.5)', asset: 'assets/Viridion_Green_small.png' }, // P3: Green
+        { name: 'Haus Tharsis', strength: 'hard', main: '#FFFF00', bg: 'rgba(255, 255, 0, 0.1)', shadow: 'rgba(255, 255, 0, 0.5)', asset: 'assets/Tharsis_Yellow_small.png' }  // P4: Yellow
     ],
     NEUTRAL_COLOR: '#9ca3af', // gray-400
     DEAD_CELL_COLOR: 'rgba(0,0,0,0)', 
@@ -22,7 +22,7 @@ const CONSTANTS = {
     // Game Phases
     PHASE_SETUP: 'SETUP',
     PHASE_PLACEMENT: 'PLATZIERUNG',
-    PHASE_SIMULATION: 'SIMULATION',
+    PHASE_SIMULATION: 'EVOLUTION',
     PHASE_GAMEOVER: 'BEENDET',
 
     // Base Budget (fallback, now mostly taken from config)

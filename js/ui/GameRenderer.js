@@ -6,6 +6,10 @@ class GameRenderer {
         this.ctx = canvas.getContext('2d');
         this.gameState = gameState;
         
+        // Cache for player images
+        this.playerImages = [];
+        this.loadPlayerImages();
+
         // Calculate cell size to fit window nicely
         this.cellSize = 10; 
         this.camera = { x: 0, y: 0, zoom: 1 };
@@ -43,7 +47,15 @@ class GameRenderer {
         this.render();
     }
 
-    render(inputHandler = null) {
+    loadPlayerImages() {
+        CONSTANTS.PLAYER_COLORS.forEach((p, i) => {
+            const img = new Image();
+            img.src = p.asset;
+            this.playerImages[i] = img;
+        });
+    }
+
+    render(inputHandler = null, campIndicator = null) {
         // Clear background
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -66,6 +78,11 @@ class GameRenderer {
         // 5. Draw Hover/Preview (if in placement phase)
         if (inputHandler && this.gameState.phase === CONSTANTS.PHASE_PLACEMENT && this.gameState.isCurrentPlayerHuman()) {
             this.drawHoverPreview(inputHandler);
+        }
+
+        // 6. Draw Camp Indicator
+        if (campIndicator && campIndicator.pId !== null) {
+            this.drawCampIndicator(campIndicator);
         }
 
         this.ctx.restore();
@@ -230,6 +247,58 @@ class GameRenderer {
                 );
             }
         }
+    }
+
+    drawCampIndicator(indicator) {
+        const { pId, opacity } = indicator;
+        const camp = this.gameState.territory.camps.find(c => c.id === pId);
+        if (!camp) return;
+
+        const x = camp.cMin * this.cellSize;
+        const y = camp.rMin * this.cellSize;
+        const w = (camp.cMax - camp.cMin + 1) * this.cellSize;
+        const h = (camp.rMax - camp.rMin + 1) * this.cellSize;
+
+        const img = this.playerImages[pId];
+        if (!img || !img.complete || img.width === 0) return;
+
+        // 1. Zoom into a square center section of the image (to get the emblem itself)
+        const zoomFactor = 0.8; // Take center 80%
+        const sourceBaseSize = Math.min(img.width, img.height) * zoomFactor;
+        const sourceBaseX = (img.width - sourceBaseSize) / 2;
+        const sourceBaseY = (img.height - sourceBaseSize) / 2;
+
+        // 2. "Cover" logic: Adjust source rect to match destination aspect ratio (w/h)
+        const destAR = w / h;
+        let sw, sh, sx, sy;
+
+        if (destAR > 1) {
+            // Target is wider than square: take a wide strip from the square source center
+            sw = sourceBaseSize;
+            sh = sourceBaseSize / destAR;
+            sx = sourceBaseX;
+            sy = sourceBaseY + (sourceBaseSize - sh) / 2;
+        } else {
+            // Target is taller than square: take a tall strip from the square source center
+            sh = sourceBaseSize;
+            sw = sourceBaseSize * destAR;
+            sy = sourceBaseY;
+            sx = sourceBaseX + (sourceBaseSize - sw) / 2;
+        }
+
+        this.ctx.save();
+        this.ctx.globalAlpha = opacity;
+        
+        // Subtle glow effect
+        this.ctx.shadowColor = CONSTANTS.PLAYER_COLORS[pId].main;
+        this.ctx.shadowBlur = 20;
+        
+        this.ctx.drawImage(
+            img,
+            sx, sy, sw, sh, // Source (cropped & zoomed)
+            x, y, w, h     // Destination (fills entire camp)
+        );
+        this.ctx.restore();
     }
 
     // Helper: HEX to RGB string (e.g. "#FF00FF" -> "255, 0, 255")

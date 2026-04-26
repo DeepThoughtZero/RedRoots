@@ -7,6 +7,7 @@ class UIManager {
         this.renderer = null; // Set later
         this.inputHandler = null; // Set later
         this.ai = null; // Set later
+        this.campIndicator = { pId: null, startTime: 0, opacity: 0 };
 
         // DOM Elements
         this.elStartMenu = document.getElementById('startMenu');
@@ -376,11 +377,11 @@ class UIManager {
         
         if (phase === CONSTANTS.PHASE_SIMULATION) {
             this.elGamePhaseDisplay.classList.replace('text-mars-300', 'text-neon-cyan');
-            this.logEvent("Simulationsphase läuft...");
+            this.logEvent("Evolutionsphase läuft...");
             this.elRightPanel.classList.add('translate-x-full');
             this.elSimSpeedContainer.classList.remove('hidden');
             this.elTerritoryBarContainer.classList.remove('hidden');
-            this.elCurrentPlayerDisplay.textContent = 'Simulation läuft...';
+            this.elCurrentPlayerDisplay.textContent = 'Evolution läuft...';
             this.elCurrentPlayerDisplay.style.color = '#fff';
             this.updateTerritoryBars();
         } else if (phase === CONSTANTS.PHASE_PLACEMENT) {
@@ -395,11 +396,14 @@ class UIManager {
     }
 
     handleCycleUpdate(step, maxSteps) {
-        this.elGamePhaseDisplay.textContent = `SIMULATION (${step}/${maxSteps})`;
+        this.elGamePhaseDisplay.textContent = `EVOLUTION (${step}/${maxSteps})`;
     }
 
     handlePlayerChange(pId) {
         if (pId < 0) return;
+        
+        // Show camp indicator
+        this.showCampIndicator(pId);
         
         const isHuman = this.gameState.isCurrentPlayerHuman();
         const pName = CONSTANTS.PLAYER_COLORS[pId].name;
@@ -460,7 +464,7 @@ class UIManager {
         this.elAlertBox.classList.remove('scale-95');
         this.elAlertBox.classList.add('scale-100');
         
-        this.logEvent("Simulation beendet.");
+        this.logEvent("Evolution beendet.");
     }
 
     updateBudgetDisplay() {
@@ -505,9 +509,40 @@ class UIManager {
         this.elEventLog.textContent = `> ${msg}`;
     }
 
+    showCampIndicator(pId) {
+        if (this.campAnimFrame) {
+            cancelAnimationFrame(this.campAnimFrame);
+        }
+
+        this.campIndicator = {
+            pId: pId,
+            startTime: Date.now(),
+            opacity: 1
+        };
+        
+        const animate = () => {
+            const elapsed = Date.now() - this.campIndicator.startTime;
+            if (elapsed < 3000) {
+                this.campIndicator.opacity = 1;
+                this.render();
+                this.campAnimFrame = requestAnimationFrame(animate);
+            } else if (elapsed < 4000) {
+                this.campIndicator.opacity = 1 - (elapsed - 3000) / 1000;
+                this.render();
+                this.campAnimFrame = requestAnimationFrame(animate);
+            } else {
+                this.campIndicator.opacity = 0;
+                this.campIndicator.pId = null;
+                this.campAnimFrame = null;
+                this.render();
+            }
+        };
+        this.campAnimFrame = requestAnimationFrame(animate);
+    }
+
     render() {
         if (this.renderer) {
-            this.renderer.render(this.inputHandler);
+            this.renderer.render(this.inputHandler, this.campIndicator);
         }
     }
 }
