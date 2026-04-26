@@ -312,7 +312,7 @@ class GameState {
 
         for (let i = 0; i < this.playerCount; i++) {
             // Give 1 budget per 'budgetFactor' territory tiles, min budget of 1 to avoid soft locks completely
-            this.budgets[i] = Math.max(1, Math.floor(counts[i] / this.budgetFactor));
+            this.budgets[i] += Math.max(1, Math.floor(counts[i] / this.budgetFactor));
         }
     }
 }

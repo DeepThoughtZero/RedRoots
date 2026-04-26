@@ -188,7 +188,8 @@ class UIManager {
         
         // Populate patterns
         this.elPatternList.innerHTML = '';
-        for (const [key, pData] of Object.entries(CONSTANTS.PATTERNS)) {
+        const sortedPatterns = Object.entries(CONSTANTS.PATTERNS).sort((a, b) => a[1].cost - b[1].cost);
+        for (const [key, pData] of sortedPatterns) {
             const btn = document.createElement('button');
             btn.className = `pattern-btn ${key === 'cell' ? 'active' : ''}`;
             btn.innerHTML = `

@@ -21,8 +21,9 @@ class GameRenderer {
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
         
-        // Calculate cell size keeping aspect ratio
-        const aspectX = rect.width / this.gameState.cols;
+        // Calculate cell size keeping aspect ratio, accounting for right panel (320px) on desktop
+        const availableWidth = rect.width > 600 ? rect.width - 320 : rect.width;
+        const aspectX = availableWidth / this.gameState.cols;
         const aspectY = rect.height / this.gameState.rows;
         
         this.cellSize = Math.max(5, Math.floor(Math.min(aspectX, aspectY) * 0.95));
@@ -30,10 +31,13 @@ class GameRenderer {
         const gridPixelWidth = this.gameState.cols * this.cellSize;
         const gridPixelHeight = this.gameState.rows * this.cellSize;
         
-        // Center the grid initially
+        // Center the grid initially, shifted slightly left to accommodate the right panel (w-80 = 320px)
         if (this.camera.zoom === 1 && this.camera.x === 0 && this.camera.y === 0) {
-            this.camera.x = (rect.width - gridPixelWidth) / 2;
+            this.camera.x = (rect.width - 320 - gridPixelWidth) / 2;
             this.camera.y = (rect.height - gridPixelHeight) / 2;
+            
+            // Prevent shifting too far left on small screens
+            if (this.camera.x < 10) this.camera.x = 10;
         }
         
         this.render();

@@ -109,7 +109,14 @@ class Grid {
     }
 
     determineNewCellOwner(ownerCounts) {
+        const owners = Object.keys(ownerCounts);
+        
         if (this.collisionRule === 'neutral') {
+            if (owners.length > 1) {
+                return CONSTANTS.OWNER_NEUTRAL;
+            } else if (owners.length === 1) {
+                return parseInt(owners[0]);
+            }
             return CONSTANTS.OWNER_NEUTRAL;
         }
 
