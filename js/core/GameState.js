@@ -10,7 +10,6 @@ class GameState {
         this.humansCount = config.humansCount;
         this.radius = config.radius;
         this.budgetFactor = config.budgetFactor || 10;
-        this.aiStrength = config.aiStrength || 'medium';
         
         this.phase = CONSTANTS.PHASE_SETUP;
         this.currentRound = 1;

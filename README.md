@@ -2,43 +2,57 @@
 
 **[🚀 Jetzt direkt im Browser spielen!](https://deepthoughtzero.github.io/RedRoots/)**
 
+![Mars Overview](assets/Mars_Overview.png)
+
 RedRoots ist ein rundenbasiertes, kompetitives Strategiespiel, das auf **Conway's Game of Life** aufbaut. Das Spielgeschehen ist in ein packendes Sci-Fi-Szenario auf dem Mars eingebettet: Spieler übernehmen die Rolle von Siedlern, die im Wettbewerb miteinander wuchern und versuchen, durch cleveres Platzieren von lebenden Zellen (Pflanzen) die Lager der gegnerischen Siedler zu überwuchern.
+
+## 🌌 Die Geschichte: Der Kampf um die roten Wurzeln
+Im Jahr 2148 ist die Oberfläche des Mars nicht mehr nur roter Staub. Forscher haben die "Mars-Flora" entdeckt — eine genetisch instabile, aber extrem schnell wachsende Vegetation, die sich nach den mathematischen Gesetzen von *Conway's Game of Life* verhält. 
+
+Vier große Fraktionen, die **Häuser des Mars**, kämpfen nun um die fruchtbarsten Sektoren:
+- **Haus Marineris (Cyan)**: Die Entdecker der großen Gräben.
+- **Haus Hellas (Pink)**: Industrielle Tiefkrater-Bewohner.
+- **Haus Viridion (Grün)**: Meister der Bio-Engineers und Terraformer.
+- **Haus Tharsis (Gelb)**: Mächtige Broker aus den vulkanischen Regionen.
+
+Übernimm das Kommando über eine dieser Fraktionen und nutze die Biologische Kriegsführung, um den Planeten für dein Haus zu beanspruchen.
 
 ## ✨ Features
 
 - **Kompetitiver Multiplayer:** Spiele gegen bis zu 3 Freunde im Hot-Seat-Modus an einem Gerät oder trete gegen Computergegner (KI) an.
-- **Strategische Runden:** Nutze ein zugeteiltes Zell-Budget, um komplexe Figuren (Gleiter, Raumschiffe, R-Pentominos) in deinem eigenen Territorium zu platzieren.
+- **Drei Schwierigkeitsstufen:** Die KI der Häuser agiert unterschiedlich — von einfachen Gleitern bis hin zu komplexen Gleiter-Kanonen.
+- **Strategische Runden:** Nutze ein zugeteiltes Zell-Budget, um komplexe Figuren (Gleiter, Raumschiff, R-Pentomino) in deinem eigenen Territorium zu platzieren.
 - **Marsfelsen & Gebirge:** Prozedural generierte Bergketten blockieren die Vegetation und erfordern kluges Umschiffen der natürlichen Barrieren.
-- **Dynamische Territorien:** Nach jeder Runde erobern überlebende Zellen automatisch neues Gebiet für dich (mit definierbarem Radius). Überschneiden sich Einflussbereiche, entsteht Niemandsland.
-- **Auto-Stopp & Echtzeit-Kontrolle:** Ein Slider erlaubt die Kontrolle der Geschwindigkeit während der Simulation. Endlosschleifen (periodische Zustände) werden automatisch erkannt und übersprungen.
-- **Undo & Touch-Support:** Volle Undo-Funktionalität (`Strg+Z`) und optimiert für Tablets (Pinch-to-Zoom, Wischen & Tippen).
-- **Neon Mars Theme:** Modernes, visuell ansprechendes Design mit Glassmorphismus, leuchtenden Laserlinien (Brennlinien) und Neon-Akzenten.
+- **Dynamische Territorien:** Nach jeder Runde erobern überlebende Zellen automatisch neues Gebiet für dich. Überschneiden sich Einflussbereiche, entsteht Niemandsland.
+- **Optimierte Performance:** Endlosschleifen (periodische Zustände) werden automatisch erkannt und übersprungen.
+- **Cross-Platform:** Voller Touch-Support für Tablets und mobile Endgeräte (Pinch-to-Zoom, Wischen & Tippen).
+- **Aesthetic UI:** Modernes Design mit Glassmorphismus, leuchtenden Laserlinien (Brennlinien) und Neon-Akzenten.
 
 ## 🚀 Spielstart
 
 Das Spiel besteht aus purem HTML, CSS und JavaScript. Es werden keine externen Server, Datenbanken oder Build-Tools benötigt!
 
 1. Klone dieses Repository oder lade es als ZIP herunter.
-2. Öffne die Datei `index.html` in einem modernen Webbrowser (Chrome, Firefox, Safari, Edge).
-3. Konfiguriere im Startmenü deine Mission (Rastergröße, KI-Gegner, Rundenanzahl).
+2. Öffne die Datei `index.html` in einem modernen Webbrowser.
+3. Konfiguriere im Startmenü deine Mission (Häuser, Mapgröße, Rundenanzahl).
 4. Klicke auf **Mission Starten**.
 
 ## 🎮 Spielregeln & Steuerung
 
-- **Ziel:** Platziere deine Zellen so, dass sie sich nach den Game of Life-Regeln vermehren und bewege deine Organismen bis in das feindliche, schraffiert markierte Lager (in den Ecken oder an der Grundlinie). Wer das feindliche Lager erreicht, gewinnt sofort!
-- **Steuerung (Maus):** Klicke mit der linken Maustaste, um Figuren zu platzieren. Drücke das Mausrad zum Verschieben der Kamera und scrolle zum Zoomen. Figuren rotierst du mit `R` oder `Rechtsklick`. Mit `Strg+Z` machst du Schritte rückgängig.
-- **Steuerung (Touch/Tablet):** Tippe auf das Spielfeld, um eine Figur zu platzieren. Nutze zwei Finger zum Verschieben (Wischen) und Zoomen (Pinch) der Kamera. Figuren können über die UI-Buttons rechts rotiert und rückgängig gemacht werden.
-- **Überleben:** Conway's Game of Life Kernregeln gelten:
-  1. Zelle mit < 2 Nachbarn stirbt (Unterbevölkerung).
-  2. Zelle mit 2 oder 3 Nachbarn überlebt.
-  3. Zelle mit > 3 Nachbarn stirbt (Überbevölkerung).
-  4. Leeres Feld mit genau 3 Nachbarn wird neu geboren. Bei uns entscheidet hierbei (einstellbar) die *Mehrheitsregel*: Welcher Spieler die meisten Nachbarn beigesteuert hat, dem gehört die neue Zelle!
+- **Ziel:** Erreiche das feindliche, schraffiert markierte Lager (in den Ecken). Wer das Lager infiltriert, gewinnt den Sektor für sein Haus!
+- **Steuerung (Maus):** 
+  - `Linksklick`: Figur platzieren
+  - `Mausrad halten`: Kamera verschieben
+  - `Mausrad scrollen`: Zoom
+  - `R` oder `Rechtsklick`: Figur rotieren
+  - `Strg+Z`: Rückgängig
+- **Überleben:** Conway's Game of Life Kernregeln gelten (Unterbevölkerung, Überleben, Überbevölkerung, Wachstum). Bei uns entscheidet die *Mehrheitsregel* bei Geburten in Konfliktzonen.
 
 ## 🛠️ Architektur
 
 - `index.html`: UI-Struktur.
 - `css/style.css`: Custom Styling und Mars-Hintergründe.
-- `js/utils/Constants.js`: Farben, Figuren und Kosten.
+- `js/utils/Constants.js`: Farben, Häuser und Figuren.
 - `js/core/`: Spiel-Engine (`GameState`, `Grid`, `Territory`, `AI`, `InputHandler`).
 - `js/ui/`: Visuelles Rendering auf dem Canvas und Menüsteuerung.
 

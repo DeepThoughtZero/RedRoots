@@ -37,6 +37,7 @@ class UIManager {
         this.elAlertOverlay = document.getElementById('alertOverlay');
         this.elAlertBox = document.getElementById('alertBox');
         this.elAlertTitle = document.getElementById('alertTitle');
+        this.elAlertImage = document.getElementById('alertImage');
         this.elAlertMessage = document.getElementById('alertMessage');
         this.elBtnRestartGame = document.getElementById('btnRestartGame');
 
@@ -44,6 +45,12 @@ class UIManager {
         this.elSimSpeed = document.getElementById('simSpeed');
         this.elTerritoryBarContainer = document.getElementById('territoryBarContainer');
         this.elTerritoryBars = document.getElementById('territoryBars');
+
+        // Settings Dialog
+        this.elSettingsOverlay = document.getElementById('settingsOverlay');
+        this.elSettingsBox = document.getElementById('settingsBox');
+        this.elBtnSettingsCancel = document.getElementById('btnSettingsCancel');
+        this.elBtnSettingsConfirm = document.getElementById('btnSettingsConfirm');
 
         this.initStartMenu();
         this.initPanelControls();
@@ -58,12 +65,9 @@ class UIManager {
                 if (c.raw_mapSize) document.getElementById('cfgMapSize').value = c.raw_mapSize;
                 if (c.rounds) document.getElementById('cfgRounds').value = c.rounds;
                 if (c.budgetFactor) document.getElementById('cfgBudgetFactor').value = c.budgetFactor;
-                if (c.aiStrength) document.getElementById('cfgAiStrength').value = c.aiStrength;
                 if (c.steps) document.getElementById('cfgSteps').value = c.steps;
-                if (c.playerCount) document.getElementById('cfgPlayerCount').value = c.playerCount;
                 if (c.humansCount) document.getElementById('cfgHumans').value = c.humansCount;
                 if (c.radius) document.getElementById('cfgRadius').value = c.radius;
-                if (c.collisionRule) document.getElementById('cfgCollision').value = c.collisionRule;
                 if (c.rocks !== undefined) {
                     document.getElementById('cfgRocks').value = c.rocks;
                     document.getElementById('valRocks').textContent = c.rocks;
@@ -94,12 +98,11 @@ class UIManager {
                 cols: cols,
                 rounds: parseInt(document.getElementById('cfgRounds').value),
                 budgetFactor: parseInt(document.getElementById('cfgBudgetFactor').value),
-                aiStrength: document.getElementById('cfgAiStrength').value,
                 steps: parseInt(document.getElementById('cfgSteps').value),
-                playerCount: parseInt(document.getElementById('cfgPlayerCount').value),
+                playerCount: 4,
                 humansCount: parseInt(document.getElementById('cfgHumans').value),
                 radius: parseInt(document.getElementById('cfgRadius').value),
-                collisionRule: document.getElementById('cfgCollision').value,
+                collisionRule: 'majority',
                 rocks: parseInt(document.getElementById('cfgRocks').value)
             };
 
@@ -127,8 +130,25 @@ class UIManager {
                 helpBox.classList.add('scale-95');
                 setTimeout(() => {
                     helpOverlay.classList.add('hidden');
+
+                    // If first time, show start menu now
+                    if (!localStorage.getItem('redroots_briefing_shown')) {
+                        localStorage.setItem('redroots_briefing_shown', 'true');
+                        this.elStartMenu.classList.remove('hidden', 'opacity-0');
+                    }
                 }, 300);
             });
+        }
+
+        // Check first start
+        const briefingShown = localStorage.getItem('redroots_briefing_shown');
+        if (!briefingShown) {
+            // Hide start menu initially
+            this.elStartMenu.classList.add('hidden');
+            // Trigger help overlay
+            setTimeout(() => {
+                if (btnHelp) btnHelp.click();
+            }, 500);
         }
 
         if (this.elBtnRestartGame) {
@@ -138,9 +158,27 @@ class UIManager {
         }
         if (this.elBtnSettings) {
             this.elBtnSettings.addEventListener('click', () => {
-                if (confirm("Möchtest du das aktuelle Spiel abbrechen und neu starten?")) {
-                    location.reload();
-                }
+                this.elSettingsOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    this.elSettingsOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                    this.elSettingsBox.classList.remove('scale-95');
+                }, 10);
+            });
+        }
+
+        if (this.elBtnSettingsCancel) {
+            this.elBtnSettingsCancel.addEventListener('click', () => {
+                this.elSettingsOverlay.classList.add('opacity-0', 'pointer-events-none');
+                this.elSettingsBox.classList.add('scale-95');
+                setTimeout(() => {
+                    this.elSettingsOverlay.classList.add('hidden');
+                }, 300);
+            });
+        }
+
+        if (this.elBtnSettingsConfirm) {
+            this.elBtnSettingsConfirm.addEventListener('click', () => {
+                location.reload();
             });
         }
     }
@@ -283,10 +321,10 @@ class UIManager {
         if (pId < 0) return;
         
         const isHuman = this.gameState.isCurrentPlayerHuman();
-        const pName = isHuman ? `Spieler ${pId + 1}` : `Computer ${pId + 1}`;
+        const pName = CONSTANTS.PLAYER_COLORS[pId].name;
         const pColor = CONSTANTS.PLAYER_COLORS[pId].main;
         
-        this.elCurrentPlayerDisplay.textContent = isHuman ? `${pName} platziert...` : `${pName} rechnet...`;
+        this.elCurrentPlayerDisplay.textContent = isHuman ? `${pName} ist am Zug...` : `${pName} (KI) berechnet...`;
         this.elCurrentPlayerDisplay.style.color = pColor;
 
         this.elPanelPlayerName.textContent = pName;
@@ -315,9 +353,23 @@ class UIManager {
 
     handleGameOver(winnerId) {
         this.elRightPanel.classList.add('translate-x-full');
-        let title = "SPIEL BEENDET";
-        let msg = winnerId === -1 ? "Es ist ein Unentschieden. Keine Überlebenden." : `Spieler ${winnerId + 1} hat gesiegt!`;
-        let color = winnerId === -1 ? 'white' : CONSTANTS.PLAYER_COLORS[winnerId].main;
+        let title = "MISSION BEENDET";
+        let msg = "";
+        let color = "white";
+        let asset = "";
+
+        if (winnerId === -1) {
+            msg = "Es ist ein Unentschieden. Keine Überlebenden.";
+            this.elAlertImage.classList.add('hidden');
+        } else {
+            const winner = CONSTANTS.PLAYER_COLORS[winnerId];
+            msg = `${winner.name} hat die Vorherrschaft errungen!`;
+            color = winner.main;
+            this.elAlertImage.src = winner.asset;
+            this.elAlertImage.classList.remove('hidden');
+            this.elAlertImage.style.borderColor = color;
+            this.elAlertImage.style.boxShadow = `0 0 30px ${winner.shadow}`;
+        }
 
         this.elAlertTitle.textContent = title;
         this.elAlertMessage.textContent = msg;

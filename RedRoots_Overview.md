@@ -8,12 +8,30 @@
 Das Spiel kommt komplett **ohne Backend, Datenbank oder Build-Prozess** aus und nutzt reines HTML, CSS (Tailwind via CDN) und Vanilla JavaScript (ES6 Modules).
 
 ## 2. Spiel-Mechaniken
-- **Game of Life:** Es gelten die Standard-Regeln (B3/S23). Die "Mehrheitsregel" entscheidet, welchem Spieler eine neu geborene Zelle zugesprochen wird.
-- **Rundenbasiert:** Spieler haben ein Budget, um Patterns in ihrem Einflussgebiet zu setzen. Ist das Budget aufgebraucht (oder der Zug beendet), simulieren wir `X` Evolutionsschritte.
-- **Gebirgsketten:** Statische Felsen (`OWNER_ROCK: -3`) dienen als natürliche Barrieren, blockieren Gebietsansprüche und Zellwachstum.
-- **Ziel:** Wer als erstes das Start-Camp eines gegnerischen Spielers mit einer lebenden Zelle erreicht, gewinnt.
-- **KI-Gegner:** Berechnen Heuristiken (Schaden/Kosten), rotieren Schusswaffen (`glider`, `lwss`) intelligent in Richtung Spielfeldmitte und nutzen "BurnLines" für weitreichende Schüsse.
-- **Periodizitäts-Erkennung:** Das Spiel stoppt Simulationen frühzeitig, wenn ein exakter Zustand nach 1 bis 10 Schritten wiederkehrt (Early Stop), um Endlosschleifen zu vermeiden.
+- **Biologische Kriegsführung:** Es gelten die Standard-Regeln von *Conway's Game of Life* (B3/S23). Eine Zelle ("Pflanze") stirbt bei Einsamkeit oder Überbevölkerung und gedeiht bei optimaler Nachbarschaft.
+- **Rundenbasiert:** Spieler haben ein Budget an genetischem Material, um Setzlinge und komplexe Flora-Strukturen in ihrem Einflussgebiet zu züchten.
+- **Gebirgsketten:** Statische Felsen dienen als natürliche Barrieren, blockieren das Pflanzenwachstum und Gebietsansprüche.
+- **Ziel:** Wer zuerst das Start-Camp eines gegnerischen Hauses mit einer lebenden Pflanzen-Zelle überwuchert, gewinnt den Sektor.
+- **KI-Gegner:** Nutzen Heuristiken, um "Gleiter-Kanonen" und andere biologische Waffen strategisch in Richtung feindlicher Lager abzufeuern.
+- **Periodizitäts-Erkennung:** Stoppt Simulationen frühzeitig, wenn die Flora in eine stabile Endlosschleife (z.B. Blinker) gerät.
+
+## 6. Das Setting: Der Kampf um den Mars
+Statt generischer Spielernamen nutzt RedRoots ein atmosphärisches Setting, das an *Dune* angelehnt ist. Vier große Häuser kämpfen mit genetisch modifizierter **Mars-Flora** um die Vorherrschaft:
+
+| Haus | Farbe | Hintergrund |
+| :--- | :--- | :--- |
+| **Haus Marineris** | Cyan (`#00FFFF`) | Forscher und Eistechniker aus den tiefen Tälern des Valles Marineris. |
+| **Haus Hellas** | Pink (`#FF00FF`) | Industrielle Großmacht aus dem Hellas-Einschlagbecken. |
+| **Haus Viridion** | Grün (`#39FF14`) | Spezialisten für biologische Kriegsführung und Terraforming. |
+| **Haus Tharsis** | Gelb (`#FFFF00`) | Die Lords der Energie, sesshaft auf dem vulkanischen Tharsis-Plateau. |
+
+### Die Regeln des Wachstums
+Die Pflanzen folgen den strikten Gesetzen der zellulären Automaten:
+- **Einsamkeit:** < 2 Nachbarn = Pflanze vertrocknet.
+- **Überleben:** 2 oder 3 Nachbarn = Pflanze überlebt.
+- **Überbevölkerung:** > 3 Nachbarn = Pflanze erstickt.
+- **Wachstum (Geburt):** Exakt 3 Nachbarn = Ein neuer **Setzling** sprießt!
+
 
 ## 3. Architektur & Dateisystem
 
