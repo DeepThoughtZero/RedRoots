@@ -32,7 +32,7 @@ class AI {
         const pId = this.gameState.currentPlayer;
         if (pId < 0) return;
 
-        const strength = CONSTANTS.PLAYER_COLORS[pId].strength;
+        const strength = this.gameState.playerStrengths[pId];
         console.log(`AI Player ${pId} (${strength}) taking turn...`);
         await new Promise(resolve => setTimeout(resolve, 800));
 

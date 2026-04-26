@@ -52,6 +52,12 @@ class UIManager {
         this.elBtnSettingsCancel = document.getElementById('btnSettingsCancel');
         this.elBtnSettingsConfirm = document.getElementById('btnSettingsConfirm');
 
+        // Randomize Setup Header Image
+        const setupHeaderImage = document.getElementById('setupHeaderImage');
+        if (setupHeaderImage) {
+            setupHeaderImage.src = Math.random() > 0.5 ? 'assets/Mars_Overview01.png' : 'assets/Mars_Overview02.png';
+        }
+
         this.initStartMenu();
         this.initPanelControls();
     }
@@ -68,18 +74,72 @@ class UIManager {
                 if (c.steps) document.getElementById('cfgSteps').value = c.steps;
                 if (c.humansCount) document.getElementById('cfgHumans').value = c.humansCount;
                 if (c.radius) document.getElementById('cfgRadius').value = c.radius;
-                if (c.rocks !== undefined) {
-                    document.getElementById('cfgRocks').value = c.rocks;
-                    document.getElementById('valRocks').textContent = c.rocks;
-                }
             } catch(e) { console.error('Failed to parse saved config', e); }
         }
 
+        // Randomize Rocks (Mountains) for each mission
         const cfgRocks = document.getElementById('cfgRocks');
         const valRocks = document.getElementById('valRocks');
         if (cfgRocks && valRocks) {
+            const randomRocks = Math.floor(Math.random() * 1001);
+            cfgRocks.value = randomRocks;
+            valRocks.textContent = randomRocks;
+            
             cfgRocks.addEventListener('input', () => {
                 valRocks.textContent = cfgRocks.value;
+            });
+        }
+
+        // Interactive House Selection
+        const humanHousesContainer = document.getElementById('humanHousesContainer');
+        this.humanFlags = [true, false, false, false]; // Default: P1 human
+
+        if (humanHousesContainer) {
+            const updateHouseUI = () => {
+                humanHousesContainer.innerHTML = '';
+                CONSTANTS.PLAYER_COLORS.forEach((player, i) => {
+                    const isSelected = this.humanFlags[i];
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.className = `relative cursor-pointer rounded-2xl border-2 transition-all p-4 flex flex-col items-center justify-center gap-3 ${
+                        isSelected ? 'border-mars-500 bg-mars-900/40 shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'border-white/5 bg-black/40 opacity-30 hover:opacity-70 hover:border-white/10'
+                    }`;
+                    
+                    wrapper.innerHTML = `
+                        <div class="relative w-full aspect-video overflow-hidden rounded-lg">
+                            <img src="${player.asset}" alt="${player.name}" class="w-full h-full object-contain ${isSelected ? 'drop-shadow-[0_0_12px_rgba(255,255,255,0.5)] scale-110' : 'grayscale'} transition-all duration-500">
+                        </div>
+                        <span class="text-xs font-black uppercase tracking-widest ${isSelected ? 'text-mars-300' : 'text-gray-500'}">${player.name.split(' ')[1]}</span>
+                        <div class="absolute top-2 right-2 text-sm drop-shadow-md">
+                            ${isSelected ? '👤' : '🤖'}
+                        </div>
+                    `;
+                    
+                    wrapper.addEventListener('click', () => {
+                        this.humanFlags[i] = !this.humanFlags[i];
+                        // Ensure at least one human or at least keep it flexible (AI vs AI is also cool)
+                        updateHouseUI();
+                    });
+                    
+                    humanHousesContainer.appendChild(wrapper);
+                });
+            };
+            updateHouseUI();
+        }
+
+        // Developer Mode (5 clicks on title)
+        const setupTitle = document.getElementById('setupTitle');
+        const devSettings = document.getElementById('devSettings');
+        let setupClickCount = 0;
+        if (setupTitle && devSettings) {
+            setupTitle.addEventListener('click', () => {
+                setupClickCount++;
+                if (setupClickCount >= 5) {
+                    devSettings.classList.remove('hidden');
+                    setupTitle.classList.add('text-orange-500');
+                    setupTitle.textContent = "Developer Setup";
+                    this.logEvent("Entwicklermodus aktiviert.");
+                }
             });
         }
 
@@ -93,14 +153,14 @@ class UIManager {
             if (mapSize === 'xxlarge') { rows = 140; cols = 240; }
 
             const config = {
-                raw_mapSize: mapSize, // store to restore dropdown
+                raw_mapSize: mapSize,
                 rows: rows,
                 cols: cols,
                 rounds: parseInt(document.getElementById('cfgRounds').value),
                 budgetFactor: parseInt(document.getElementById('cfgBudgetFactor').value),
                 steps: parseInt(document.getElementById('cfgSteps').value),
                 playerCount: 4,
-                humansCount: parseInt(document.getElementById('cfgHumans').value),
+                humanFlags: [...this.humanFlags], // Use selected flags
                 radius: parseInt(document.getElementById('cfgRadius').value),
                 collisionRule: 'majority',
                 rocks: parseInt(document.getElementById('cfgRocks').value)
@@ -112,22 +172,37 @@ class UIManager {
 
         // Help Modal Events
         const btnHelp = document.getElementById('btnHelp');
+        const btnShowBriefing = document.getElementById('btnShowBriefing'); // Question mark in setup
         const btnHelpClose = document.getElementById('btnHelpClose');
         const helpOverlay = document.getElementById('helpOverlay');
         const helpBox = document.getElementById('helpBox');
 
-        if (btnHelp && btnHelpClose && helpOverlay && helpBox) {
-            btnHelp.addEventListener('click', () => {
-                helpOverlay.classList.remove('hidden');
-                setTimeout(() => {
-                    helpOverlay.classList.remove('opacity-0', 'pointer-events-none');
-                    helpBox.classList.remove('scale-95');
-                }, 10);
-            });
+        // Audio for Briefing
+        this.audioBriefing = new Audio('assets/Intro_Rules.mp3');
+        this.audioBriefing.loop = true;
 
+        const showHelp = () => {
+            helpOverlay.classList.remove('hidden');
+            this.audioBriefing.play().catch(e => console.warn("Audio playback failed:", e));
+            
+            setTimeout(() => {
+                helpOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                helpBox.classList.remove('scale-95');
+            }, 10);
+        };
+
+        if (btnHelp) btnHelp.addEventListener('click', showHelp);
+        if (btnShowBriefing) btnShowBriefing.addEventListener('click', showHelp);
+
+        if (btnHelpClose && helpOverlay && helpBox) {
             btnHelpClose.addEventListener('click', () => {
                 helpOverlay.classList.add('opacity-0', 'pointer-events-none');
                 helpBox.classList.add('scale-95');
+                
+                // Stop audio
+                this.audioBriefing.pause();
+                this.audioBriefing.currentTime = 0;
+
                 setTimeout(() => {
                     helpOverlay.classList.add('hidden');
 
@@ -158,6 +233,12 @@ class UIManager {
         }
         if (this.elBtnSettings) {
             this.elBtnSettings.addEventListener('click', () => {
+                // Randomize Cancel Header Image
+                const cancelHeaderImage = document.getElementById('cancelHeaderImage');
+                if (cancelHeaderImage) {
+                    cancelHeaderImage.src = Math.random() > 0.5 ? 'assets/Mars_Terraforming01.png' : 'assets/Mars_Terraforming02.png';
+                }
+
                 this.elSettingsOverlay.classList.remove('hidden');
                 setTimeout(() => {
                     this.elSettingsOverlay.classList.remove('opacity-0', 'pointer-events-none');

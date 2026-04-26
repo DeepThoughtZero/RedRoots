@@ -7,7 +7,7 @@ class GameState {
         this.maxRounds = config.rounds;
         this.stepsPerRound = config.steps;
         this.playerCount = config.playerCount;
-        this.humansCount = config.humansCount;
+        this.humanFlags = config.humanFlags || [true, false, false, false]; // Default: P1 is human
         this.radius = config.radius;
         this.budgetFactor = config.budgetFactor || 10;
         
@@ -25,6 +25,30 @@ class GameState {
         this.generateRocks(config.rocks);
         this.territory.setInitialTerritories();
         this.calculateBudgets();
+
+        // Assign AI Strengths dynamically
+        this.playerStrengths = Array(this.playerCount).fill('medium'); // default
+        const aiIndices = [];
+        for (let i = 0; i < this.playerCount; i++) {
+            if (!this.humanFlags[i]) aiIndices.push(i);
+        }
+
+        if (aiIndices.length === 1) {
+            this.playerStrengths[aiIndices[0]] = 'hard';
+        } else if (aiIndices.length === 2) {
+            this.playerStrengths[aiIndices[0]] = 'medium';
+            this.playerStrengths[aiIndices[1]] = 'hard';
+        } else if (aiIndices.length === 3) {
+            this.playerStrengths[aiIndices[0]] = 'easy';
+            this.playerStrengths[aiIndices[1]] = 'medium';
+            this.playerStrengths[aiIndices[2]] = 'hard';
+        } else if (aiIndices.length === 4) {
+            this.playerStrengths[0] = 'easy';
+            this.playerStrengths[1] = 'medium';
+            this.playerStrengths[2] = 'medium';
+            this.playerStrengths[3] = 'hard';
+        }
+
         this.history = []; // for periodicity detection
         this.undoStack = []; // for undoing placements
         this.simSpeedMs = 250; // default speed 
@@ -70,7 +94,8 @@ class GameState {
     }
 
     isCurrentPlayerHuman() {
-        return this.currentPlayer < this.humansCount;
+        if (this.currentPlayer < 0) return false;
+        return this.humanFlags[this.currentPlayer];
     }
 
     canPlacePattern(pattern, baseR, baseC) {
