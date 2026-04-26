@@ -21,9 +21,9 @@ const CONSTANTS = {
     
     // Game Phases
     PHASE_SETUP: 'SETUP',
-    PHASE_PLACEMENT: 'PLACEMENT',
+    PHASE_PLACEMENT: 'PLATZIERUNG',
     PHASE_SIMULATION: 'SIMULATION',
-    PHASE_GAMEOVER: 'GAMEOVER',
+    PHASE_GAMEOVER: 'BEENDET',
 
     // Base Budget (fallback, now mostly taken from config)
     BASE_BUDGET_PER_ROUND: 300,
