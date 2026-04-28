@@ -144,6 +144,21 @@ class UIManager {
             });
         }
 
+        const cfgDojoMode = document.getElementById('cfgDojoMode');
+        const batchModeContainer = document.getElementById('batchModeContainer');
+        if (cfgDojoMode && batchModeContainer) {
+            const cfgSteps = document.getElementById('cfgSteps');
+            cfgDojoMode.addEventListener('change', () => {
+                if (cfgDojoMode.checked) {
+                    batchModeContainer.classList.remove('hidden');
+                    if (cfgSteps) cfgSteps.value = 150;
+                } else {
+                    batchModeContainer.classList.add('hidden');
+                    if (cfgSteps) cfgSteps.value = 2000;
+                }
+            });
+        }
+
         document.getElementById('btnStartGame').addEventListener('click', () => {
             // Read config
             const mapSize = document.getElementById('cfgMapSize').value;
@@ -161,11 +176,18 @@ class UIManager {
                 budgetFactor: parseInt(document.getElementById('cfgBudgetFactor').value),
                 steps: parseInt(document.getElementById('cfgSteps').value),
                 playerCount: 4,
-                humanFlags: [...this.humanFlags], // Use selected flags
                 radius: parseInt(document.getElementById('cfgRadius').value),
                 collisionRule: 'majority',
-                rocks: parseInt(document.getElementById('cfgRocks').value)
+                rocks: parseInt(document.getElementById('cfgRocks').value),
+                isDojoMode: document.getElementById('cfgDojoMode').checked,
+                isBatchMode: document.getElementById('cfgBatchMode').checked
             };
+
+            if (config.isDojoMode) {
+                config.humanFlags = [false, false, false, false];
+                config.steps = 150; 
+                config.rounds = 7;
+            }
 
             localStorage.setItem('redroots_config', JSON.stringify(config));
             this.startGame(config);
@@ -263,6 +285,26 @@ class UIManager {
                 location.reload();
             });
         }
+
+        const btnStartSandbox = document.getElementById('btnStartSandbox');
+        if (btnStartSandbox) {
+            btnStartSandbox.addEventListener('click', () => {
+                const config = {
+                    rows: 60,
+                    cols: 100,
+                    rounds: 99,
+                    budgetFactor: 1,
+                    steps: 1000,
+                    playerCount: 1,
+                    humanFlags: [true, false, false, false],
+                    radius: 5,
+                    collisionRule: 'majority',
+                    rocks: 0,
+                    isSandbox: true
+                };
+                this.startGame(config);
+            });
+        }
     }
 
     initPanelControls() {
@@ -279,10 +321,29 @@ class UIManager {
         });
 
         this.elBtnFinishTurn.addEventListener('click', () => {
+            if (this.gameState && this.gameState.isSandbox) {
+                if (this.gameState.phase === CONSTANTS.PHASE_PLACEMENT) {
+                    this.gameState.nextPlayerTurn();
+                } else if (this.gameState.phase === CONSTANTS.PHASE_SIMULATION) {
+                    this.gameState.stopSimulation = true;
+                }
+                return;
+            }
             if (this.gameState && this.gameState.phase === CONSTANTS.PHASE_PLACEMENT && this.gameState.isCurrentPlayerHuman()) {
                 this.gameState.nextPlayerTurn();
             }
         });
+
+        const btnResetSandbox = document.getElementById('btnResetSandbox');
+        if (btnResetSandbox) {
+            btnResetSandbox.addEventListener('click', () => {
+                if (this.gameState && this.gameState.isSandbox) {
+                    if (confirm("Spielfeld wirklich komplett leeren?")) {
+                        this.gameState.resetSandbox();
+                    }
+                }
+            });
+        }
 
         this.elBtnRotate.addEventListener('click', () => {
             if (this.inputHandler) {
@@ -339,7 +400,19 @@ class UIManager {
         this.gameState = new GameState(config);
         this.renderer = new GameRenderer(this.canvas, this.gameState);
         this.inputHandler = new InputHandler(this.canvas, this.gameState, this);
-        this.ai = new AI(this.gameState);
+        
+        this.evolver = new AIEvolver(this.gameState);
+        this.ai = new AI(this.gameState); // Single instance, will swap genomes
+
+        if (config.isDojoMode) {
+            const playersGenomes = this.evolver.genomes; // Use current population
+            this.aiGenomes = playersGenomes.slice(0, 4);
+            // Assign IDs to genomes for tracking
+            this.aiGenomes.forEach((g, i) => g.assignedToPlayer = i);
+            this.logEvent(`Evolutions-Lauf gestartet (Gen: ${this.evolver.generation})`);
+        } else {
+            this.aiGenomes = null;
+        }
 
         // Bind events
         this.gameState.onPhaseChange = this.handlePhaseChange.bind(this);
@@ -378,7 +451,14 @@ class UIManager {
         if (phase === CONSTANTS.PHASE_SIMULATION) {
             this.elGamePhaseDisplay.classList.replace('text-mars-300', 'text-neon-cyan');
             this.logEvent("Evolutionsphase läuft...");
-            this.elRightPanel.classList.add('translate-x-full');
+            
+            if (this.gameState.isSandbox) {
+                this.elBtnFinishTurn.textContent = "Simulation Stoppen";
+                this.elBtnFinishTurn.classList.replace('bg-green-600/80', 'bg-red-600/80');
+            } else {
+                this.elRightPanel.classList.add('translate-x-full');
+            }
+            
             this.elSimSpeedContainer.classList.remove('hidden');
             this.elTerritoryBarContainer.classList.remove('hidden');
             this.elCurrentPlayerDisplay.textContent = 'Evolution läuft...';
@@ -388,10 +468,24 @@ class UIManager {
             this.elGamePhaseDisplay.classList.replace('text-neon-cyan', 'text-mars-300');
             this.elRoundDisplay.textContent = `${this.gameState.currentRound} / ${this.gameState.maxRounds}`;
             this.elRightPanel.classList.remove('translate-x-full');
+            
+            if (this.gameState.isSandbox) {
+                this.elBtnFinishTurn.textContent = "Simulation Starten";
+                this.elBtnFinishTurn.classList.replace('bg-red-600/80', 'bg-green-600/80');
+                document.getElementById('btnResetSandbox').classList.remove('hidden');
+            }
+            
             this.elSimSpeedContainer.classList.add('hidden');
             this.elTerritoryBarContainer.classList.remove('hidden');
             this.logEvent(`Runde ${this.gameState.currentRound} beginnt.`);
             this.updateTerritoryBars();
+        }
+
+        if (this.gameState.isSandbox) {
+            this.elBudgetDisplay.textContent = "∞";
+            this.elRoundDisplay.parentElement.classList.add('hidden');
+            this.elTerritoryBarContainer.classList.add('hidden');
+            this.elBtnFinishTurn.textContent = "Simulation Starten";
         }
     }
 
@@ -409,18 +503,33 @@ class UIManager {
         const pName = CONSTANTS.PLAYER_COLORS[pId].name;
         const pColor = CONSTANTS.PLAYER_COLORS[pId].main;
         
-        this.elCurrentPlayerDisplay.textContent = isHuman ? `${pName} ist am Zug...` : `${pName} (KI) berechnet...`;
-        this.elCurrentPlayerDisplay.style.color = pColor;
+        if (this.gameState.isSandbox) {
+            this.elCurrentPlayerDisplay.textContent = "Sandbox Modus - Platziere nach Belieben";
+            this.elCurrentPlayerDisplay.style.color = "#fff";
+        } else {
+            this.elCurrentPlayerDisplay.textContent = isHuman ? `${pName} ist am Zug...` : `${pName} (KI) berechnet...`;
+            this.elCurrentPlayerDisplay.style.color = pColor;
+        }
 
         this.elPanelPlayerName.textContent = pName;
         this.elPanelPlayerHeader.style.borderColor = pColor;
         this.elPanelPlayerHeader.style.boxShadow = `0 0 15px ${CONSTANTS.PLAYER_COLORS[pId].bg}`;
         
-        this.updateBudgetDisplay();
+        if (this.gameState.isSandbox) {
+            this.elBudgetDisplay.textContent = "∞";
+        } else {
+            this.updateBudgetDisplay();
+        }
         
         if (!isHuman && this.gameState.phase === CONSTANTS.PHASE_PLACEMENT) {
             this.elBtnFinishTurn.disabled = true;
             this.elBtnFinishTurn.classList.add('opacity-50');
+            
+            // Swap genome if in Dojo/Evolution mode
+            if (this.aiGenomes) {
+                this.ai.genome = this.aiGenomes[pId].params;
+            }
+            
             this.ai.takeTurn();
         } else {
             this.elBtnFinishTurn.disabled = false;
@@ -460,11 +569,63 @@ class UIManager {
         this.elAlertMessage.textContent = msg;
         this.elAlertMessage.style.color = color;
 
-        this.elAlertOverlay.classList.remove('opacity-0', 'pointer-events-none');
-        this.elAlertBox.classList.remove('scale-95');
-        this.elAlertBox.classList.add('scale-100');
+        if (!this.gameState.isBatchMode) {
+            this.elAlertOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            this.elAlertBox.classList.remove('scale-95');
+            this.elAlertBox.classList.add('scale-100');
+        }
         
         this.logEvent("Evolution beendet.");
+
+        // Evolution Mode Result Recording
+        if (this.gameState.isDojoMode && this.aiGenomes) {
+            const stats = [];
+            for (let i = 0; i < 4; i++) {
+                stats.push({
+                    pId: i,
+                    territoryCount: this.getTerritoryCount(i),
+                    minDistanceToEnemyCamp: this.getMinDistanceToEnemyCamp(i),
+                    won: (winnerId === i)
+                });
+            }
+            this.evolver.recordResult(stats);
+
+            if (this.gameState.isBatchMode) {
+                this.logEvent("Nächster Evolutions-Lauf in 1s...");
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        }
+    }
+
+    getTerritoryCount(pId) {
+        let count = 0;
+        for (let r = 0; r < this.gameState.rows; r++) {
+            for (let c = 0; c < this.gameState.cols; c++) {
+                if (this.gameState.territory.getOwnerAt(r, c) === pId) count++;
+            }
+        }
+        return count;
+    }
+
+    getMinDistanceToEnemyCamp(pId) {
+        let minDist = 1000;
+        const enemyCamps = this.gameState.territory.camps.filter(c => c.id !== pId);
+        
+        for (let r = 0; r < this.gameState.rows; r++) {
+            for (let c = 0; c < this.gameState.cols; c++) {
+                if (this.gameState.grid.getCell(r, c).owner === pId) {
+                    for (const camp of enemyCamps) {
+                        const centerR = (camp.rMin + camp.rMax) / 2;
+                        const centerC = (camp.cMin + camp.cMax) / 2;
+                        const dist = Math.sqrt(Math.pow(r - centerR, 2) + Math.pow(c - centerC, 2));
+                        if (dist < minDist) minDist = dist;
+                    }
+                }
+            }
+        }
+        return minDist;
     }
 
     updateBudgetDisplay() {

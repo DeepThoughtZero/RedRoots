@@ -190,6 +190,19 @@
                                             <span class="text-xs text-orange-400 w-12 text-right font-mono" id="valRocks">0</span>
                                         </div>
                                     </div>
+                                    <div class="flex items-center gap-3 pt-4 sm:col-span-2 md:col-span-1">
+                                        <input type="checkbox" id="cfgDojoMode" class="w-5 h-5 accent-orange-500 rounded bg-gray-800 border-gray-700">
+                                        <label for="cfgDojoMode" class="text-sm font-bold text-orange-400 cursor-pointer">Dojo Modus (AI vs AI)</label>
+                                    </div>
+                                    <div id="batchModeContainer" class="hidden flex items-center gap-3 pt-4 sm:col-span-2 md:col-span-1">
+                                        <input type="checkbox" id="cfgBatchMode" class="w-5 h-5 accent-orange-500 rounded bg-gray-800 border-gray-700">
+                                        <label for="cfgBatchMode" class="text-sm font-bold text-orange-400 cursor-pointer">Batch-Evolution (Auto-Restart)</label>
+                                    </div>
+                                    <div class="flex items-center gap-3 pt-4 sm:col-span-2 md:col-span-1">
+                                        <button id="btnStartSandbox" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded text-xs uppercase tracking-widest shadow-lg transition-all">
+                                            Sandbox-Modus starten
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -268,6 +281,11 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
+                            </button>
+                            <button id="btnResetSandbox"
+                                class="hidden p-1.5 bg-red-900/40 hover:bg-red-800/60 rounded text-red-200 transition"
+                                title="Spielfeld leeren (Reset)">
+                                🔄
                             </button>
                         </div>
                     </div>
@@ -391,6 +409,7 @@
     <script src="js/core/Territory.js"></script>
     <script src="js/core/Grid.js"></script>
     <script src="js/core/AI.js"></script>
+    <script src="js/core/AIEvolver.js"></script>
     <script src="js/core/InputHandler.js"></script>
     <script src="js/core/GameState.js"></script>
     <script src="js/ui/GameRenderer.js"></script>

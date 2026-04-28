@@ -49,7 +49,8 @@ redroots/
     │   ├── Grid.js            # Conway's Rules, 2D-Array Verwaltung
     │   ├── Territory.js       # BFS-basierte Einflussgebiets-Berechnung
     │   ├── InputHandler.js    # Maus- & Touch-Steuerung (Pan, Zoom, Undo)
-    │   └── AI.js              # Heuristik-basierte Computergegner
+    │   ├── AI.js              # Heuristik-basierte Computergegner (genomgesteuert)
+    │   └── AIEvolver.js       # Genetischer Algorithmus für KI-Selbstoptimierung
     ├── ui/                    # Visualisierung
     │   ├── GameRenderer.js    # Canvas Rendering (Pflanzen, Berge, Gebiete)
     │   └── UIManager.js       # DOM Manipulation, Settings-Parsing, Menüs
@@ -69,6 +70,13 @@ redroots/
 1. **Performance:** `calculateNextGeneration()` wird Tausende Male pro Sekunde aufgerufen. Code-Änderungen in `Grid.js` müssen extrem performant sein (keine unnötigen Array-Allozierungen).
 2. **Vanilla JS:** Keine externen Abhängigkeiten (außer Tailwind-CDN und FontAwesome-CDN) einführen, um das Deployment via GitHub Pages trivial zu halten.
 3. **Visueller Stil:** Der "Neon Sci-Fi Mars" Stil (dunkle Hintergründe, stark leuchtende Farben, Glassmorphism) muss beibehalten werden.
+
+## 7. KI-Selbstoptimierung (Dojo & Evolution)
+RedRoots verfügt über ein integriertes Lernsystem für Computergegner:
+- **Dojo-Modus:** Ein spezieller Simulationsmodus, in dem 4 KIs in beschleunigter Zeit gegeneinander antreten (7 Runden à 150 Schritte).
+- **Genetischer Algorithmus:** Jede KI wird durch ein "Genom" (Pattern-Gewichtung, Taktik-Heuristiken) gesteuert.
+- **Batch-Evolution:** In Läufen von 30 Spielen werden die erfolgreichsten Genome selektiert und mutiert, um die optimale Mars-Strategie zu "züchten".
+- **Monitoring:** Die Fitness-Entwicklung und Simulationsergebnisse werden detailliert in der Browser-Konsole (`F12`) ausgegeben.
 
 ---
 *End of Document. Please update when adding new core mechanics or refactoring major components.*

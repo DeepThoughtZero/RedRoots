@@ -10,6 +10,11 @@ class GameState {
         this.humanFlags = config.humanFlags || [true, false, false, false]; // Default: P1 is human
         this.radius = config.radius;
         this.budgetFactor = config.budgetFactor || 10;
+        this.isDojoMode = config.isDojoMode || false;
+        this.isBatchMode = config.isBatchMode || false;
+        this.isSandbox = config.isSandbox || false;
+        this.stopSimulation = false;
+        this.rocksCount = config.rocks || 0;
         
         this.phase = CONSTANTS.PHASE_SETUP;
         this.currentRound = 1;
@@ -66,6 +71,11 @@ class GameState {
     start() {
         this.currentRound = 1;
         this.currentPlayer = 0;
+        
+        if (this.isSandbox) {
+            this.budgets[0] = 999999;
+        }
+
         this.changePhase(CONSTANTS.PHASE_PLACEMENT);
         this.notifyPlayerChange();
     }
@@ -75,8 +85,22 @@ class GameState {
         if (this.onPhaseChange) this.onPhaseChange(this.phase);
 
         if (this.phase === CONSTANTS.PHASE_SIMULATION) {
+            this.stopSimulation = false;
             this.runSimulation();
         }
+    }
+
+    clearGrid() {
+        this.grid.cells = this.grid.createEmptyGrid();
+        this.generateRocks(this.rocksCount); 
+        this.notifyStateUpdate();
+    }
+    
+    resetSandbox() {
+        this.clearGrid();
+        this.currentRound = 1;
+        this.budgets[0] = 999999;
+        this.changePhase(CONSTANTS.PHASE_PLACEMENT);
     }
 
     nextPlayerTurn() {
@@ -100,6 +124,16 @@ class GameState {
 
     canPlacePattern(pattern, baseR, baseC) {
         if (this.phase !== CONSTANTS.PHASE_PLACEMENT) return false;
+
+        if (this.isSandbox) {
+             // Basic bounds check only
+             for (const [dr, dc] of pattern) {
+                const r = baseR + dr;
+                const c = baseC + dc;
+                if (r < 0 || r >= this.rows || c < 0 || c >= this.cols) return false;
+            }
+            return true;
+        }
 
         const cost = pattern.length;
         if (this.budgets[this.currentPlayer] < cost) return false;
@@ -143,7 +177,9 @@ class GameState {
         if (!this.undoStack) this.undoStack = [];
         this.undoStack.push(delta);
 
-        this.budgets[this.currentPlayer] -= pattern.length;
+        if (!this.isSandbox) {
+            this.budgets[this.currentPlayer] -= pattern.length;
+        }
         this.notifyStateUpdate();
         return true;
     }
@@ -161,7 +197,9 @@ class GameState {
             this.undoStack.push(delta);
             
             this.grid.setCell(r, c, CONSTANTS.OWNER_NONE, false);
-            this.budgets[this.currentPlayer] += 1;
+            if (!this.isSandbox) {
+                this.budgets[this.currentPlayer] += 1;
+            }
             this.notifyStateUpdate();
             return true;
         }
@@ -191,6 +229,8 @@ class GameState {
 
         // Run Conway steps
         for (let step = 0; step < this.stepsPerRound; step++) {
+            if (this.stopSimulation) break;
+            
             this.grid.calculateNextGeneration();
             this.notifyStateUpdate();
             if (this.onCycleUpdate) this.onCycleUpdate(step + 1, this.stepsPerRound);
@@ -244,6 +284,12 @@ class GameState {
         this.calculateBudgets();
 
         this.currentRound++;
+        if (this.isSandbox) {
+            this.changePhase(CONSTANTS.PHASE_PLACEMENT);
+            this.notifyStateUpdate();
+            return;
+        }
+
         if (this.currentRound > this.maxRounds) {
             // Draw or highest score? For now, just game over draw.
             this.winner = -1; // Draw
@@ -336,7 +382,11 @@ class GameState {
 
         for (let i = 0; i < this.playerCount; i++) {
             // Give 1 budget per 'budgetFactor' territory tiles, min budget of 1 to avoid soft locks completely
-            this.budgets[i] += Math.max(1, Math.floor(counts[i] / this.budgetFactor));
+            if (this.isSandbox && i === 0) {
+                this.budgets[i] = 999999;
+            } else {
+                this.budgets[i] += Math.max(1, Math.floor(counts[i] / this.budgetFactor));
+            }
         }
     }
 }
