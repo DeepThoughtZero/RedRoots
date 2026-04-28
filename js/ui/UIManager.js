@@ -453,8 +453,8 @@ class UIManager {
             this.logEvent("Evolutionsphase läuft...");
             
             if (this.gameState.isSandbox) {
-                this.elBtnFinishTurn.textContent = "Simulation Stoppen";
-                this.elBtnFinishTurn.classList.replace('bg-green-600/80', 'bg-red-600/80');
+                this.elBtnFinishTurn.innerHTML = `<span>Simulation stoppen</span> <span class="ml-1 text-sm">⏹️</span>`;
+                this.elBtnFinishTurn.className = 'flex-1 text-white font-bold py-2 px-4 rounded transition btn-sandbox-stop';
             } else {
                 this.elRightPanel.classList.add('translate-x-full');
             }
@@ -470,8 +470,8 @@ class UIManager {
             this.elRightPanel.classList.remove('translate-x-full');
             
             if (this.gameState.isSandbox) {
-                this.elBtnFinishTurn.textContent = "Simulation Starten";
-                this.elBtnFinishTurn.classList.replace('bg-red-600/80', 'bg-green-600/80');
+                this.elBtnFinishTurn.innerHTML = `<span>Simulation starten</span> <span class="ml-1 text-sm">▶️</span>`;
+                this.elBtnFinishTurn.className = 'flex-1 text-white font-bold py-2 px-4 rounded transition btn-sandbox-start';
                 document.getElementById('btnResetSandbox').classList.remove('hidden');
             }
             
@@ -485,7 +485,6 @@ class UIManager {
             this.elBudgetDisplay.textContent = "∞";
             this.elRoundDisplay.parentElement.classList.add('hidden');
             this.elTerritoryBarContainer.classList.add('hidden');
-            this.elBtnFinishTurn.textContent = "Simulation Starten";
         }
     }
 

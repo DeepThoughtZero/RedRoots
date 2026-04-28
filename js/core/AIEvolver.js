@@ -9,18 +9,17 @@ class AIEvolver {
         
         // Force update Reference (Slot 0) to latest logic
         this.genomes[0].params = {
-            r_pentomino_weight: 0.8,
-            h_heptomino_weight: 0.6,
+            r_pentomino_weight: 0.5,
             diehard_weight: 0.5,
-            acorn_weight: 0.7,
-            b_heptomino_weight: 0.6,
-            switch_engine_weight: 0.5,
+            acorn_weight: 1.0,
+            b_heptomino_weight: 0.9,
+            switch_engine_weight: 0.8,
             rabbits_weight: 0.4,
             lidka_weight: 0.5,
             lwss_weight: 0.3,
             glider_gun_weight: 0.2,
             glider_weight: 0.1,
-            block_weight: 0.5,
+            block_weight: 0.3,
             random_rotation_chance: 1.0,
             expansion_weight: 1.0
         };
@@ -57,18 +56,17 @@ class AIEvolver {
                 isReference: false,
                 fitness: 0,
                 params: {
-                    r_pentomino_weight: Math.random(),
-                    h_heptomino_weight: Math.random(),
+                    r_pentomino_weight: Math.random() * 0.5,
                     diehard_weight: Math.random(),
-                    acorn_weight: Math.random(),
-                    b_heptomino_weight: Math.random(),
-                    switch_engine_weight: Math.random(),
+                    acorn_weight: 0.5 + Math.random() * 0.5, // High start
+                    b_heptomino_weight: 0.5 + Math.random() * 0.5, // High start
+                    switch_engine_weight: 0.4 + Math.random() * 0.6, // High start
                     rabbits_weight: Math.random(),
                     lidka_weight: Math.random(),
                     lwss_weight: Math.random(),
                     glider_gun_weight: Math.random() * 0.5, // Guns are expensive
                     glider_weight: Math.random(),
-                    block_weight: Math.random(),
+                    block_weight: Math.random() * 0.5,
                     random_rotation_chance: Math.random(),
                     expansion_weight: Math.random()
                 }

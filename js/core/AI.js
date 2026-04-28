@@ -9,27 +9,34 @@ class AI {
     getDefaultGenome(strength) {
         if (strength === 'easy') {
             return {
-                r_pentomino_weight: 0.4,
-                glider_weight: 0.5,
+                r_pentomino_weight: 0.2,
+                glider_weight: 0.4,
                 lwss_weight: 0.1,
-                glider_gun_weight: 0.05,
+                acorn_weight: 0.3,
+                b_heptomino_weight: 0.3,
                 block_weight: 1.0,
                 random_rotation_chance: 0.3
             };
         } else if (strength === 'hard') {
             return {
-                r_pentomino_weight: 0.8,
+                r_pentomino_weight: 0.5,
+                acorn_weight: 1.0,
+                b_heptomino_weight: 0.9,
+                switch_engine_weight: 0.8,
                 lwss_weight: 0.3,
                 glider_gun_weight: 0.2,
                 glider_weight: 0.1,
-                block_weight: 0.5,
+                block_weight: 0.3,
                 random_rotation_chance: 0.0
             };
         }
         // Medium
         return {
-            glider_gun_weight: 0.6,
-            glider_weight: 0.6,
+            acorn_weight: 0.6,
+            b_heptomino_weight: 0.5,
+            switch_engine_weight: 0.4,
+            glider_gun_weight: 0.4,
+            glider_weight: 0.4,
             r_pentomino_weight: 0.3,
             lwss_weight: 0.1,
             block_weight: 0.5,
@@ -136,7 +143,6 @@ class AI {
             if (g && (strength === 'hard' || this.evolver)) {
                 const candidates = [
                     { key: 'r_pentomino', weight: g.r_pentomino_weight || 0, cost: 5 },
-                    { key: 'h_heptomino', weight: g.h_heptomino_weight || 0, cost: 7 },
                     { key: 'diehard', weight: g.diehard_weight || 0, cost: 7 },
                     { key: 'acorn', weight: g.acorn_weight || 0, cost: 7 },
                     { key: 'b_heptomino', weight: g.b_heptomino_weight || 0, cost: 7 },
