@@ -78,5 +78,22 @@ RedRoots verfügt über ein integriertes Lernsystem für Computergegner:
 - **Batch-Evolution:** In Läufen von 30 Spielen werden die erfolgreichsten Genome selektiert und mutiert, um die optimale Mars-Strategie zu "züchten".
 - **Monitoring:** Die Fitness-Entwicklung und Simulationsergebnisse werden detailliert in der Browser-Konsole (`F12`) ausgegeben.
 
+## 8. Performance-Optimierungen (Evolutionsschritte)
+
+Die Simulation läuft bei Standardkonfiguration (180×100 Grid, 1000 Steps) durch ~18 Mio. Zellberechnungen pro Runde. Folgende Optimierungen wurden identifiziert und teils umgesetzt:
+
+| Prio | Maßnahme | Datei(en) | Status | Erwarteter Speed-Up |
+|------|----------|-----------|--------|---------------------|
+| 1 | **Typed Arrays statt Objekt-Grid** – `Int8Array` statt `{owner, isOld}` Objekte, Double-Buffer-Swap statt Neuallokation. Spieler-IDs verschieben von 0–3 auf 1–4 (0 = leer). | `Grid.js`, alle Dateien | ⬜ Geplant | ~3–5× |
+| 2 | **Render-Entkopplung** – `requestAnimationFrame`-Loop statt `notifyStateUpdate()` pro Step. Sim läuft ungedrosselt, Rendering bei max ~60 FPS. | `GameState.js` | ✅ Umgesetzt | ~3× bei Max-Speed |
+| 3 | **Zobrist-Hash** – Pre-computed XOR-Table statt String-Concat für Periodizitäts-Erkennung. Zero GC-Druck. | `GameState.js` | ✅ Umgesetzt | ~20× schnelleres Hashing |
+| 4 | **Buffer-Swap** – Swap von Typed-Array-Referenzen statt `createEmptyGrid()`. Teil von Prio 1. | `Grid.js` | ⬜ Geplant (mit Prio 1) | ~2× |
+| 5 | **Camp-Only Win-Check** – Nur die ~900 Camp-Zellen scannen statt alle 18.000 für die Siegbedingung. | `GameState.js` | ✅ Umgesetzt | ~20× schnellerer Check |
+| 6 | **Web Worker für Batch-Sim** – Komplette Simulation im Worker ohne Rendering-Interrupts. `Transferable` Arrays für Zero-Copy Kommunikation. | `SimWorker.js` [NEU] | ⬜ Geplant (niedrige Prio) | ~2–5× (nur Batch) |
+| 7 | **shadowBlur=0 in Sim** – Teuren Canvas-Shadow-Effekt während der Evolution deaktivieren. | `GameRenderer.js` | ✅ Umgesetzt | ~5–10× schnelleres Rendering |
+
+> **Konservative Gesamt-Schätzung (Prio 1–7):** ~10–20× schneller als Ausgangszustand. 1000 Steps auf XL-Grid bei Max-Speed sollen unter 1 Sekunde dauern.
+
 ---
 *End of Document. Please update when adding new core mechanics or refactoring major components.*
+

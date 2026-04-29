@@ -15,6 +15,11 @@ class GameState {
         this.isSandbox = config.isSandbox || false;
         this.stopSimulation = false;
         this.rocksCount = config.rocks || 0;
+        this._simDirty = false;
+        this._rafId = null;
+
+        // Zobrist hash table for fast periodicity detection
+        this._zobristTable = this._initZobristTable();
         
         this.phase = CONSTANTS.PHASE_SETUP;
         this.currentRound = 1;
@@ -225,56 +230,56 @@ class GameState {
     }
 
     async runSimulation() {
-        const history = [];
+        const hashHistory = [];
+
+        // Start decoupled render loop (renders at ~60fps independent of sim speed)
+        this._simDirty = true;
+        this._startRenderLoop();
 
         // Run Conway steps
         for (let step = 0; step < this.stepsPerRound; step++) {
             if (this.stopSimulation) break;
             
             this.grid.calculateNextGeneration();
-            this.notifyStateUpdate();
+            this._simDirty = true; // Mark for next RAF render
             if (this.onCycleUpdate) this.onCycleUpdate(step + 1, this.stepsPerRound);
             
-            // Check win condition instantly after each step
+            // Check win condition only in camp regions (much faster than full scan)
             if (this.checkWinCondition()) {
+                this._stopRenderLoop();
+                this.notifyStateUpdate(); // Final render
                 this.changePhase(CONSTANTS.PHASE_GAMEOVER);
                 if (this.onGameOver) this.onGameOver(this.winner);
                 return;
             }
 
-            // Detect periodic states (period <= 10)
-            let hash = '';
-            let aliveCount = 0;
-            for (let r = 0; r < this.rows; r++) {
-                for (let c = 0; c < this.cols; c++) {
-                    const owner = this.grid.cells[r][c].owner;
-                    if (owner !== CONSTANTS.OWNER_NONE) {
-                        hash += `${r},${c},${owner}|`;
-                        aliveCount++;
-                    }
-                }
-            }
+            // Detect periodic states using Zobrist hash (zero string allocation)
+            const { hash, aliveCount } = this._computeZobristHash();
 
             if (aliveCount === 0) {
                 // Everyone dead, skip to end of round
                 break;
             }
 
-            if (history.includes(hash)) {
+            if (hashHistory.includes(hash)) {
                 console.log(`Periodic state detected at step ${step}. Ending simulation phase early.`);
                 break;
             }
-            history.push(hash);
-            if (history.length > 10) history.shift();
+            hashHistory.push(hash);
+            if (hashHistory.length > 10) hashHistory.shift();
 
             // Dynamic delay for visualization
             if (this.simSpeedMs > 0) {
                 await new Promise(resolve => setTimeout(resolve, this.simSpeedMs)); 
-            } else if (step % 5 === 0) {
-                // Yield to main thread every few steps when running at max speed
+            } else if (step % 50 === 0) {
+                // Yield less often at max speed for better throughput
                 await new Promise(resolve => setTimeout(resolve, 0));
             }
         }
+
+        // Stop decoupled render loop
+        this._stopRenderLoop();
+        this.notifyStateUpdate(); // Final render of end state
 
         // End of round
         this.grid.markAllOld();
@@ -304,13 +309,14 @@ class GameState {
     }
 
     checkWinCondition() {
-        for (let r = 0; r < this.rows; r++) {
-            for (let c = 0; c < this.cols; c++) {
-                const cellOwner = this.grid.cells[r][c].owner;
-                if (cellOwner !== CONSTANTS.OWNER_NONE && cellOwner !== CONSTANTS.OWNER_NEUTRAL) {
-                    const campId = this.territory.isCamp(r, c);
-                    // If player reached an enemy camp
-                    if (campId !== null && campId !== cellOwner) {
+        // Optimized: Only scan camp regions instead of the full grid (~900 cells vs ~18,000)
+        const camps = this.territory.camps;
+        for (let ci = 0; ci < camps.length; ci++) {
+            const camp = camps[ci];
+            for (let r = camp.rMin; r <= camp.rMax; r++) {
+                for (let c = camp.cMin; c <= camp.cMax; c++) {
+                    const cellOwner = this.grid.cells[r][c].owner;
+                    if (cellOwner !== CONSTANTS.OWNER_NONE && cellOwner !== CONSTANTS.OWNER_NEUTRAL && cellOwner !== CONSTANTS.OWNER_ROCK && cellOwner !== camp.id) {
                         this.winner = cellOwner;
                         return true;
                     }
@@ -318,6 +324,72 @@ class GameState {
             }
         }
         return false;
+    }
+
+    // --- Performance: Zobrist Hash ---
+    _initZobristTable() {
+        // Pre-compute random 32-bit values for each cell position × possible owner value.
+        // Owner values we care about: player IDs (0-3), neutral (-1), rock (-3).
+        // We use 6 slots per cell to cover owners: -3, -1, 0, 1, 2, 3
+        const size = this.rows * this.cols * 6;
+        const table = new Uint32Array(size);
+        for (let i = 0; i < size; i++) {
+            table[i] = (Math.random() * 0xFFFFFFFF) >>> 0;
+        }
+        return table;
+    }
+
+    _ownerToSlot(owner) {
+        // Map owner values to table slots: null→skip, -3→0, -1→1, 0→2, 1→3, 2→4, 3→5
+        if (owner === null || owner === CONSTANTS.OWNER_NONE) return -1; // skip empty
+        if (owner === CONSTANTS.OWNER_ROCK) return 0;
+        if (owner === CONSTANTS.OWNER_NEUTRAL) return 1;
+        return owner + 2; // 0→2, 1→3, 2→4, 3→5
+    }
+
+    _computeZobristHash() {
+        let hash = 0;
+        let aliveCount = 0;
+        const cells = this.grid.cells;
+        const cols = this.cols;
+        const table = this._zobristTable;
+
+        for (let r = 0; r < this.rows; r++) {
+            const row = cells[r];
+            const rowOffset = r * cols;
+            for (let c = 0; c < cols; c++) {
+                const owner = row[c].owner;
+                if (owner !== CONSTANTS.OWNER_NONE) {
+                    aliveCount++;
+                    const slot = this._ownerToSlot(owner);
+                    if (slot >= 0) {
+                        hash ^= table[(rowOffset + c) * 6 + slot];
+                    }
+                }
+            }
+        }
+        return { hash, aliveCount };
+    }
+
+    // --- Performance: Decoupled Render Loop ---
+    _startRenderLoop() {
+        const loop = () => {
+            if (this._simDirty) {
+                this._simDirty = false;
+                this.notifyStateUpdate();
+            }
+            if (this.phase === CONSTANTS.PHASE_SIMULATION) {
+                this._rafId = requestAnimationFrame(loop);
+            }
+        };
+        this._rafId = requestAnimationFrame(loop);
+    }
+
+    _stopRenderLoop() {
+        if (this._rafId) {
+            cancelAnimationFrame(this._rafId);
+            this._rafId = null;
+        }
     }
 
     generateRocks(count) {

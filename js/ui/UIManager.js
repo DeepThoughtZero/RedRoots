@@ -138,10 +138,19 @@ class UIManager {
             setupTitle.addEventListener('click', () => {
                 setupClickCount++;
                 if (setupClickCount >= 5) {
-                    devSettings.classList.remove('hidden');
-                    setupTitle.classList.add('text-orange-500');
-                    setupTitle.textContent = "Developer Setup";
-                    this.logEvent("Entwicklermodus aktiviert.");
+                    const isHidden = devSettings.classList.contains('hidden');
+                    if (isHidden) {
+                        devSettings.classList.remove('hidden');
+                        setupTitle.classList.add('text-orange-500');
+                        setupTitle.textContent = "Developer Setup";
+                        this.logEvent("Entwicklermodus aktiviert.");
+                    } else {
+                        devSettings.classList.add('hidden');
+                        setupTitle.classList.remove('text-orange-500');
+                        setupTitle.textContent = "Missions-Setup";
+                        this.logEvent("Entwicklermodus deaktiviert.");
+                    }
+                    setupClickCount = 0;
                 }
             });
         }
@@ -181,7 +190,7 @@ class UIManager {
                 mapSize = 'xlarge';
                 rounds = 7;
                 budgetFactor = 100;
-                steps = 2000;
+                steps = 1000;
                 radius = 5;
                 rocks = Math.floor(Math.random() * 1001); // Random mountains for variety
                 isDojoMode = false;
