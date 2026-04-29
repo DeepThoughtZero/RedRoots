@@ -78,20 +78,24 @@ class Territory {
     }
 
     // Calculate new territories based on cell proximity
-    updateTerritories(gridCells, radius) {
+    updateTerritories(grid, radius) {
         this.territoryMap = this.createEmptyMap();
         const influenceMap = this.createEmptyMap(); // Will store { distance: X, owners: Set }
 
         // Multi-source BFS to find shortest distance from any living cell to all map points
         const queue = [];
+        const gridOwners = grid.owners;
+        const cols = grid.cols;
 
         // 1. Initialize queue with all living cells
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                const owner = gridCells[r][c].owner;
-                if (owner !== CONSTANTS.OWNER_NONE && owner !== CONSTANTS.OWNER_NEUTRAL && owner !== CONSTANTS.OWNER_ROCK) {
-                    queue.push({ r, c, owner, dist: 0 });
-                    influenceMap[r][c] = { dist: 0, owners: new Set([owner]) };
+                const gridOwner = gridOwners[r * cols + c];
+                // Player cells have grid owner values 1-4
+                if (gridOwner > 0) {
+                    const playerIdx = gridOwner - 1; // Convert grid owner (1-4) → player index (0-3)
+                    queue.push({ r, c, owner: playerIdx, dist: 0 });
+                    influenceMap[r][c] = { dist: 0, owners: new Set([playerIdx]) };
                 }
             }
         }
@@ -135,9 +139,9 @@ class Territory {
                 const inf = influenceMap[r][c];
                 if (inf) {
                     if (inf.owners.size === 1) {
-                        this.territoryMap[r][c] = [...inf.owners][0]; // Extract the single owner
+                        this.territoryMap[r][c] = [...inf.owners][0]; // Player index (0-3)
                     } else {
-                        // Tie -> Niemandsland
+                        // Tie → Niemandsland
                         this.territoryMap[r][c] = -1;
                     }
                 }

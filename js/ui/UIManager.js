@@ -461,9 +461,9 @@ class UIManager {
         // Bind speed slider
         const updateSimSpeed = () => {
             const speedVal = parseInt(this.elSimSpeed.value);
-            // Cubic curve to map 1-100 to 500ms-0ms. Makes the middle position much faster (e.g., 50 -> ~62ms)
+            // Cubic curve: 1→500ms, 50→~70ms, 100→16ms (~60fps, still visible to human eye)
             const x = speedVal / 100;
-            const delay = Math.round(500 * Math.pow(1 - x, 3));
+            const delay = Math.max(16, Math.round(500 * Math.pow(1 - x, 3)));
             
             this.gameState.simSpeedMs = delay;
         };
@@ -651,7 +651,7 @@ class UIManager {
         
         for (let r = 0; r < this.gameState.rows; r++) {
             for (let c = 0; c < this.gameState.cols; c++) {
-                if (this.gameState.grid.getCell(r, c).owner === pId) {
+                if (this.gameState.grid.getOwner(r, c) === pId + 1) {
                     for (const camp of enemyCamps) {
                         const centerR = (camp.rMin + camp.rMax) / 2;
                         const centerC = (camp.cMin + camp.cMax) / 2;

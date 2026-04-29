@@ -241,7 +241,7 @@ class AI {
                         for (let nr = r - 4; nr <= r + 4; nr += 2) {
                             for (let nc = c - 4; nc <= c + 4; nc += 2) {
                                 if (nr >= 0 && nr < this.gameState.rows && nc >= 0 && nc < this.gameState.cols) {
-                                    if (this.gameState.grid.getCell(nr, nc).owner !== CONSTANTS.OWNER_NONE) {
+                                    if (this.gameState.grid.getOwner(nr, nc) !== CONSTANTS.OWNER_NONE) {
                                         neighborhoodCells++;
                                     }
                                 }
@@ -277,7 +277,7 @@ class AI {
                                 for (let br = minR - buffer; br <= maxR + buffer; br++) {
                                     for (let bc = minC - buffer; bc <= maxC + buffer; bc++) {
                                         if (br >= 0 && br < this.gameState.rows && bc >= 0 && bc < this.gameState.cols) {
-                                            if (this.gameState.grid.getCell(br, bc).owner !== CONSTANTS.OWNER_NONE) {
+                                            if (this.gameState.grid.getOwner(br, bc) !== CONSTANTS.OWNER_NONE) {
                                                 blocked = true;
                                                 break;
                                             }
@@ -356,7 +356,7 @@ class AI {
         for (let dist = 0; dist < 60; dist++) {
             if (checkR < 0 || checkR >= this.gameState.rows || checkC < 0 || checkC >= this.gameState.cols) break;
             
-            const cellOwner = this.gameState.grid.getCell(checkR, checkC).owner;
+            const cellOwner = this.gameState.grid.getOwner(checkR, checkC);
             const territoryOwner = this.gameState.territory.getOwnerAt(checkR, checkC);
 
             if (cellOwner === CONSTANTS.OWNER_ROCK) break; // Path blocked
@@ -368,9 +368,9 @@ class AI {
                 const s2r = checkR - dc, s2c = checkC + dr;
                 
                 const side1 = (s1r >= 0 && s1r < this.gameState.rows && s1c >= 0 && s1c < this.gameState.cols) 
-                    ? this.gameState.grid.getCell(s1r, s1c).owner : null;
+                    ? this.gameState.grid.getOwner(s1r, s1c) : CONSTANTS.OWNER_NONE;
                 const side2 = (s2r >= 0 && s2r < this.gameState.rows && s2c >= 0 && s2c < this.gameState.cols) 
-                    ? this.gameState.grid.getCell(s2r, s2c).owner : null;
+                    ? this.gameState.grid.getOwner(s2r, s2c) : CONSTANTS.OWNER_NONE;
                 
                 if (side1 === CONSTANTS.OWNER_ROCK || side2 === CONSTANTS.OWNER_ROCK) {
                     score = 0;

@@ -15,7 +15,9 @@ const CONSTANTS = {
     CAMP_BG_OPACITY: 0.2,
     
     // Cell/Map logic
-    OWNER_NONE: null,
+    // Grid owner values: 0=empty, 1-4=players, -1=neutral, -3=rock
+    // Player index (0-3) → grid owner: +1. Grid owner → player index: -1.
+    OWNER_NONE: 0,
     OWNER_NEUTRAL: -1,
     OWNER_ROCK: -3,
     

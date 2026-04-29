@@ -157,27 +157,31 @@ class GameRenderer {
     drawCells() {
         // Performance: Disable expensive shadow blur during simulation phase
         const isSim = this.gameState.phase === CONSTANTS.PHASE_SIMULATION;
+        const gridOwners = this.gameState.grid.owners;
+        const gridIsOld = this.gameState.grid.isOldFlags;
+        const cols = this.gameState.cols;
 
         for (let r = 0; r < this.gameState.rows; r++) {
             for (let c = 0; c < this.gameState.cols; c++) {
-                const cell = this.gameState.grid.cells[r][c];
-                const owner = cell.owner;
-                if (owner !== CONSTANTS.OWNER_NONE) {
+                const idx = r * cols + c;
+                const owner = gridOwners[idx];
+                if (owner !== 0) { // OWNER_NONE = 0
                     let color, shadowColor;
                     if (owner === CONSTANTS.OWNER_ROCK) {
-                        color = '#6b7280'; // Tailwind gray-500
+                        color = '#6b7280';
                         shadowColor = 'rgba(0,0,0,0.5)';
                     } else if (owner === CONSTANTS.OWNER_NEUTRAL) {
                         color = CONSTANTS.NEUTRAL_COLOR;
                         shadowColor = 'rgba(255,255,255,0.2)';
                     } else {
-                        color = CONSTANTS.PLAYER_COLORS[owner].main;
-                        shadowColor = CONSTANTS.PLAYER_COLORS[owner].shadow;
+                        // Player grid owner (1-4) → PLAYER_COLORS index (0-3)
+                        const pIdx = owner - 1;
+                        color = CONSTANTS.PLAYER_COLORS[pIdx].main;
+                        shadowColor = CONSTANTS.PLAYER_COLORS[pIdx].shadow;
                     }
                     
                     this.ctx.fillStyle = color;
                     if (isSim) {
-                        // No glow during simulation → ~5-10× faster canvas rendering
                         this.ctx.shadowBlur = 0;
                     } else {
                         this.ctx.shadowColor = shadowColor;
@@ -191,20 +195,18 @@ class GameRenderer {
 
                     this.ctx.fillRect(x, y, s, s);
 
-                    // Reset shadow for inner drawings
                     this.ctx.shadowBlur = 0;
 
                     if (owner === CONSTANTS.OWNER_ROCK) {
-                        this.ctx.fillStyle = '#4b5563'; // gray-600
+                        this.ctx.fillStyle = '#4b5563';
                         this.ctx.fillRect(c * this.cellSize + 3, r * this.cellSize + 3, this.cellSize - 6, this.cellSize - 6);
-                    } else if (cell.isOld && !isSim) {
-                        // Draw a thick border for old cells
+                    } else if (gridIsOld[idx] && !isSim) {
                         this.ctx.strokeStyle = '#ffffff';
                         this.ctx.lineWidth = 2;
                         this.ctx.strokeRect(x, y, s, s);
                     }
                     
-                    this.ctx.shadowBlur = 0; // Reset
+                    this.ctx.shadowBlur = 0;
                 }
             }
         }
@@ -218,8 +220,9 @@ class GameRenderer {
         if (inputHandler.isEraserMode) {
             const r = inputHandler.hoverRow;
             const c = inputHandler.hoverCol;
-            const cell = this.gameState.grid.getCell(r, c);
-            const canErase = cell && cell.owner === pId && !cell.isOld;
+            // Compare grid owner (1-4) with player index + 1
+            const gridOwner = this.gameState.grid.getOwner(r, c);
+            const canErase = gridOwner === (pId + 1) && !this.gameState.grid.getIsOld(r, c);
             
             this.ctx.fillStyle = canErase ? 'rgba(239, 68, 68, 0.8)' : 'rgba(100, 100, 100, 0.4)';
             this.ctx.fillRect(c * this.cellSize, r * this.cellSize, this.cellSize, this.cellSize);

@@ -1,53 +1,80 @@
 // js/core/Grid.js
+// Performance: Flat typed arrays + double-buffer swap (Prio 1+4)
+// Owner values: 0=empty, -3=rock, -1=neutral, 1-4=players
 
 class Grid {
     constructor(rows, cols, collisionRule) {
         this.rows = rows;
         this.cols = cols;
-        this.collisionRule = collisionRule; // 'majority' or 'neutral'
-        this.cells = this.createEmptyGrid();
+        this.size = rows * cols;
+        this.collisionRule = collisionRule;
+
+        // Flat typed arrays: zero-GC, cache-friendly
+        this.owners = new Int8Array(this.size);
+        this.isOldFlags = new Uint8Array(this.size);
+
+        // Double buffers for swap-based generation (Prio 4)
+        this._nextOwners = new Int8Array(this.size);
+        this._nextIsOld = new Uint8Array(this.size);
     }
 
-    createEmptyGrid() {
-        const grid = [];
-        for (let r = 0; r < this.rows; r++) {
-            const row = [];
-            for (let c = 0; c < this.cols; c++) {
-                row.push({ owner: CONSTANTS.OWNER_NONE, isOld: false });
-            }
-            grid.push(row);
+    // --- Accessors ---
+
+    getOwner(r, c) {
+        if (r >= 0 && r < this.rows && c >= 0 && c < this.cols) {
+            return this.owners[r * this.cols + c];
         }
-        return grid;
+        return CONSTANTS.OWNER_NONE;
     }
 
+    getIsOld(r, c) {
+        if (r >= 0 && r < this.rows && c >= 0 && c < this.cols) {
+            return this.isOldFlags[r * this.cols + c] !== 0;
+        }
+        return false;
+    }
+
+    // Compatibility accessor (creates temp object — use only in non-hot paths like undo/erase)
     getCell(r, c) {
         if (r >= 0 && r < this.rows && c >= 0 && c < this.cols) {
-            return this.cells[r][c];
+            const i = r * this.cols + c;
+            return { owner: this.owners[i], isOld: this.isOldFlags[i] !== 0 };
         }
         return null;
     }
 
     setCell(r, c, ownerId, isOld = false) {
         if (r >= 0 && r < this.rows && c >= 0 && c < this.cols) {
-            this.cells[r][c].owner = ownerId;
-            this.cells[r][c].isOld = isOld;
+            const i = r * this.cols + c;
+            this.owners[i] = ownerId;
+            this.isOldFlags[i] = isOld ? 1 : 0;
         }
     }
 
+    resetGrid() {
+        this.owners.fill(0);
+        this.isOldFlags.fill(0);
+    }
+
+    // --- Neighbor Analysis (hot path) ---
+
     getNeighborsData(r, c) {
         let count = 0;
-        const ownerCounts = {}; // Track how many neighbors each player has
+        const ownerCounts = {};
+        const cols = this.cols;
+        const rows = this.rows;
+        const owners = this.owners;
 
         for (let i = -1; i <= 1; i++) {
             for (let j = -1; j <= 1; j++) {
                 if (i === 0 && j === 0) continue;
-                
+
                 const nr = r + i;
                 const nc = c + j;
-                
-                if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols) {
-                    const neighborOwner = this.cells[nr][nc].owner;
-                    if (neighborOwner !== CONSTANTS.OWNER_NONE && neighborOwner !== CONSTANTS.OWNER_ROCK) {
+
+                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                    const neighborOwner = owners[nr * cols + nc];
+                    if (neighborOwner !== 0 && neighborOwner !== CONSTANTS.OWNER_ROCK) {
                         count++;
                         if (neighborOwner !== CONSTANTS.OWNER_NEUTRAL) {
                             ownerCounts[neighborOwner] = (ownerCounts[neighborOwner] || 0) + 1;
@@ -59,58 +86,73 @@ class Grid {
         return { count, ownerCounts };
     }
 
-    calculateNextGeneration() {
-        const nextGrid = this.createEmptyGrid();
+    // --- Core Simulation (hottest path) ---
 
-        for (let r = 0; r < this.rows; r++) {
-            for (let c = 0; c < this.cols; c++) {
-                const currentCell = this.cells[r][c];
-                
-                if (currentCell.owner === CONSTANTS.OWNER_ROCK) {
-                    nextGrid[r][c].owner = CONSTANTS.OWNER_ROCK;
-                    nextGrid[r][c].isOld = true;
+    calculateNextGeneration() {
+        const cols = this.cols;
+        const rows = this.rows;
+        const owners = this.owners;
+        const nextOwners = this._nextOwners;
+        const nextIsOld = this._nextIsOld;
+
+        // Clear next-generation buffers (native fill — very fast)
+        nextOwners.fill(0);
+        nextIsOld.fill(0);
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const idx = r * cols + c;
+                const currentOwner = owners[idx];
+
+                if (currentOwner === CONSTANTS.OWNER_ROCK) {
+                    nextOwners[idx] = CONSTANTS.OWNER_ROCK;
+                    nextIsOld[idx] = 1;
                     continue;
                 }
 
-                const isAlive = currentCell.owner !== CONSTANTS.OWNER_NONE;
+                const isAlive = currentOwner !== 0;
                 const { count, ownerCounts } = this.getNeighborsData(r, c);
 
                 if (isAlive) {
-                    // Conway Rule 1 & 3: Underpopulation (<2) or Overpopulation (>3) -> Dies
                     if (count < 2 || count > 3) {
-                        nextGrid[r][c].owner = CONSTANTS.OWNER_NONE;
-                        nextGrid[r][c].isOld = false;
+                        // Dies (underpopulation or overpopulation)
+                        nextOwners[idx] = 0;
                     } else {
-                        // Conway Rule 2: Survives
-                        nextGrid[r][c].owner = currentCell.owner;
-                        nextGrid[r][c].isOld = currentCell.isOld;
+                        // Survives
+                        nextOwners[idx] = currentOwner;
+                        nextIsOld[idx] = this.isOldFlags[idx];
                     }
                 } else {
-                    // Conway Rule 4: Reproduction (=3)
                     if (count === 3) {
-                        nextGrid[r][c].owner = this.determineNewCellOwner(ownerCounts);
-                        nextGrid[r][c].isOld = false;
+                        // Birth
+                        nextOwners[idx] = this.determineNewCellOwner(ownerCounts);
                     }
                 }
             }
         }
 
-        this.cells = nextGrid;
+        // Buffer swap — O(1) instead of O(n) allocation (Prio 4)
+        const tmpOwners = this.owners;
+        const tmpIsOld = this.isOldFlags;
+        this.owners = this._nextOwners;
+        this.isOldFlags = this._nextIsOld;
+        this._nextOwners = tmpOwners;
+        this._nextIsOld = tmpIsOld;
     }
 
     markAllOld() {
-        for (let r = 0; r < this.rows; r++) {
-            for (let c = 0; c < this.cols; c++) {
-                if (this.cells[r][c].owner !== CONSTANTS.OWNER_NONE) {
-                    this.cells[r][c].isOld = true;
-                }
+        const owners = this.owners;
+        const isOld = this.isOldFlags;
+        for (let i = 0; i < this.size; i++) {
+            if (owners[i] !== 0) {
+                isOld[i] = 1;
             }
         }
     }
 
     determineNewCellOwner(ownerCounts) {
         const owners = Object.keys(ownerCounts);
-        
+
         if (this.collisionRule === 'neutral') {
             if (owners.length > 1) {
                 return CONSTANTS.OWNER_NEUTRAL;

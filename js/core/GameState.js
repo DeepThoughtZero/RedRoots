@@ -96,7 +96,7 @@ class GameState {
     }
 
     clearGrid() {
-        this.grid.cells = this.grid.createEmptyGrid();
+        this.grid.resetGrid();
         this.generateRocks(this.rocksCount); 
         this.notifyStateUpdate();
     }
@@ -152,7 +152,7 @@ class GameState {
             if (r < 0 || r >= this.rows || c < 0 || c >= this.cols) return false;
             
             // Occupancy check
-            if (this.grid.getCell(r, c).owner !== CONSTANTS.OWNER_NONE) return false;
+            if (this.grid.getOwner(r, c) !== CONSTANTS.OWNER_NONE) return false;
             
             // Territory check
             if (this.territory.getOwnerAt(r, c) !== this.currentPlayer) return false;
@@ -173,10 +173,10 @@ class GameState {
         for (const [dr, dc] of pattern) {
             const r = baseR + dr;
             const c = baseC + dc;
-            const existingCell = this.grid.getCell(r, c);
-            delta.cells.push({ r, c, owner: existingCell.owner, isOld: existingCell.isOld });
+            delta.cells.push({ r, c, owner: this.grid.getOwner(r, c), isOld: this.grid.getIsOld(r, c) });
             
-            this.grid.setCell(r, c, this.currentPlayer);
+            // Player index (0-3) → grid owner (1-4)
+            this.grid.setCell(r, c, this.currentPlayer + 1);
         }
 
         if (!this.undoStack) this.undoStack = [];
@@ -191,12 +191,14 @@ class GameState {
 
     eraseCell(r, c) {
         if (this.phase !== CONSTANTS.PHASE_PLACEMENT) return false;
-        const cell = this.grid.getCell(r, c);
-        if (cell && cell.owner === this.currentPlayer && !cell.isOld) {
+        const gridOwner = this.grid.getOwner(r, c);
+        const isOld = this.grid.getIsOld(r, c);
+        // Compare with grid owner value: player index + 1
+        if (gridOwner === this.currentPlayer + 1 && !isOld) {
             const delta = {
                 type: 'erase',
-                cost: -1, // since we add 1 to budget when erasing, undoing it costs 1
-                cells: [{ r, c, owner: cell.owner, isOld: cell.isOld }]
+                cost: -1,
+                cells: [{ r, c, owner: gridOwner, isOld: isOld }]
             };
             if (!this.undoStack) this.undoStack = [];
             this.undoStack.push(delta);
@@ -283,7 +285,7 @@ class GameState {
 
         // End of round
         this.grid.markAllOld();
-        this.territory.updateTerritories(this.grid.cells, this.radius);
+        this.territory.updateTerritories(this.grid, this.radius);
         
         // Reset budgets dynamically
         this.calculateBudgets();
@@ -311,13 +313,17 @@ class GameState {
     checkWinCondition() {
         // Optimized: Only scan camp regions instead of the full grid (~900 cells vs ~18,000)
         const camps = this.territory.camps;
+        const owners = this.grid.owners;
+        const cols = this.cols;
         for (let ci = 0; ci < camps.length; ci++) {
             const camp = camps[ci];
+            const campGridOwner = camp.id + 1; // Camp ID (0-3) → grid owner (1-4)
             for (let r = camp.rMin; r <= camp.rMax; r++) {
                 for (let c = camp.cMin; c <= camp.cMax; c++) {
-                    const cellOwner = this.grid.cells[r][c].owner;
-                    if (cellOwner !== CONSTANTS.OWNER_NONE && cellOwner !== CONSTANTS.OWNER_NEUTRAL && cellOwner !== CONSTANTS.OWNER_ROCK && cellOwner !== camp.id) {
-                        this.winner = cellOwner;
+                    const cellOwner = owners[r * cols + c];
+                    // A player cell (>0) that doesn't belong to this camp's owner
+                    if (cellOwner > 0 && cellOwner !== campGridOwner) {
+                        this.winner = cellOwner - 1; // Convert grid owner (1-4) → player index (0-3)
                         return true;
                     }
                 }
@@ -340,31 +346,27 @@ class GameState {
     }
 
     _ownerToSlot(owner) {
-        // Map owner values to table slots: null→skip, -3→0, -1→1, 0→2, 1→3, 2→4, 3→5
-        if (owner === null || owner === CONSTANTS.OWNER_NONE) return -1; // skip empty
+        // Map owner values to table slots: 0(empty)→skip, -3→0, -1→1, 1→2, 2→3, 3→4, 4→5
+        if (owner === 0) return -1; // skip empty (OWNER_NONE)
         if (owner === CONSTANTS.OWNER_ROCK) return 0;
         if (owner === CONSTANTS.OWNER_NEUTRAL) return 1;
-        return owner + 2; // 0→2, 1→3, 2→4, 3→5
+        return owner + 1; // 1→2, 2→3, 3→4, 4→5
     }
 
     _computeZobristHash() {
         let hash = 0;
         let aliveCount = 0;
-        const cells = this.grid.cells;
-        const cols = this.cols;
+        const owners = this.grid.owners; // Direct flat array access
+        const size = this.grid.size;
         const table = this._zobristTable;
 
-        for (let r = 0; r < this.rows; r++) {
-            const row = cells[r];
-            const rowOffset = r * cols;
-            for (let c = 0; c < cols; c++) {
-                const owner = row[c].owner;
-                if (owner !== CONSTANTS.OWNER_NONE) {
-                    aliveCount++;
-                    const slot = this._ownerToSlot(owner);
-                    if (slot >= 0) {
-                        hash ^= table[(rowOffset + c) * 6 + slot];
-                    }
+        for (let i = 0; i < size; i++) {
+            const owner = owners[i];
+            if (owner !== 0) { // Not empty
+                aliveCount++;
+                const slot = this._ownerToSlot(owner);
+                if (slot >= 0) {
+                    hash ^= table[i * 6 + slot];
                 }
             }
         }
@@ -412,7 +414,7 @@ class GameState {
             while (clusterPlaced < clusterSize && attempts < maxAttempts) {
                 attempts++;
                 // Check if valid to place rock here (not in a camp, not already a rock)
-                if (this.grid.getCell(r, c).owner !== CONSTANTS.OWNER_ROCK) {
+                if (this.grid.getOwner(r, c) !== CONSTANTS.OWNER_ROCK) {
                     if (this.territory.isCamp(r, c) === null) {
                         this.grid.setCell(r, c, CONSTANTS.OWNER_ROCK, true);
                         rocksPlaced++;
@@ -446,7 +448,7 @@ class GameState {
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
                 const owner = this.territory.getOwnerAt(r, c);
-                if (owner !== null && owner !== CONSTANTS.OWNER_NEUTRAL) {
+                if (owner !== null && owner >= 0) {
                     counts[owner]++;
                 }
             }

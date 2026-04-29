@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>RedRoots – Simulation Benchmark</title>
+    <style>
+        body { background: #111; color: #eee; font-family: 'Fira Code', monospace; padding: 40px; }
+        h1 { color: #ff6644; }
+        .result { margin: 10px 0; padding: 12px 20px; border-radius: 8px; font-size: 16px; }
+        .old { background: #331111; border-left: 4px solid #ff4444; }
+        .new { background: #113311; border-left: 4px solid #44ff44; }
+        .summary { background: #112233; border-left: 4px solid #44aaff; margin-top: 20px; font-size: 20px; font-weight: bold; }
+        #log { white-space: pre-wrap; font-size: 13px; color: #888; margin-top: 20px; }
+        button { background: #ff6644; color: #fff; border: none; padding: 12px 32px; font-size: 18px; border-radius: 8px; cursor: pointer; margin: 10px 4px; }
+        button:hover { background: #ff8866; }
+        .config { color: #aaa; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🔬 RedRoots Simulation Benchmark</h1>
+    <div class="config" id="config"></div>
+    <button onclick="runBenchmark(100, 60)">Benchmark: Medium (100×60)</button>
+    <button onclick="runBenchmark(180, 100)">Benchmark: XLarge (180×100)</button>
+    <button onclick="runBenchmark(240, 140)">Benchmark: XXLarge (240×140)</button>
+    <div id="results"></div>
+    <div id="log"></div>
+
+<script>
+// ========== OLD IMPLEMENTATION (Object-based, pre-optimization) ==========
+class OldGrid {
+    constructor(rows, cols) {
+        this.rows = rows;
+        this.cols = cols;
+        this.cells = this.createEmptyGrid();
+    }
+    createEmptyGrid() {
+        const grid = [];
+        for (let r = 0; r < this.rows; r++) {
+            const row = [];
+            for (let c = 0; c < this.cols; c++) {
+                row.push({ owner: null, isOld: false });
+            }
+            grid.push(row);
+        }
+        return grid;
+    }
+    calculateNextGeneration() {
+        const nextGrid = this.createEmptyGrid();
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                const currentCell = this.cells[r][c];
+                if (currentCell.owner === -3) { nextGrid[r][c].owner = -3; nextGrid[r][c].isOld = true; continue; }
+                const isAlive = currentCell.owner !== null;
+                let count = 0;
+                const ownerCounts = {};
+                for (let i = -1; i <= 1; i++) {
+                    for (let j = -1; j <= 1; j++) {
+                        if (i === 0 && j === 0) continue;
+                        const nr = r + i, nc = c + j;
+                        if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols) {
+                            const no = this.cells[nr][nc].owner;
+                            if (no !== null && no !== -3) {
+                                count++;
+                                if (no !== -1) ownerCounts[no] = (ownerCounts[no] || 0) + 1;
+                            }
+                        }
+                    }
+                }
+                if (isAlive) {
+                    if (count >= 2 && count <= 3) { nextGrid[r][c].owner = currentCell.owner; nextGrid[r][c].isOld = currentCell.isOld; }
+                } else {
+                    if (count === 3) {
+                        let maxC = 0, dom = -1;
+                        for (const [id, cnt] of Object.entries(ownerCounts)) { if (cnt > maxC) { maxC = cnt; dom = parseInt(id); } }
+                        nextGrid[r][c].owner = dom;
+                    }
+                }
+            }
+        }
+        this.cells = nextGrid;
+    }
+    // Old hash method (string concat)
+    computeHashOld() {
+        let hash = '';
+        let aliveCount = 0;
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                const owner = this.cells[r][c].owner;
+                if (owner !== null) { hash += `${r},${c},${owner}|`; aliveCount++; }
+            }
+        }
+        return { hash, aliveCount };
+    }
+    // Old win check (full grid scan)
+    checkWinOld(camps) {
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                const cellOwner = this.cells[r][c].owner;
+                if (cellOwner !== null && cellOwner !== -1) {
+                    for (const camp of camps) {
+                        if (r >= camp.rMin && r <= camp.rMax && c >= camp.cMin && c <= camp.cMax && camp.id !== cellOwner) return cellOwner;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+}
+
+// ========== NEW IMPLEMENTATION (Typed Arrays + Buffer Swap) ==========
+class NewGrid {
+    constructor(rows, cols) {
+        this.rows = rows;
+        this.cols = cols;
+        this.size = rows * cols;
+        this.owners = new Int8Array(this.size);
+        this.isOldFlags = new Uint8Array(this.size);
+        this._nextOwners = new Int8Array(this.size);
+        this._nextIsOld = new Uint8Array(this.size);
+    }
+    calculateNextGeneration() {
+        const cols = this.cols, rows = this.rows;
+        const owners = this.owners;
+        const nextOwners = this._nextOwners;
+        const nextIsOld = this._nextIsOld;
+        nextOwners.fill(0);
+        nextIsOld.fill(0);
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const idx = r * cols + c;
+                const cur = owners[idx];
+                if (cur === -3) { nextOwners[idx] = -3; nextIsOld[idx] = 1; continue; }
+                const isAlive = cur !== 0;
+                let count = 0;
+                const ownerCounts = {};
+                for (let i = -1; i <= 1; i++) {
+                    for (let j = -1; j <= 1; j++) {
+                        if (i === 0 && j === 0) continue;
+                        const nr = r + i, nc = c + j;
+                        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                            const no = owners[nr * cols + nc];
+                            if (no !== 0 && no !== -3) {
+                                count++;
+                                if (no !== -1) ownerCounts[no] = (ownerCounts[no] || 0) + 1;
+                            }
+                        }
+                    }
+                }
+                if (isAlive) {
+                    if (count >= 2 && count <= 3) { nextOwners[idx] = cur; nextIsOld[idx] = this.isOldFlags[idx]; }
+                } else {
+                    if (count === 3) {
+                        let maxC = 0, dom = -1;
+                        for (const [id, cnt] of Object.entries(ownerCounts)) { if (cnt > maxC) { maxC = cnt; dom = parseInt(id); } }
+                        nextOwners[idx] = dom;
+                    }
+                }
+            }
+        }
+        // Buffer swap
+        const tmp1 = this.owners, tmp2 = this.isOldFlags;
+        this.owners = this._nextOwners; this.isOldFlags = this._nextIsOld;
+        this._nextOwners = tmp1; this._nextIsOld = tmp2;
+    }
+    // Zobrist hash (numeric)
+    computeHashNew(zobristTable) {
+        let hash = 0, aliveCount = 0;
+        const owners = this.owners;
+        for (let i = 0; i < this.size; i++) {
+            const o = owners[i];
+            if (o !== 0) {
+                aliveCount++;
+                let slot = -1;
+                if (o === -3) slot = 0;
+                else if (o === -1) slot = 1;
+                else slot = o + 1;
+                if (slot >= 0) hash ^= zobristTable[i * 6 + slot];
+            }
+        }
+        return { hash, aliveCount };
+    }
+    // Camp-only win check
+    checkWinNew(camps, cols) {
+        const owners = this.owners;
+        for (const camp of camps) {
+            const campOwner = camp.id + 1;
+            for (let r = camp.rMin; r <= camp.rMax; r++) {
+                for (let c = camp.cMin; c <= camp.cMax; c++) {
+                    const o = owners[r * cols + c];
+                    if (o > 0 && o !== campOwner) return o - 1;
+                }
+            }
+        }
+        return null;
+    }
+}
+
+// ========== BENCHMARK ==========
+function seedGrid(oldGrid, newGrid, rows, cols, playerCount) {
+    // Deterministic seed: place random cells for 4 players
+    let seed = 42;
+    function rng() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+
+    for (let i = 0; i < rows * cols * 0.08; i++) {
+        const r = Math.floor(rng() * rows);
+        const c = Math.floor(rng() * cols);
+        const player = Math.floor(rng() * playerCount);
+        oldGrid.cells[r][c].owner = player;
+        newGrid.owners[r * cols + c] = player + 1; // Shifted ID
+    }
+    // Add some rocks
+    for (let i = 0; i < 200; i++) {
+        const r = Math.floor(rng() * rows);
+        const c = Math.floor(rng() * cols);
+        oldGrid.cells[r][c].owner = -3;
+        newGrid.owners[r * cols + c] = -3;
+    }
+}
+
+function log(msg) {
+    document.getElementById('log').textContent += msg + '\n';
+}
+
+function addResult(cls, html) {
+    const div = document.createElement('div');
+    div.className = 'result ' + cls;
+    div.innerHTML = html;
+    document.getElementById('results').appendChild(div);
+}
+
+async function runBenchmark(cols, rows) {
+    const STEPS = 200;
+    const results = document.getElementById('results');
+    results.innerHTML = '';
+    document.getElementById('log').textContent = '';
+
+    const camps = [
+        { id: 0, rMin: 0, rMax: 14, cMin: 0, cMax: 14 },
+        { id: 1, rMin: rows-15, rMax: rows-1, cMin: cols-15, cMax: cols-1 },
+        { id: 2, rMin: rows-15, rMax: rows-1, cMin: 0, cMax: 14 },
+        { id: 3, rMin: 0, rMax: 14, cMin: cols-15, cMax: cols-1 }
+    ];
+
+    document.getElementById('config').innerHTML = 
+        `Grid: <b>${cols}×${rows}</b> (${(cols*rows).toLocaleString()} Zellen) | Steps: <b>${STEPS}</b> | Gesamtberechnungen: <b>${(cols*rows*STEPS).toLocaleString()}</b>`;
+
+    log(`Starting benchmark: ${cols}×${rows}, ${STEPS} steps...`);
+    await new Promise(r => setTimeout(r, 100));
+
+    // ---- OLD ----
+    const oldGrid = new OldGrid(rows, cols);
+    const newGrid = new NewGrid(rows, cols);
+    seedGrid(oldGrid, newGrid, rows, cols, 4);
+
+    // Warm-up
+    for (let i = 0; i < 3; i++) oldGrid.calculateNextGeneration();
+    // Re-seed
+    const oldGrid2 = new OldGrid(rows, cols);
+    seedGrid(oldGrid2, new NewGrid(rows, cols), rows, cols, 4);
+
+    log('Running OLD (Object Grid + String Hash + Full Scan Win Check)...');
+    await new Promise(r => setTimeout(r, 50));
+
+    const t0old = performance.now();
+    for (let step = 0; step < STEPS; step++) {
+        oldGrid2.calculateNextGeneration();
+        oldGrid2.computeHashOld();
+        oldGrid2.checkWinOld(camps);
+    }
+    const tOld = performance.now() - t0old;
+
+    addResult('old', `<b>ALT</b> (Objekt-Grid + String-Hash + Full-Scan Win): <b>${tOld.toFixed(1)} ms</b> für ${STEPS} Steps → ${(tOld/STEPS).toFixed(2)} ms/step`);
+    log(`OLD done: ${tOld.toFixed(1)} ms`);
+    await new Promise(r => setTimeout(r, 50));
+
+    // ---- NEW ----
+    const newGrid2 = new NewGrid(rows, cols);
+    seedGrid(new OldGrid(rows, cols), newGrid2, rows, cols, 4);
+    
+    // Zobrist table
+    const zobristTable = new Uint32Array(rows * cols * 6);
+    for (let i = 0; i < zobristTable.length; i++) zobristTable[i] = (Math.random() * 0xFFFFFFFF) >>> 0;
+
+    // Warm-up
+    for (let i = 0; i < 3; i++) newGrid2.calculateNextGeneration();
+    // Re-seed
+    const newGrid3 = new NewGrid(rows, cols);
+    seedGrid(new OldGrid(rows, cols), newGrid3, rows, cols, 4);
+
+    log('Running NEW (Typed Arrays + Zobrist Hash + Camp-Only Win)...');
+    await new Promise(r => setTimeout(r, 50));
+
+    const t0new = performance.now();
+    for (let step = 0; step < STEPS; step++) {
+        newGrid3.calculateNextGeneration();
+        newGrid3.computeHashNew(zobristTable);
+        newGrid3.checkWinNew(camps, cols);
+    }
+    const tNew = performance.now() - t0new;
+
+    addResult('new', `<b>NEU</b> (Typed Arrays + Zobrist + Camp-Only Win): <b>${tNew.toFixed(1)} ms</b> für ${STEPS} Steps → ${(tNew/STEPS).toFixed(2)} ms/step`);
+    log(`NEW done: ${tNew.toFixed(1)} ms`);
+
+    // ---- SUMMARY ----
+    const speedup = tOld / tNew;
+    addResult('summary', `⚡ Speed-Up: <b>${speedup.toFixed(1)}×</b> schneller &nbsp;|&nbsp; Alt: ${(tOld/STEPS).toFixed(2)} ms/step → Neu: ${(tNew/STEPS).toFixed(2)} ms/step`);
+    log(`\nSPEED-UP: ${speedup.toFixed(2)}×`);
+}
+</script>
+</body>
+</html>
