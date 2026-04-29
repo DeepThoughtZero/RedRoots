@@ -9,38 +9,51 @@ class AI {
     getDefaultGenome(strength) {
         if (strength === 'easy') {
             return {
-                r_pentomino_weight: 0.2,
-                glider_weight: 0.4,
-                lwss_weight: 0.1,
-                acorn_weight: 0.3,
-                b_heptomino_weight: 0.3,
-                block_weight: 1.0,
-                random_rotation_chance: 0.3
+                r_pentomino_weight: 0.6,
+                acorn_weight: 0.7,
+                b_heptomino_weight: 0.7,
+                diehard_weight: 0.5,
+                switch_engine_weight: 0.4,
+                rabbits_weight: 0.4,
+                lidka_weight: 0.3,
+                lwss_weight: 0.2,
+                glider_weight: 0.1,
+                block_weight: 0.3,
+                random_rotation_chance: 0.3,
+                expansion_weight: 0.3
             };
         } else if (strength === 'hard') {
             return {
-                r_pentomino_weight: 0.5,
+                r_pentomino_weight: 0.8,
                 acorn_weight: 1.0,
-                b_heptomino_weight: 0.9,
-                switch_engine_weight: 0.8,
-                lwss_weight: 0.3,
-                glider_gun_weight: 0.2,
-                glider_weight: 0.1,
-                block_weight: 0.3,
-                random_rotation_chance: 0.0
+                b_heptomino_weight: 1.0,
+                switch_engine_weight: 0.9,
+                diehard_weight: 0.8,
+                rabbits_weight: 0.7,
+                lidka_weight: 0.6,
+                lwss_weight: 0.6,
+                glider_gun_weight: 0.05,
+                glider_weight: 0.05,
+                block_weight: 0.1,
+                random_rotation_chance: 0.0,
+                expansion_weight: 1.0
             };
         }
         // Medium
         return {
-            acorn_weight: 0.6,
-            b_heptomino_weight: 0.5,
-            switch_engine_weight: 0.4,
-            glider_gun_weight: 0.4,
-            glider_weight: 0.4,
-            r_pentomino_weight: 0.3,
-            lwss_weight: 0.1,
-            block_weight: 0.5,
-            random_rotation_chance: 0.1
+            acorn_weight: 0.9,
+            b_heptomino_weight: 0.8,
+            switch_engine_weight: 0.7,
+            r_pentomino_weight: 0.7,
+            diehard_weight: 0.6,
+            rabbits_weight: 0.5,
+            lidka_weight: 0.4,
+            lwss_weight: 0.4,
+            glider_gun_weight: 0.1,
+            glider_weight: 0.1,
+            block_weight: 0.2,
+            random_rotation_chance: 0.1,
+            expansion_weight: 0.6
         };
     }
 
@@ -101,9 +114,8 @@ class AI {
             } else {
                 return dr >= 0 ? 1 : 3; // Down or Up
             }
-        } else if (patternKey === 'r_pentomino') {
-            // R-pentomino expands. Let's orient it so it's "pointing" towards target.
-            // Quadrant based is usually fine for its general growth.
+        } else if (patternKey === 'r_pentomino' || patternKey === 'acorn' || patternKey === 'switch_engine' || patternKey === 'b_heptomino') {
+            // Complex patterns: orient quadrant-based towards target
             if (dr >= 0 && dc >= 0) return 0;
             if (dr >= 0 && dc < 0) return 1;
             if (dr < 0 && dc < 0) return 2;
@@ -139,8 +151,8 @@ class AI {
             let chosenKey = 'cell';
             const g = this.genome;
 
-            // DYNAMIC GENOME-BASED SELECTION (for Hard AI or Evolver)
-            if (g && (strength === 'hard' || this.evolver)) {
+            // UNIFORM GENOME-BASED SELECTION (Now for all AI levels)
+            if (g) {
                 const candidates = [
                     { key: 'r_pentomino', weight: g.r_pentomino_weight || 0, cost: 5 },
                     { key: 'diehard', weight: g.diehard_weight || 0, cost: 7 },
@@ -151,7 +163,8 @@ class AI {
                     { key: 'lidka', weight: g.lidka_weight || 0, cost: 13 },
                     { key: 'lwss', weight: g.lwss_weight || 0, cost: 9 },
                     { key: 'glider_gun', weight: g.glider_gun_weight || 0, cost: 36 },
-                    { key: 'glider', weight: g.glider_weight || 0.1, cost: 5 }
+                    { key: 'glider', weight: g.glider_weight || 0, cost: 5 },
+                    { key: 'block', weight: g.block_weight || 0, cost: 4 }
                 ];
 
                 const affordable = candidates.filter(c => budget >= c.cost && c.weight > 0);
@@ -165,25 +178,12 @@ class AI {
                             break;
                         }
                     }
-                } else if (budget >= 4) {
-                    chosenKey = 'block';
+                } else if (budget >= 1) {
+                    chosenKey = 'cell';
                 }
             } else {
-                // FALLBACK TO LEGACY LOGIC
-                if (strength === 'easy') {
-                    if (budget >= 5 && Math.random() < 0.3) chosenKey = 'r_pentomino';
-                    else if (budget >= 5 && Math.random() < 0.1) chosenKey = 'glider';
-                    else if (budget >= 4) chosenKey = 'block';
-                } else if (strength === 'medium') {
-                    if (budget >= 36 && Math.random() < 0.2) chosenKey = 'glider_gun';
-                    else if (budget >= 5 && Math.random() < 0.2) chosenKey = 'glider';
-                    else if (budget >= 4) chosenKey = 'block';
-                } else {
-                    if (budget >= 5 && Math.random() < 0.8) chosenKey = 'r_pentomino';
-                    else if (budget >= 9 && Math.random() < 0.3) chosenKey = 'lwss';
-                    else if (budget >= 36 && Math.random() < 0.2) chosenKey = 'glider_gun';
-                    else if (budget >= 4) chosenKey = 'block';
-                }
+                // Should not happen if initialized correctly
+                chosenKey = budget >= 4 ? 'block' : 'cell';
             }
             
             // 2. FIND BEST SPOT (with fallback)

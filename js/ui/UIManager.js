@@ -73,9 +73,11 @@ class UIManager {
                 if (c.rounds) document.getElementById('cfgRounds').value = c.rounds;
                 if (c.budgetFactor) document.getElementById('cfgBudgetFactor').value = c.budgetFactor;
                 if (c.steps) document.getElementById('cfgSteps').value = c.steps;
-                if (c.humansCount) document.getElementById('cfgHumans').value = c.humansCount;
                 if (c.radius) document.getElementById('cfgRadius').value = c.radius;
+                if (c.humanFlags) this.humanFlags = c.humanFlags;
             } catch(e) { console.error('Failed to parse saved config', e); }
+        } else {
+            this.humanFlags = [true, false, false, false]; // Default: P1 human
         }
 
         // Randomize Rocks (Mountains) for each mission
@@ -93,7 +95,7 @@ class UIManager {
 
         // Interactive House Selection
         const humanHousesContainer = document.getElementById('humanHousesContainer');
-        this.humanFlags = [true, false, false, false]; // Default: P1 human
+        if (!this.humanFlags) this.humanFlags = [true, false, false, false]; // Fallback if not loaded
 
         if (humanHousesContainer) {
             const updateHouseUI = () => {
@@ -160,10 +162,35 @@ class UIManager {
         }
 
         document.getElementById('btnStartGame').addEventListener('click', () => {
-            // Read config
-            const mapSize = document.getElementById('cfgMapSize').value;
+            const devSettings = document.getElementById('devSettings');
+            const isDevMode = devSettings && !devSettings.classList.contains('hidden');
+
+            let mapSize, rounds, budgetFactor, steps, radius, rocks, isDojoMode, isBatchMode;
+
+            if (isDevMode) {
+                mapSize = document.getElementById('cfgMapSize').value;
+                rounds = parseInt(document.getElementById('cfgRounds').value);
+                budgetFactor = parseInt(document.getElementById('cfgBudgetFactor').value);
+                steps = parseInt(document.getElementById('cfgSteps').value);
+                radius = parseInt(document.getElementById('cfgRadius').value);
+                rocks = parseInt(document.getElementById('cfgRocks').value);
+                isDojoMode = document.getElementById('cfgDojoMode').checked;
+                isBatchMode = document.getElementById('cfgBatchMode').checked;
+            } else {
+                // Non-Developer Mode Defaults
+                mapSize = 'xlarge';
+                rounds = 7;
+                budgetFactor = 100;
+                steps = 2000;
+                radius = 5;
+                rocks = Math.floor(Math.random() * 1001); // Random mountains for variety
+                isDojoMode = false;
+                isBatchMode = false;
+            }
+
             let rows = 60, cols = 100;
             if (mapSize === 'small') { rows = 40; cols = 60; }
+            if (mapSize === 'medium') { rows = 60; cols = 100; }
             if (mapSize === 'large') { rows = 80; cols = 140; }
             if (mapSize === 'xlarge') { rows = 100; cols = 180; }
             if (mapSize === 'xxlarge') { rows = 140; cols = 240; }
@@ -172,15 +199,16 @@ class UIManager {
                 raw_mapSize: mapSize,
                 rows: rows,
                 cols: cols,
-                rounds: parseInt(document.getElementById('cfgRounds').value),
-                budgetFactor: parseInt(document.getElementById('cfgBudgetFactor').value),
-                steps: parseInt(document.getElementById('cfgSteps').value),
+                rounds: rounds,
+                budgetFactor: budgetFactor,
+                steps: steps,
                 playerCount: 4,
-                radius: parseInt(document.getElementById('cfgRadius').value),
+                radius: radius,
                 collisionRule: 'majority',
-                rocks: parseInt(document.getElementById('cfgRocks').value),
-                isDojoMode: document.getElementById('cfgDojoMode').checked,
-                isBatchMode: document.getElementById('cfgBatchMode').checked
+                rocks: rocks,
+                isDojoMode: isDojoMode,
+                isBatchMode: isBatchMode,
+                humanFlags: [...this.humanFlags] // Spread to clone the array
             };
 
             if (config.isDojoMode) {
