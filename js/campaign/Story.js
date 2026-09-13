@@ -5,33 +5,33 @@ const CAMPAIGN_STORY = {
     chapters: [
         {
             voice: 'UNSERE BIOLOGIN',
-            briefing: 'Commander, unsere Wasservorräte reichen bis zum nächsten Winter. Wir sind in Chryse gelandet, einer weiten Ebene auf dem Mars. Hier soll unsere erste Pflanzensiedlung entstehen. Beginnen wir klein. Vier Zellen können etwas, das eine einzelne nicht schafft.',
-            debriefing: 'Die erste Kolonie hält. Unsere Biologin lacht zum ersten Mal seit der Landung. Dann empfängt die Landefähre ein Echo aus einer stillgelegten Forschungsboje: dieselbe Kennung wie unser frisch entwickeltes Genom.',
-            archive: { title: '01 · Das Echo', text: 'UNSERE BIOLOGIN: „Keine Störung. Die Boje hat unsere Genomkennung erkannt. Jemand hat dieses Experiment schon einmal durchgeführt.“ Empfangsort: Chryse. Absender: unbekannt.' }
+            briefing: "Du führst die Landefähre des Hauses Marineris. Hier in Chryse, einer weiten Marsebene, soll eure erste Kolonie entstehen. „Ich untersuche unsere Pflanzen“, meldet sich die Biologin. „Unsere Wasservorräte reichen nur noch einen Winter. Finden wir heraus, wie wenige Zellen gemeinsam überleben können.“",
+            debriefing: "Die Kolonie hält. Doch die Forschungsboje erkennt ihre Genomkennung. „Jemand hat dieses Experiment schon einmal durchgeführt“, sagt unsere Biologin. Die vermeintliche Neuentdeckung hat eine Vergangenheit.",
+
         },
         {
             voice: 'UNSERE BIOLOGIN',
-            briefing: 'Das Echo führt zu einer Forschungsstation jenseits unserer Landezone. Ihre Batterie erwacht nur unter biologischer Aktivität. Erschließe den Standort mit lebenden Kolonien. Wir brauchen die Messdaten – und eine Erklärung.',
-            debriefing: 'Die Station öffnet ein Archiv von 2110: Die frühere Expedition hieß PALISADE. Ada Kessler war ihre Forschungsleiterin. Unser Genom ist dort vollständig dokumentiert. Unsere Biologin flüstert: „Das ist keine neue Erfindung. Man hat uns eine alte gegeben.“',
-            archive: { title: '02 · PALISADE, 2110', text: 'DIE FRÜHERE FORSCHUNGSLEITERIN: „B3/S23. Keine Ausnahmen. Wir verändern nicht die Regeln, sondern die Anfangsbedingungen.“ Die Datei enthält den ersten mobilen Stamm. Auftraggeber und Expeditionsende wurden geschwärzt.' }
+            briefing: "Eine stillgelegte Forschungsboje hat unser angeblich neues Genom erkannt. Ihre Spur führt zu einer verlassenen Station. Erweitere dein Einflussgebiet bis dorthin und wecke das Archiv. Wer hat diese Pflanzen schon vor uns auf den Mars gebracht?",
+            debriefing: "Das Archiv stammt von 2110: PALISADE, geleitet von der Forscherin Ada Kessler. Es beschreibt unser Genom bis ins Detail. Auftraggeber und Expeditionsende wurden geschwärzt. Eine Spur führt durch die Schlucht.",
+
         },
         {
             voice: 'DIE LANDEFÄHRE',
-            briefing: 'Die Koordinaten der alten Forschungsleiterin führen durch einen schmalen Canyon. Das geborgene Gleiter-Genom bewegt sich alle vier Generationen ein Feld diagonal weiter. Bringe es durch den Pass. Auf der anderen Seite sendet ein zweiter, vollkommen identischer Stamm.',
-            debriefing: 'Hinter dem Pass wächst derselbe Gleiter ohne unsere Hilfe. Unsere Biologin findet eine alte Warnung: „Nicht mit dem Tal verbinden.“ Noch bevor wir antworten, schaltet sich eine fremde Stimme ein: „An die Landefähre. Hier Sera Voss, Kommandantin des Hauses Hellas. Unsere Siedlungen liegen südlich von Ihnen. Beenden Sie die Aussaat.“',
-            archive: { title: '03 · Die versiegelte Schlucht', text: 'DIE FRÜHERE FORSCHUNGSLEITERIN: „Ein einzelnes Muster ist berechenbar. Tausend kollidierende Kolonien sind es für unsere Rechner nicht mehr rechtzeitig. Die Sperrzonen schützen nicht die Forschung vor Menschen. Sie schützen Menschen vor der Forschung.“' }
+            briefing: "Ada Kessler, Leiterin der früheren Expedition PALISADE, hinterließ Koordinaten jenseits dieser Schlucht. Ihr Gleiter-Genom wandert alle vier Generationen ein Feld diagonal. Bringe lebende Flora durch den Pass. Dahinter wächst derselbe Stamm – obwohl dort niemand von uns ausgesät hat.",
+            debriefing: "Eine alte Aufzeichnung warnt: „Die Sperren schützen Menschen vor der Forschung.“ Dann funkt Sera Voss, Kommandantin der südlichen Hellas-Siedlungen: „Beenden Sie die Aussaat.“ Was haben wir gerade geöffnet?",
+
         },
         {
             voice: 'DIE HELLAS-KOMMANDANTIN',
-            briefing: '„Das Eis speist unsere südlichen Kuppeln“, sagt die Hellas-Kommandantin. „Ihre Aussaat bedroht die Leitungen.“ Doch auch Chryse braucht dieses Wasser. Ein Hellas-Gleiter ist bereits unterwegs. Erreiche das Reservoir zuerst, bevor der Streit zur Belagerung wird.',
-            debriefing: 'die Landefähre sichert das Reservoir. Unter dem Eis liegen alte Wurzelkanäle. Die Hellas-Kommandantin übermittelt Bilder einer überwucherten Kuppel: „Wir kämpfen nicht um Ihr Patent. Wir halten eine Quarantäne.“ Ihr Außenposten blockiert dennoch unseren Weg zum Hauptarchiv.',
-            archive: { title: '04 · Kein feindliches Haus', text: 'DIE HELLAS-KOMMANDANTIN: „Die Flora an unserer Kuppel hat keine Hauskennung. Wir haben sie verbrannt. Drei Wochen später kam sie aus einem anderen Schacht.“ UNSERE BIOLOGIN: „Sie verfolgt niemanden. Wir haben ihr bloß überall dieselben idealen Wachstumsbedingungen gebaut.“' }
+            briefing: "„Dieses Eis versorgt unsere Familien“, warnt Sera Voss, die Hellas-Kommandantin. Auch unsere Siedlung braucht das Wasser. Ein Hellas-Gleiter nähert sich bereits dem Reservoir. Erreiche es zuerst. Warum verteidigt Voss die Leitungen, als wäre unsere Flora eine Gefahr?",
+            debriefing: "Das Wasser ist gesichert. Voss zeigt eine überwucherte Kuppel: „Wir halten eine Quarantäne.“ Die Pflanzen kamen durch alte Schächte zurück. Sie jagen niemanden – unsere Leitungen bieten ihnen ideale Wachstumswege.",
+
         },
         {
             voice: 'UNSERE BIOLOGIN',
-            briefing: 'Im Hellas-Außenposten liegt der Zugangsschlüssel zum PALISADE-Netz. Die Hellas-Kommandantin verweigert die Durchfahrt; unser Wasserfenster schließt sich. Nimm das Camp ein und sichere die Aufzeichnungen. Die unmarkierte Flora östlich der Felswand gehört keinem von uns.',
-            debriefing: 'Das Camp fällt, seine Besatzung zieht ab. Das Archiv beweist: PALISADE wurde nie vernichtet. Das Haus Tharsis, Betreiber der großen Energieanlagen, kaufte die Daten, löschte die Warnungen und verkaufte die Genome an alle vier Häuser. Unsere Landung hat die biologische Sperre der alten Expedition unterbrochen. Die Hellas-Kommandantin funkt: „Sie haben Ihren Durchgang. Helfen Sie mir jetzt, die Kuppeln zu retten.“ Zum ersten Mal antworten wir auf derselben Frequenz.',
-            archive: { title: '05 · Das Gedächtnis des Bodens', text: 'DIE FRÜHERE FORSCHUNGSLEITERIN / LETZTE NACHRICHT: „Die Flora erinnert sich an nichts. Aber jede Generation erbt die Folgen der vorherigen. Das ist genug.“ Anlage: Sperrnetz OLYMPUS. Status: durch neue Kolonien unterbrochen. Nächstes Ziel: die Wasseradern von Hellas.' }
+            briefing: "Voss sperrt den Außenposten, doch darin liegt der Schlüssel zu den alten Forschungsdaten. Unser Wasser wird knapp. Überwuchere das Camp und sichere die Aufzeichnungen. Hinter der östlichen Felswand wächst unmarkierte Flora. Sie gehört keinem der Häuser.",
+            debriefing: "Das Camp ist geräumt. Die Daten beweisen: Tharsis, Betreiber der Energieanlagen, verkaufte alte Genome und löschte ihre Warnungen. Unsere Aussaat hat eine biologische Sperre durchbrochen. Voss funkt: „Sie haben Ihren Durchgang. Helfen Sie uns jetzt.“",
+
         }
     ]
 };

@@ -1,102 +1,152 @@
 [
   {
     "id": "A1_M01_briefing",
-    "text": "Commander, unsere Wasservorräte reichen bis zum nächsten Winter. Wir sind in Chryse gelandet, einer weiten Ebene auf dem Mars. Hier soll unsere erste Pflanzensiedlung entstehen. Beginnen wir klein. Vier Zellen können etwas, das eine einzelne nicht schafft.",
+    "text": "Du führst die Landefähre des Hauses Marineris. Hier in Chryse, einer weiten Marsebene, soll eure erste Kolonie entstehen. „Ich untersuche unsere Pflanzen“, meldet sich die Biologin. „Unsere Wasservorräte reichen nur noch einen Winter. Finden wir heraus, wie wenige Zellen gemeinsam überleben können.“",
     "voice": "uncle_fu"
   },
   {
     "id": "A1_M01_debriefing",
-    "text": "Die erste Kolonie hält. Unsere Biologin lacht zum ersten Mal seit der Landung. Dann empfängt die Landefähre ein Echo aus einer stillgelegten Forschungsboje: dieselbe Kennung wie unser frisch entwickeltes Genom.",
+    "text": "Die Kolonie hält. Doch die Forschungsboje erkennt ihre Genomkennung. „Jemand hat dieses Experiment schon einmal durchgeführt“, sagt unsere Biologin. Die vermeintliche Neuentdeckung hat eine Vergangenheit.",
     "voice": "uncle_fu"
   },
   {
     "id": "A1_M02_briefing",
-    "text": "Das Echo führt zu einer Forschungsstation jenseits unserer Landezone. Ihre Batterie erwacht nur unter biologischer Aktivität. Erschließe den Standort mit lebenden Kolonien. Wir brauchen die Messdaten – und eine Erklärung.",
+    "text": "Eine stillgelegte Forschungsboje hat unser angeblich neues Genom erkannt. Ihre Spur führt zu einer verlassenen Station. Erweitere dein Einflussgebiet bis dorthin und wecke das Archiv. Wer hat diese Pflanzen schon vor uns auf den Mars gebracht?",
     "voice": "uncle_fu"
   },
   {
     "id": "A1_M02_debriefing",
-    "text": "Die Station öffnet ein Archiv von 2110: Die frühere Expedition hieß PALISADE. Ada Kessler war ihre Forschungsleiterin. Unser Genom ist dort vollständig dokumentiert. Unsere Biologin flüstert: „Das ist keine neue Erfindung. Man hat uns eine alte gegeben.“",
+    "text": "Das Archiv stammt von 2110: PALISADE, geleitet von der Forscherin Ada Kessler. Es beschreibt unser Genom bis ins Detail. Auftraggeber und Expeditionsende wurden geschwärzt. Eine Spur führt durch die Schlucht.",
     "voice": "uncle_fu"
   },
   {
     "id": "A1_M03_briefing",
-    "text": "Die Koordinaten der alten Forschungsleiterin führen durch einen schmalen Canyon. Das geborgene Gleiter-Genom bewegt sich alle vier Generationen ein Feld diagonal weiter. Bringe es durch den Pass. Auf der anderen Seite sendet ein zweiter, vollkommen identischer Stamm.",
+    "text": "Ada Kessler, Leiterin der früheren Expedition PALISADE, hinterließ Koordinaten jenseits dieser Schlucht. Ihr Gleiter-Genom wandert alle vier Generationen ein Feld diagonal. Bringe lebende Flora durch den Pass. Dahinter wächst derselbe Stamm – obwohl dort niemand von uns ausgesät hat.",
     "voice": "uncle_fu"
   },
   {
     "id": "A1_M03_debriefing",
-    "text": "Hinter dem Pass wächst derselbe Gleiter ohne unsere Hilfe. Unsere Biologin findet eine alte Warnung: „Nicht mit dem Tal verbinden.“ Noch bevor wir antworten, schaltet sich eine fremde Stimme ein: „An die Landefähre. Hier Sera Voss, Kommandantin des Hauses Hellas. Unsere Siedlungen liegen südlich von Ihnen. Beenden Sie die Aussaat.“",
+    "text": "Eine alte Aufzeichnung warnt: „Die Sperren schützen Menschen vor der Forschung.“ Dann funkt Sera Voss, Kommandantin der südlichen Hellas-Siedlungen: „Beenden Sie die Aussaat.“ Was haben wir gerade geöffnet?",
     "voice": "uncle_fu"
   },
   {
     "id": "A1_M04_briefing",
-    "text": "„Das Eis speist unsere südlichen Kuppeln“, sagt die Hellas-Kommandantin. „Ihre Aussaat bedroht die Leitungen.“ Doch auch Chryse braucht dieses Wasser. Ein Hellas-Gleiter ist bereits unterwegs. Erreiche das Reservoir zuerst, bevor der Streit zur Belagerung wird.",
+    "text": "„Dieses Eis versorgt unsere Familien“, warnt Sera Voss, die Hellas-Kommandantin. Auch unsere Siedlung braucht das Wasser. Ein Hellas-Gleiter nähert sich bereits dem Reservoir. Erreiche es zuerst. Warum verteidigt Voss die Leitungen, als wäre unsere Flora eine Gefahr?",
     "voice": "uncle_fu"
   },
   {
     "id": "A1_M04_debriefing",
-    "text": "die Landefähre sichert das Reservoir. Unter dem Eis liegen alte Wurzelkanäle. Die Hellas-Kommandantin übermittelt Bilder einer überwucherten Kuppel: „Wir kämpfen nicht um Ihr Patent. Wir halten eine Quarantäne.“ Ihr Außenposten blockiert dennoch unseren Weg zum Hauptarchiv.",
+    "text": "Das Wasser ist gesichert. Voss zeigt eine überwucherte Kuppel: „Wir halten eine Quarantäne.“ Die Pflanzen kamen durch alte Schächte zurück. Sie jagen niemanden – unsere Leitungen bieten ihnen ideale Wachstumswege.",
     "voice": "uncle_fu"
   },
   {
     "id": "A1_M05_briefing",
-    "text": "Im Hellas-Außenposten liegt der Zugangsschlüssel zum PALISADE-Netz. Die Hellas-Kommandantin verweigert die Durchfahrt; unser Wasserfenster schließt sich. Nimm das Camp ein und sichere die Aufzeichnungen. Die unmarkierte Flora östlich der Felswand gehört keinem von uns.",
+    "text": "Voss sperrt den Außenposten, doch darin liegt der Schlüssel zu den alten Forschungsdaten. Unser Wasser wird knapp. Überwuchere das Camp und sichere die Aufzeichnungen. Hinter der östlichen Felswand wächst unmarkierte Flora. Sie gehört keinem der Häuser.",
     "voice": "uncle_fu"
   },
   {
     "id": "A1_M05_debriefing",
-    "text": "Das Camp fällt, seine Besatzung zieht ab. Das Archiv beweist: PALISADE wurde nie vernichtet. Das Haus Tharsis, Betreiber der großen Energieanlagen, kaufte die Daten, löschte die Warnungen und verkaufte die Genome an alle vier Häuser. Unsere Landung hat die biologische Sperre der alten Expedition unterbrochen. Die Hellas-Kommandantin funkt: „Sie haben Ihren Durchgang. Helfen Sie mir jetzt, die Kuppeln zu retten.“ Zum ersten Mal antworten wir auf derselben Frequenz.",
+    "text": "Das Camp ist geräumt. Die Daten beweisen: Tharsis, Betreiber der Energieanlagen, verkaufte alte Genome und löschte ihre Warnungen. Unsere Aussaat hat eine biologische Sperre durchbrochen. Voss funkt: „Sie haben Ihren Durchgang. Helfen Sie uns jetzt.“",
     "voice": "uncle_fu"
   },
   {
     "id": "A2_M01_briefing",
-    "text": "Die Kommandantin des Hauses Hellas heißt Sera Voss. Gestern hielt sie uns auf; heute zeigt sie uns zwei Siedlungen, deren Wasserleitungen versagen. Unsere Pflanzen können die Pumpen versorgen. Aber nur, wenn beide Anschlüsse gleichzeitig in unserem Einflussgebiet liegen. Erreiche beide, bevor die Vorräte aufgebraucht sind.",
+    "text": "Gestern hielt uns Voss auf. Heute zeigt uns die Hellas-Kommandantin zwei bedrohte Siedlungen im südlichen Marsbecken. Ihre Wasserpumpen versagen. Verbinde beide Anschlüsse gleichzeitig mit deinem Einflussgebiet. Zum ersten Mal geht es um die Familien beider Häuser.",
     "voice": "uncle_fu"
   },
   {
     "id": "A2_M01_debriefing",
-    "text": "Beide Pumpen laufen. Die Hellas-Kommandantin öffnet die Schleusen für unsere Siedler. Dann kommt eine erschreckende Messung: Unter den Leitungen wächst fremde Flora. Unser Streit hat ihr Zeit verschafft. Wir müssen gemeinsam den Zufluss sichern.",
+    "text": "Beide Pumpen laufen. Voss teilt erstmals ihre Karten mit uns. Doch unter den Leitungen wächst fremde Flora. Unser Streit hat ihr Zeit verschafft. Gemeinsam müssen wir jetzt die Schleusen sichern.",
     "voice": "uncle_fu"
   },
   {
     "id": "A2_M02_briefing",
-    "text": "Unsere Biologin hat zwei biologische Schlösser gefunden. Die alte Expedition legte sie an, um getrennte Wachstumsgebiete zu erhalten. Beide müssen gleichzeitig von unserer Flora erreicht werden. Ein einzelner Gleiter kann das nicht leisten. Teile deine Aussaat auf und beachte die unterschiedlichen Flugwege.",
+    "text": "Die alte Expedition trennte ihre Pflanzenkolonien durch Schutzschleusen. „Treffen zu viele Kolonien zusammen, kippen ihre Wachstumsbahnen“, erklärt unsere Biologin. Erreiche beide Kammern gleichzeitig mit lebender Flora. Zwei Wege, zwei Ankünfte – ein einzelner Gleiter reicht nicht.",
     "voice": "uncle_fu"
   },
   {
     "id": "A2_M02_debriefing",
-    "text": "Die Schlösser öffnen sich gemeinsam. Hinter ihnen liegt keine Waffe, sondern ein Schutzsystem. Seine Erbauer wollten verhindern, dass alle Pflanzenkolonien zu einer einzigen unkontrollierbaren Front zusammenwachsen. Wir haben bisher genau das Gegenteil getan.",
+    "text": "Die Schleusen öffnen sich. Dahinter liegt ein Schutzsystem: Es hält Pflanzenkolonien auseinander, statt ihr Wachstum zu fördern. Wir haben bisher das Gegenteil getan. Aus der südlichen Kuppel trifft ein Notruf ein.",
     "voice": "uncle_fu"
   },
   {
     "id": "A2_M03_briefing",
-    "text": "Die fremde Flora hat einen Schacht erreicht. Ein unmarkierter Gleiter treibt auf den Evakuierungsplatz zu. Die letzte Fähre kann erst nach 96 Generationen starten. Fange den Gleiter mit deiner Aussaat ab und erhalte eine eigene Kolonie. Eine einzige fremde Zelle auf dem Landeplatz beendet die Rettung.",
+    "text": "Ein unmarkierter Gleiter treibt auf den Evakuierungsplatz zu. Die letzte Fähre braucht noch 96 Generationen. Fange die fremde Flora ab und erhalte eine eigene Kolonie. Eine einzige fremde Zelle am Landeplatz gefährdet alle Wartenden – gleichgültig, zu welchem Haus sie gehören.",
     "voice": "uncle_fu"
   },
   {
     "id": "A2_M03_debriefing",
-    "text": "Die Fähre hebt ab. An Bord sitzen Menschen beider Häuser. Die Kommandantin übergibt uns die vollständigen Forschungsdaten. Keine Bedingungen mehr. Darin entdecken wir, wer die Warnungen vor dieser Flora aus den verkauften Genomen entfernt hat: das Haus Tharsis, der Betreiber der großen Energieanlagen.",
+    "text": "Die Fähre hebt ab – mit Menschen beider Häuser. Im Funk heißt es erstmals „unsere Leute“. Voss übergibt die Forschungsdaten ohne Bedingungen. Sie führen zu den verschwundenen Sicherheitsberichten von Tharsis.",
     "voice": "uncle_fu"
   },
   {
     "id": "A2_M04_briefing",
-    "text": "Tharsis verkauft Energie und Pflanzengenome an alle Häuser. In drei Außenstationen liegen die ursprünglichen Sicherheitsberichte. Eine örtliche Wachmannschaft will unseren Zugriff verhindern. Erreiche alle drei Archive mit lebender Flora. Ein kurzer Kontakt genügt zum Sichern; die Dateien bleiben auch erhalten, wenn die Kolonie weiterzieht.",
+    "text": "Das Energiehaus Tharsis verkaufte uns die alten Genome ohne Warnhinweise. Drei Forschungsarchive könnten das beweisen; eine Wache versperrt den Zugriff. Berühre jedes Archiv mit lebender Flora. Ein kurzer Kontakt genügt: Die Daten bleiben gesichert, auch wenn deine Kolonie weiterzieht.",
     "voice": "uncle_fu"
   },
   {
     "id": "A2_M04_debriefing",
-    "text": "Die Berichte stimmen überein. Die frühere Forschungsleiterin Ada Kessler warnte vor einer Verbindung aller Wachstumsnetze. Tharsis entfernte diese Warnung, um billiger zu verkaufen. Doch auch die alten Forscher machten einen Fehler: Ihr Schutzsystem hängt an einer einzigen Energiezentrale. Und genau diese Zentrale fällt jetzt aus.",
+    "text": "Kesslers alte Berichte beweisen die Vertuschung. Die frühere Forschungsleiterin warnte vor verbundenen Wachstumsnetzen. Doch auch ihr Schutzsystem hat eine Schwäche: eine einzige Energiezentrale. Genau diese fällt jetzt aus.",
     "voice": "uncle_fu"
   },
   {
     "id": "A2_M05_briefing",
-    "text": "Die Energiezentrale ist ausgefallen. Unmarkierte Flora treibt auf die Siedlung zu. Zwei voneinander getrennte Notpumpen können den Schutzgürtel erhalten. Besetze beide gelben Pumpenbereiche gleichzeitig und halte sie zwölf Generationen lang. Der Landeplatz im Süden darf keine fremde Zelle berühren. Diesmal musst du Ankunft, Dauer und Sicherheit zugleich planen.",
+    "text": "Die Energiezentrale ist ausgefallen. Fremde Flora rückt auf die Siedlung vor. Nur zwei getrennte Notpumpen können den Schutzgürtel erhalten. Halte beide Bereiche zwölf Generationen gleichzeitig mit lebender Flora besetzt. Keine fremde Zelle darf die Siedlung im Süden erreichen.",
     "voice": "uncle_fu"
   },
   {
     "id": "A2_M05_debriefing",
-    "text": "Die Pumpen halten. Zum ersten Mal versorgt ein gemeinsames Netz beide Häuser, ohne die Pflanzenkolonien miteinander zu verbinden. Die Siedlung ist gerettet. Dann öffnet sich Kesslers letzte Karte: Unter dem riesigen Vulkan Olympus liegt eine zweite, viel ältere Anlage. Sie reagiert bereits auf unseren Neustart. Die Rettung von Hellas war der Anfang – jetzt wissen wir, wonach wir suchen müssen.",
+    "text": "Die Pumpen halten. Beide Häuser sind gerettet, ihre Pflanzenkolonien bleiben getrennt. Kesslers letzte Karte weist unter den riesigen Vulkan Olympus: Dort liegt das ursprüngliche Schutzsystem. Wir müssen es finden, bevor weitere Siedlungen ihre Wachstumsnetze verbinden.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A3_M01_briefing",
+    "text": "Unter Olympus, dem großen Vulkan, finden wir drei biologische Zugangsschalter. Sie akzeptieren nur die Reihenfolge eins, zwei, drei. Ein falscher Kontakt verriegelt die Anlage. Plane die Ankunft deiner Kolonien: Wir haben nur ein kurzes Zeitfenster, bevor der Zugang wieder verschüttet wird.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A3_M01_debriefing",
+    "text": "Die Türen öffnen sich. Hinter ihnen laufen seit Jahrzehnten dieselben Versuche. Kessler hat das Netz nicht abgeschaltet. Sie ließ es lernen, welche Kolonien sich sicher voneinander trennen lassen. Ein Test läuft noch: Er verlangt, dass unser Leben wieder verschwindet.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A3_M02_briefing",
+    "text": "Die Kammer prüft ein kurzlebiges Versorgungssystem. Unsere Flora muss nach hundert Generationen noch leben und anschließend vollständig verschwinden. Spätestens nach Generation 140 muss die Kammer leer sein. Kein Radieren während der Evolution. Hier helfen weder ein ewiger Block noch grenzenloses Wachstum.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A3_M02_debriefing",
+    "text": "Die Kammer wird leer. Das ist kein Fehlschlag, sondern die Sicherung: Ein zeitlich begrenzter Organismus kann Energie liefern, ohne eine dauerhafte Verbindung zu hinterlassen. Dann zeigt die Außenkamera zwei Wildwuchsfronten. Beide steuern auf unsere Rückkehrroute zu.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A3_M03_briefing",
+    "text": "Zwei unmarkierte Gleiter bedrohen getrennte Rettungsplätze. Voss hält die Fähren bereit, doch die Stollen brauchen 96 Generationen zum Druckausgleich. Fange beide Fronten ab und bewahre eigene Flora. Ein einziger Durchbruch an einem der Plätze schneidet die Rückkehr ab.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A3_M03_debriefing",
+    "text": "Beide Rückwege bleiben offen. Voss will die Anlage sprengen, bevor weitere Fronten austreten. Unsere Biologin widerspricht: Die gleichen Systeme halten die Wassersiedlungen am Leben. Wir brauchen die vollständige Abschaltfolge – und Tharsis bewacht ihren letzten Speicher.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A3_M04_briefing",
+    "text": "Tharsis verteidigt drei Speicher mit der Abschaltfolge. Erreiche alle mit lebender Flora, ohne den roten Quarantänestreifen zu berühren – auch unsere eigenen Pflanzen sind dort verboten. Die Wache setzt starke Muster. Großflächiges Wachstum könnte uns den Zugang für immer versperren.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A3_M04_debriefing",
+    "text": "Die Speicher enthüllen den Preis der Abschaltung: Sie würde auch Hellas das Wasser nehmen. Kesslers letzte Notiz bietet einen anderen Weg – unabhängige Relais statt einer einzigen Zentrale. Tharsis sendet seine Schaltpläne. Zum ersten Mal trägt auch dieses Haus zur Rettung bei.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A3_M05_briefing",
+    "text": "Drei unabhängige Relais können die Zentrale ersetzen. Halte alle sechzehn Generationen gleichzeitig besetzt. Der rote Trennstreifen muss völlig leer bleiben. Jetzt zählt alles: Flugwege, Ankunft und begrenztes Wachstum. Scheitern wir, müssen wir zwischen der Anlage und dem Wasser der Siedlungen wählen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A3_M05_debriefing",
+    "text": "Die Relais übernehmen. Die Zentrale verstummt, doch in Hellas laufen die Pumpen weiter. Voss legt den Sprengzünder weg. Wir haben das Netz gerettet, indem wir es getrennt haben. Dann trifft eine Meldung aus dem Norden ein: Ein Sturm legt weitere alte Wurzelkanäle frei.",
     "voice": "uncle_fu"
   }
 ]

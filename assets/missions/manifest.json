@@ -1,0 +1,79 @@
+{
+  "generator": "Built-in image_gen",
+  "styleReferences": [
+    "assets/Mars_Terraforming01.png",
+    "assets/Marineris_Cyan.png"
+  ],
+  "images": [
+    {
+      "id": "A1_M01",
+      "title": "Erstes Leben",
+      "file": "A1_M01.webp",
+      "source": "exec-a9a48b27-89c1-4560-ae54-705479b29092.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. Intimate low-angle view of four tiny cyan succulent colonies taking root in red Martian soil beside a rugged landed expedition habitat, a helmeted scientist kneeling in the distance; fragile hope at dawn."
+    },
+    {
+      "id": "A1_M02",
+      "title": "Die erste Wurzel",
+      "file": "A1_M02.webp",
+      "source": "exec-fdd93cf4-2b79-43f6-b2e7-56c9ea94aeeb.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. A trail of cyan bioluminescent root colonies crosses barren rust-red ground toward a half-buried abandoned research station, its first warm window waking in the blue twilight; discovery and mystery."
+    },
+    {
+      "id": "A1_M03",
+      "title": "Der Pass",
+      "file": "A1_M03.webp",
+      "source": "exec-d361edfe-3395-4b07-83fa-761d698ab9a7.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. Towering dark Martian canyon cliffs form a narrow pass; a delicate moving-looking ribbon of cyan crystalline plant growth threads through the opening toward sunlight beyond, immense scale, dramatic perspective. No large planets in sky."
+    },
+    {
+      "id": "A1_M04",
+      "title": "Erster Kontakt",
+      "file": "A1_M04.webp",
+      "source": "exec-73f38010-a88d-4e0c-b1ba-573f032628b1.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. A deep Martian water-ice reservoir in an eroded basin, cyan flora approaching from one side and magenta flora from the other, two small rival expedition outposts, tension and precious pale blue ice. No large planets in sky."
+    },
+    {
+      "id": "A1_M05",
+      "title": "Die rote Grenze",
+      "file": "A1_M05.webp",
+      "source": "exec-b4276d93-a702-40d3-9f18-b0d57163f041.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. A rugged fortified magenta-lit Hellas outpost at the foot of red canyon walls, cyan roots approaching its perimeter; sealed research vault visible within, dust and dusk, biological territorial conflict without guns. No large planets in sky."
+    },
+    {
+      "id": "A2_M01",
+      "title": "Zwei Städte, ein Wasserstrom",
+      "file": "A2_M01.webp",
+      "source": "exec-dabcd6d3-27ac-42a3-b8c0-7456c64d10ad.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. Panoramic view of two inhabited dome settlements in an immense Martian basin, one cyan-lit and one magenta-lit, separated by barren terrain with two distinct root-powered pumping conduits; urgent fragile cooperation. No large planets in sky."
+    },
+    {
+      "id": "A2_M02",
+      "title": "Die geteilte Schlucht",
+      "file": "A2_M02.webp",
+      "source": "exec-54c46895-e10f-47d7-8105-b259c39fe034.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. A vast branching Mars canyon containing two industrial water sluices on separate rock terraces, carefully separated cyan bioluminescent colonies reaching toward both gates, deep shadow and shafts of amber light. No large planets in sky."
+    },
+    {
+      "id": "A2_M03",
+      "title": "Die letzte Fähre",
+      "file": "A2_M03.webp",
+      "source": "exec-615e0065-9f2d-49a0-898f-b77db85133ac.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. A grounded evacuation shuttle on a rugged Martian landing pad, tiny helmeted settlers boarding in an orderly urgent line; pale gray-white wild root growth approaching across the red valley, cyan colonies forming a fragile defensive barrier, stormy cinematic light. No large planets in sky."
+    },
+    {
+      "id": "A2_M04",
+      "title": "Die gestohlenen Warnungen",
+      "file": "A2_M04.webp",
+      "source": "exec-ad8da01c-9807-4e74-acff-f0a49086532f.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. Three abandoned research archive towers on distant red-rock terraces, scattered cyan root trails leading between them, yellow-lit energy-company machinery watching from a distant ridge, secretive ominous night, warm archive beacons. No large planets in sky."
+    },
+    {
+      "id": "A2_M05",
+      "title": "Ein Netz aus Inseln",
+      "file": "A2_M05.webp",
+      "source": "exec-78a2346c-4b5a-46ac-ae4d-c52640779cf7.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. Epic hopeful Mars panorama of two separate cyan living pump gardens glowing on rocky islands with a barren protective corridor between them; cyan and magenta settlement lights safely shining in the distance, pale wild flora beyond the perimeter, storm clearing at sunrise. No large planets in sky."
+    }
+  ]
+}

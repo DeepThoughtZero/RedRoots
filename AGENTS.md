@@ -44,6 +44,7 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 | `js/ui/GameAudio.js` | Audio-Einstellungen, Wiedergabe, Pause, Hintergrundabsenkung |
 | `js/campaign/Missions.js` | Deklarative Missionen und MissionManager zur Szenarioinitialisierung |
 | `js/campaign/ObjectiveSystem.js` | Missionsziele, Niederlagen, Statistiken und Sterne |
+| `js/campaign/Act3.js` | Fünf Missionen von Akt III und CAMPAIGN_ACTS für Aktnavigation; nach Act2.js laden |
 | `js/campaign/Act2.js` | Fünf Szenarien von Akt II; nach Story.js laden |
 | `js/campaign/Story.js` | Briefings, Berichte und nach Siegen freigeschaltete Archivtexte |
 | `js/campaign/CampaignManager.js` | CampaignState, Marskarte, Missions-HUD, Ergebnisse und Codes |
@@ -72,9 +73,9 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 
 ## Kampagne und Geschichte
 
-**Spielbar sind zehn Missionen in Akt I und II.** Akt II ergänzt territoriale Versorgung, gleichzeitige Zielbesetzung, Evakuierung mit Schutzzone, dauerhaft gesammelte Archive und ununterbrochenes Halten mehrerer Pumpen. Akte III–V bleiben geplant.
+**Spielbar sind fünfzehn Missionen in Akt I–III.** Akt II ergänzt territoriale Versorgung, gleichzeitige Zielbesetzung, Evakuierung mit Schutzzone, dauerhaft gesammelte Archive und ununterbrochenes Halten mehrerer Pumpen. Akt III ergänzt geordnete Kontakte, zeitlich begrenztes Leben, Doppelabfangmanöver und sterile Zonen. Akte IV–V bleiben geplant.
 
-Mission 1 beginnt nur mit Einzelzellen und schaltet den Block frei. Ihr Überlebensziel umfasst zwölf Generationen, mit festen 800 ms pro Generation und 1000 ms sichtbarem Endzustand; andere Missionen behalten den Temporegler. Mission 2 erlaubt Zelle/Block und schaltet Gleiter plus Blinker frei. Keine vorgefertigte Lösung in Mission 1 auswählen; alternative Conway-Lösungen bleiben gültig. Die Kampagne folgt derzeit Haus Marineris. Zentrale Geschichte: Eine verschwiegene Expedition namens PALISADE entwickelte die vermeintlich neuen Genome Jahrzehnte zuvor. Kesslers Sperrnetz, die Wasserkrise und der Konflikt mit Hellas führen zur Frage gemeinsamer Verantwortung. Keine Aliens, Zeitreise oder magisch denkende Flora einführen. Vor Storyänderungen `docs/CAMPAIGN_STORY.md` lesen.
+Mission 1 beginnt nur mit Einzelzellen und schaltet den Block frei. Ihr Überlebensziel umfasst zwölf Generationen, mit festen 800 ms pro Generation und 1000 ms sichtbarem Endzustand; andere Missionen behalten den Temporegler. Mission 2 erlaubt Zelle/Block und schaltet den Gleiter frei; der Blinker folgt nach Mission 3. Keine vorgefertigte Lösung in Mission 1 auswählen; alternative Conway-Lösungen bleiben gültig. Die Kampagne folgt derzeit Haus Marineris. Zentrale Geschichte: Eine verschwiegene Expedition namens PALISADE entwickelte die vermeintlich neuen Genome Jahrzehnte zuvor. Kesslers Sperrnetz, die Wasserkrise und der Konflikt mit Hellas führen zur Frage gemeinsamer Verantwortung. Keine Aliens, Zeitreise oder magisch denkende Flora einführen. Vor Storyänderungen `docs/CAMPAIGN_STORY.md` lesen.
 
 Für neue Missionen:
 
@@ -92,7 +93,7 @@ Für neue Missionen:
 - `redroots_audio_v1`: Audio-Einstellungen.
 - Weitere bestehende Keys betreffen Hilfe/Dojo; Kampagnenreset darf diese nicht pauschal löschen.
 - Gespeichert werden Abschlüsse, nicht der laufende Missionszustand. Browserprofil, Website und Port bestimmen den Speicherbereich; keine automatische Synchronisierung.
-- Neue `RR2`-Expeditionscodes übertragen zehn Sternwertungen mit Prüfziffer; alte `RR1`-Codes mit fünf Wertungen bleiben importierbar. Sie sind absichtlich keine kryptografisch geschützten Zugangsdaten.
+- Neue `RR3`-Expeditionscodes übertragen fünfzehn Sternwertungen; RR1 mit fünf und RR2 mit zehn Wertungen bleiben importierbar. Sie sind absichtlich keine kryptografisch geschützten Zugangsdaten.
 - Import vereinigt Fortschritte und behält die jeweils bessere Wertung. Sektorpasswörter geben früheren Missionen mindestens einen Stern und ihre Forschung/Archive.
 - Reset verlangt eine Bestätigung und betrifft nur die Kampagne. Ungültige Codes dürfen den Spielstand nicht verändern.
 - Speicherfehler behandeln und korrekt anzeigen. Keine Speicherung behaupten, wenn localStorage blockiert ist.
@@ -121,7 +122,7 @@ Speaches benötigt auf dieser Workstation einen Schlüssel. Nur für den lokalen
 
 Briefings und Missionsberichte automatisch vorlesen; bei Autoplay-Sperre mit der nächsten Interaktion nachholen. Hintergrund bleibt separat zuschaltbar und regelbar und darf Hinweise nicht übertönen. Niederlagen nutzen bei Verfügbarkeit die deutsche Browser-Sprachausgabe. Missionsatmosphären stehen in den Szenariodaten; zusätzliche CPU-Sounddesign-Varianten sind im Audio-Herkunftsmanifest gekennzeichnet. Vorlesen ist pausierbar; beim Szenenwechsel stoppen, bei verborgenem Tab pausieren. Texte müssen ohne Ton verständlich bleiben.
 
-**Audiozustand:** Alle aktuellen Missionen setzen `narration: browser`, damit neue Storytexte automatisch statt veralteter MP3s gesprochen werden. Deutsche Systemstimme bevorzugen; Verfügbarkeit hängt vom Gerät ab. „Ares-1“ ist in der aktiven Erzählung durch „Landefähre“ ersetzt. Das Manifest enthält zwanzig aktuelle Texte, alte MP3s und verification.json sind historische Aufnahmen. Die lokale GPU fiel aus; vor Neugenerierung Status prüfen, anschließend alle Clips verifizieren und erst dann die Wiedergabe umstellen. Keine GPU-Resets/Rechnerneustarts ohne Autorisierung.
+**Audiozustand:** Alle aktuellen Missionen setzen `narration: browser`, damit neue Storytexte automatisch statt veralteter MP3s gesprochen werden. Deutsche Systemstimme bevorzugen; Verfügbarkeit hängt vom Gerät ab. „Ares-1“ ist in der aktiven Erzählung durch „Landefähre“ ersetzt. Das Manifest enthält dreißig aktuelle Texte, alte MP3s und verification.json sind historische Aufnahmen. Die lokale GPU fiel aus; vor Neugenerierung Status prüfen, anschließend alle Clips verifizieren und erst dann die Wiedergabe umstellen. Keine GPU-Resets/Rechnerneustarts ohne Autorisierung.
 
 ## Verifikation und Übergabe
 
@@ -137,3 +138,13 @@ Briefings und Missionsberichte automatisch vorlesen; bei Autoplay-Sperre mit der
 - Abschluss auf Deutsch: konkrete Änderungen, tatsächlich durchgeführte Prüfungen und offene Einschränkungen nennen. Deployment oder Veröffentlichung nur im beauftragten Umfang durchführen.
 
 Storyverständlichkeit: Rollen beim ersten Auftreten erklären und anschließend Rollenbezeichnungen bevorzugen. Chryse ist die Landeebene, Hellas das südliche Becken mit Wassersiedlungen. Voss führt Hellas; Kessler leitete die frühere Expedition PALISADE. Keine weiteren Eigennamen ohne erzählerische Notwendigkeit.
+
+## Missionsillustrationen
+
+Jede der zehn Missionen lädt `assets/missions/<Missions-ID>.webp` im Briefing. Neue Missionen benötigen ein passendes Bild oder einen bewussten Fallback. Stilreferenzen: `Mars_Terraforming01.png` und `Marineris_Cyan.png`; realistische Marslandschaften, verwitterte Technik und leuchtende Flora. Vollständige Prompts und Herkunft in `assets/missions/manifest.json`. Keine wichtigen Hinweise ausschließlich im Bild vermitteln. Querformat kompakt halten und Vergrößerung anbieten; keine Bilder über dem Spielfeld platzieren.
+
+Sektortexte statt Expeditionsarchiv: Kein separates Storyarchiv oder „Wer spricht? Wo sind wir?“-Glossar anzeigen. Rollen und Orte knapp im passenden Briefing erklären (etwa 40–55 Wörter). Entdeckungen in kurzen Abschlussberichten erzählen; auf der Marskarte nur bei bereits abgeschlossenen Sektoren direkt unter dem Briefing zeigen. Keine spätere Enthüllung vorwegnehmen. Audio-Manifest bei Textänderungen aktualisieren.
+
+Genom-Progression: Block nach 1, Gleiter nach 2, Blinker nach 3; keine Genombelohnung nach 4/5; R-Pentomino nach 6, LWSS nach 7, Diehard nach 8, Acorn nach 9, B-Heptomino nach 10. Weitere komplexe Muster erst in späteren Akten. `reward: null` ist gültig und darf keine leere Belohnungskarte oder ungültigen Genome erzeugen. Mission.patterns begrenzt auch Wiederholungen unabhängig vom globalen Fortschritt. Sterne/Abschlüsse alter Saves erhalten; Genome werden aus aktueller Belohnungstabelle abgeleitet.
+
+Akt III: `node tests/act3.test.cjs` ausführen. orderedZones verliert bei vorzeitigem Kontakt eines späteren Schalters. pulse verlangt eigenes Leben exakt bei aliveAt und vollständige Auslöschung ab emptyAfter. sterile-Zonen verlieren bei lebender Flora jedes Eigentümers, auch eigener. Niederlagen haben Vorrang vor zeitgleichem Sieg. holdZones zählt ununterbrochene Generationen, keine Rundenereignisse. Rote Darstellung steriler Zonen in GameRenderer beibehalten. Bilder können über mission.image vorhandene Motive bewusst wiederverwenden. Rabbits erst nach 12, Switch Engine nach 14, Lidka nach 15; Gleiterkanone bleibt gesperrt. CAMPAIGN_ACTS ist die Quelle für Aktnamen und Navigation.

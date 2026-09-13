@@ -17,7 +17,7 @@ const CAMPAIGN_MISSIONS = [
         briefing: 'Die Forschungsboje schweigt seit 38 Jahren. Verbinden Sie ihren Standort mit unserem Einflussgebiet. Lebende Kolonien erschließen Boden; Boden finanziert die nächste Aussaat.',
         hint: 'Setze einen Block am rechten Rand des Startgebiets. Nach der Evolution reichen seine Wurzeln fünf Felder weit. Setze in der nächsten Runde einen weiteren Block weiter rechts bis zur gelben Station.',
         debriefing: 'Die Boje erwacht. Ihr Zeitstempel liegt vor unserer ersten Landung. Eine Datei ist erhalten: PROJECT REDROOTS. Der Absender wurde gelöscht.',
-        patterns: ['cell', 'block'], reward: 'glider', additionalRewards: ['blinker'], rounds: 5, steps: 12, budget: 16,
+        patterns: ['cell', 'block'], reward: 'glider', rounds: 5, steps: 12, budget: 16,
         objective: { type: 'territoryZone', zone: 'station', label: 'Die Forschungsstation mit Einflussgebiet erreichen' },
         bonuses: [{ type: 'rounds', value: 2, label: 'In höchstens 2 Runden abschließen' }, { type: 'spent', value: 8, label: 'Höchstens 8 Genmaterial einsetzen' }],
         map: { territory: [[0, 7, 4, 17, 13]], rocks: [[2, 24, 5, 35], [21, 18, 23, 31]], zones: [{ id: 'station', label: 'FORSCHUNG', rMin: 10, rMax: 14, cMin: 21, cMax: 23 }] }
@@ -28,7 +28,7 @@ const CAMPAIGN_MISSIONS = [
         briefing: 'Eine Felswand trennt uns vom nächsten Tal. Das neue Genom bleibt nicht an seinem Ursprungsort: Nach vier Generationen hat sich ein Gleiter um ein Feld diagonal versetzt.',
         hint: 'Ein ungedrehter Gleiter fliegt nach rechts unten. Starte ungefähr bei Zeile 7, Spalte 9 (Zählung ab 1). Die gelbe Öffnung liegt auf seiner Flugbahn. Rechtsklick oder R dreht das Muster.',
         debriefing: 'Die Kolonie durchquert den Pass. Doch im Tal sehen wir dieselbe Formation. Niemand aus unserer Expedition hat sie dort ausgesät.',
-        patterns: ['cell', 'block', 'blinker', 'glider'], reward: 'r_pentomino', rounds: 4, steps: 64, budget: 15,
+        patterns: ['cell', 'block', 'glider'], reward: 'blinker', rounds: 4, steps: 64, budget: 15,
         objective: { type: 'reachZone', zone: 'pass', label: 'Lebende Flora hinter die Felswand bringen' },
         bonuses: [{ type: 'rounds', value: 1, label: 'In der ersten Runde abschließen' }, { type: 'spent', value: 5, label: 'Mit einem einzigen Gleiter lösen (5 Material)' }],
         map: { territory: [[0, 3, 3, 11, 14]], rocks: [[0, 20, 14, 21], [22, 20, 29, 21]], zones: [{ id: 'pass', label: 'DURCHBRUCH', rMin: 18, rMax: 25, cMin: 24, cMax: 29 }] }
@@ -39,7 +39,7 @@ const CAMPAIGN_MISSIONS = [
         briefing: 'Haus Hellas hat das Eis ebenfalls entdeckt. Ein feindlicher Gleiter ist bereits unterwegs. Erreichen Sie das Reservoir zuerst. Bei gleichzeitiger Ankunft gilt der Sektor als verloren.',
         hint: 'Das Eis liegt diagonal rechts unter deiner Landezone. Ein Gleiter bei Zeile 11, Spalte 15 erreicht es schnell. Der pinke Gleiter ist real: Seine Flugbahn entscheidet das Rennen.',
         debriefing: 'Wasser gesichert. Hellas sendet keine Drohung, sondern eine Warnung: „Die Pflanzen im Süden gehören keinem Haus.“',
-        patterns: ['cell', 'block', 'blinker', 'glider', 'r_pentomino'], reward: 'acorn', rounds: 3, steps: 64, budget: 20,
+        patterns: ['cell', 'block', 'blinker', 'glider'], reward: null, rounds: 3, steps: 64, budget: 20,
         objective: { type: 'race', zone: 'water', label: 'Das Wasserreservoir vor Hellas erreichen' },
         bonuses: [{ type: 'rounds', value: 1, label: 'In der ersten Runde abschließen' }, { type: 'spent', value: 10, label: 'Höchstens 10 Genmaterial einsetzen' }],
         map: { territory: [[0, 5, 6, 13, 17]], rocks: [[1, 26, 4, 34], [25, 4, 27, 15]], seeds: [{ pattern: 'glider', r: 1, c: 43, owner: 2, mirror: true }], zones: [{ id: 'water', label: 'WASSEREIS', rMin: 18, rMax: 23, cMin: 23, cMax: 28 }] }
@@ -50,7 +50,7 @@ const CAMPAIGN_MISSIONS = [
         briefing: 'Hellas versperrt den Ausgang aus dem Tal. Überwuchern Sie ihren Außenposten, bevor unser Habitat fällt. Hinter der östlichen Wand pulsiert Flora ohne Kennung. Sie war vor uns hier.',
         hint: 'Ein Gleiter bei Zeile 9, Spalte 11 fliegt direkt zum Hellas-Camp. Sichere zusätzlich dein Habitat mit stabilen Kolonien. Hellas erhält jede Runde frisches Material und setzt eigene Muster.',
         debriefing: 'Der Sektor gehört Marineris. Im Archiv des Außenpostens finden wir unsere eigene Genomsequenz – datiert auf vierzig Jahre vor ihrer Erfindung. Ende von Akt I. Das Signal wartet.',
-        patterns: ['cell', 'block', 'blinker', 'glider', 'r_pentomino', 'acorn'], reward: 'lwss', rounds: 5, steps: 64, budget: 25, enemy: true,
+        patterns: ['cell', 'block', 'blinker', 'glider'], reward: null, rounds: 5, steps: 64, budget: 25, enemy: true,
         objective: { type: 'reachZone', zone: 'enemy', label: 'Den Außenposten von Hellas überwuchern' },
         bonuses: [{ type: 'rounds', value: 2, label: 'In höchstens 2 Runden abschließen' }, { type: 'spent', value: 15, label: 'Höchstens 15 Genmaterial einsetzen' }],
         map: { territory: [[0, 4, 4, 13, 16], [1, 20, 24, 27, 33]], rocks: [[0, 36, 23, 37]], camps: [{ id: 0, rMin: 4, rMax: 6, cMin: 4, cMax: 7 }, { id: 1, rMin: 22, rMax: 26, cMin: 24, cMax: 29 }], seeds: [{ pattern: 'r_pentomino', r: 12, c: 41, owner: -1 }], zones: [{ id: 'enemy', label: 'HELLAS', rMin: 22, rMax: 26, cMin: 24, cMax: 29 }] }

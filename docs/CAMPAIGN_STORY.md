@@ -2,7 +2,7 @@
 
 ## Spielbarer Umfang
 
-Akt I und II bestehen aus je fünf implementierten Missionen. Akte III–V sind die verbindende Geschichte für spätere Erweiterungen, noch keine spielbaren Inhalte. Das freie Gefecht und die Sandbox bleiben unabhängige Startoptionen mit ihrer bisherigen Genbibliothek und ihren bisherigen Regeln. Die Kampagne folgt zunächst Haus Marineris.
+Akt I, II und III bestehen aus je fünf implementierten Missionen. Akte IV–V sind die verbindende Geschichte für spätere Erweiterungen, noch keine spielbaren Inhalte. Das freie Gefecht und die Sandbox bleiben unabhängige Startoptionen mit ihrer bisherigen Genbibliothek und ihren bisherigen Regeln. Die Kampagne folgt zunächst Haus Marineris.
 
 ## Prämisse
 
@@ -21,12 +21,12 @@ Es gibt keine Außerirdischen, keine Zeitreise und keine magisch denkende Pflanz
 ## Akt I – Landung (implementiert)
 
 1. **Erstes Leben:** Die akute Wasserkrise gibt der Landung einen Zweck. Der Spieler setzt ausschließlich Einzelzellen und entdeckt selbst eine überlebensfähige Anordnung. Belohnung: der Block als wiederverwendbare Vorlage. Auch andere überlebende Anordnungen gelten als Lösung.
-2. **Die erste Wurzel:** Gebietsexpansion verbindet die Forschungsstation. Ihr Archiv beweist, dass unsere Genome von PALISADE stammen. Belohnung: Mobilität durch den Gleiter und der Blinker als zusätzliche Forschung.
+2. **Die erste Wurzel:** Gebietsexpansion verbindet die Forschungsstation. Ihr Archiv beweist, dass unsere Genome von PALISADE stammen. Belohnung: Mobilität durch den Gleiter. Der Blinker folgt nach dem Pass.
 3. **Der Pass:** Der Spieler nutzt Mobilität und entdeckt dieselbe Flora jenseits der Sperre. Kesslers Aufzeichnung erklärt die Felsen als biologische Isolation. Voss fordert einen Aussaatstopp.
 4. **Erster Kontakt:** Beide Siedlungen brauchen dasselbe Reservoir. Ein echter feindlicher Gleiter erzeugt Zeitdruck. Nach dem Sieg zeigt Voss erstmals ihre Verluste durch unmarkierte Flora.
 5. **Die rote Grenze:** Der Streit eskaliert am gesperrten Außenposten. Seine Eroberung öffnet das Archiv: Tharsis verkaufte alte PALISADE-Genome ohne Warnhinweise. Unsere Aussaat hat getrennte Kolonien wieder verbunden. Die örtliche Mission ist erfüllt; das größere Problem wird sichtbar. Voss bittet uns um Hilfe.
 
-Die Missionsberichte werden als dauerhaft lesbare Akten auf der Marskarte freigeschaltet. Forschung und Enthüllung entstehen aus derselben Handlung. Ein Fehlschlag enthüllt keine Akten.
+Die kurzen Missionsberichte erscheinen nach dem Sieg direkt beim jeweiligen Sektor. Forschung und Enthüllung entstehen aus derselben Handlung. Ein Fehlschlag enthüllt keine Akten.
 
 ## Akt II – Die Häuser (implementiert)
 
@@ -38,21 +38,25 @@ Die Missionsberichte werden als dauerhaft lesbare Akten auf der Marskarte freige
 
 Der Konflikt wechselt von Rivalität zu notwendiger Zusammenarbeit. Flora ist kein bewusster Feind. Der Spieler lernt, Wachstum zu begrenzen und getrennte funktionierende Kolonien zu erhalten. Es gibt in diesem Akt keinen implementierten Entscheidungsbaum; spätere Verzweigungen bleiben Entwürfe.
 
-## Akt III – Das Signal (geplant)
+## Akt III – Das stille Netz (implementiert)
 
-In Utopia findet die Expedition kein geheimes Supergenom, sondern eine Bibliothek sorgfältig gewählter Anfangsmuster. PALISADE sollte trockene Korridore zwischen Terraforming-Zonen erhalten. Bewegliche Kolonien konnten jedoch Sperren umgehen und getrennte Netze verbinden. Eine zentrale Großkolonie verdrängte lokale Vielfalt und beschädigte die Wasserinfrastruktur.
+11. **Drei Schlüssel im Staub:** Biologische Zugangsschalter verlangen eine feste Reihenfolge. Die Anlage unter Olympus führt alte Versuche weiter; das vermeintliche Signal ist deren messbare Aktivität.
+12. **Die Kunst zu verschwinden:** Diehard zeigt, dass endliches Leben als Sicherung dienen kann. Eine lebende Versorgung muss lange genug bestehen und anschließend restlos verschwinden.
+13. **Zwei Fronten, kein Rückweg:** Zwei Rettungsplätze brauchen gleichzeitig Schutz. Voss will die Anlage sprengen, doch die Biologin erkennt die Gefahr für die Wasserversorgung.
+14. **Die versiegelte Wahrheit:** Unter Quarantäne und gegen eine schwere Wache werden die Abschaltdaten geborgen. Vollständiges Abschalten bedroht Hellas. Tharsis trägt erstmals Schaltpläne zur gemeinsamen Rettung bei.
+15. **Das stille Netz:** Drei unabhängige Relais ersetzen die zentrale Energieversorgung. Die Trennung gelingt spielerisch durch begrenzte, synchronisierte Kolonien. Hellas bleibt versorgt; ein Sturm im Norden öffnet die nächste Gefahr.
 
-Kessler schloss die Anlage, Tharsis verkaufte die produktiven Genome und verwarf das teure Sperrnetz. Rook erbte diese Entscheidung und vertuschte die ersten Ausfälle. Das vermeintliche „Signal“ besteht aus regelmäßigen biologischen Fronten, nicht aus Sprache. Bergung und Beobachtung von Conway-Anomalien machen die Erkenntnis spielbar.
+Der Akt beantwortet die Frage nach dem alten Netz. Weder Flora noch Anlage brauchen übernatürliches Bewusstsein. Der Konflikt um Abschalten oder Erhalten wird durch eine dritte, im Conway-Spiel bewiesene Lösung aufgelöst. Kein zusätzlicher Dialogbaum. Spätere Akte bauen auf dem bereits geretteten Netz auf.
 
 ## Akt IV – Der rote Sturm (geplant)
 
 Ein Sturm setzt bislang getrennte Lebensräume über verschüttete Wasserkanäle in Verbindung. Die Häuser müssen ihre Grenzen öffnen, um Evakuierungskorridore zu schaffen. Frühere Hilfe entscheidet über Unterstützung und Startvorräte, nicht über künstliche Sackgassen.
 
-Vale erkennt: Eine vollständige Vernichtung würde auch die funktionierende Terraformierung zerstören. Rooks zentrale Steuerung kann die lokalen Wechselwirkungen nicht schnell genug auffangen. Mehr Macht und mehr Wachstum lösen das Problem nicht. Missionen verlangen Schutz, begrenzte Aussaat, Isolation und gleichzeitige Relaiskontrolle.
+Vale erkennt: Eine vollständige Vernichtung würde auch die funktionierende Terraformierung zerstören. Die zentrale Steuerung von Tharsis kann die lokalen Wechselwirkungen nicht schnell genug auffangen. Mehr Macht und mehr Wachstum lösen das Problem nicht. Missionen verlangen Schutz, begrenzte Aussaat, Isolation und gleichzeitige Relaiskontrolle.
 
 ## Akt V – Olympus (geplant)
 
-Unter Olympus liegt Kesslers Sperrnetz-Archiv. Das Finale ist ein mehrteiliges Conway-Gefecht: Durchbruch zum Archiv, Schutz der Habitate und Aufbau voneinander getrennter stabiler Zonen. Der Spieler beweist mit den seit Mission 1 gelernten Mustern, dass ein begrenztes, verteiltes Netz tragfähig ist.
+Das in Akt III gerettete Netz unter Olympus muss nun weitere Regionen versorgen. Das geplante Finale überträgt die örtliche Lösung auf den Mars: Schutz mehrerer Habitate, Verbindungen für Menschen und voneinander getrennte stabile Pflanzenzonen. Der Spieler beweist mit den seit Mission 1 gelernten Mustern, dass ein begrenztes, verteiltes Netz tragfähig ist.
 
 Anschließend zwei verantwortbare Entscheidungen: **Ein gemeinsames Mars-Konsortium** bündelt Wartung und Wasserquoten, verlangt aber die Abgabe hausinterner Kontrolle. **Freie lokale Genome** geben den Siedlungen Autonomie und veröffentlichen die Archive, verlangen jedoch langfristige Kooperation zur Erhaltung der Sperrkorridore. Kein Knopf macht den Mars augenblicklich grün. Der Epilog zeigt, wen wir gerettet haben und wem wir Verantwortung übertragen.
 
@@ -62,4 +66,4 @@ Letzte Aufzeichnung Kesslers: „Die Flora erinnert sich an nichts. Aber jede Ge
 
 Jede Mission beantwortet eine Frage und öffnet eine konkrete nächste. Figuren sprechen über ihre unmittelbaren Bedürfnisse; die Akten tragen die Hintergrundgeschichte. Die Natur betrügt nicht: Alle Anomalien entstehen aus denselben Conway-Regeln. Entscheidungen verändern Beziehungen und taktische Bedingungen, ohne einen unbeherrschbaren Dialogbaum zu erzeugen. Weitere Akte werden erst als spielbar angezeigt, wenn ihre Szenarien umgesetzt und geprüft sind.
 
-Namen sparsam verwenden: Im Spiel sprechen überwiegend „unsere Biologin“, „die Hellas-Kommandantin“ und „die Forschungsleiterin“. Voss und Kessler werden bei ihrer ersten Erwähnung mit Rolle eingeführt; das Glossar auf der Marskarte hält diese Erklärungen bereit.
+Namen sparsam verwenden: Im Spiel sprechen überwiegend „unsere Biologin“, „die Hellas-Kommandantin“ und „die Forschungsleiterin“. Voss und Kessler werden bei ihrer ersten Erwähnung mit Rolle eingeführt; die Sektortexte enthalten diese Erklärungen direkt.
