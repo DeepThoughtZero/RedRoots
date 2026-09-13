@@ -14,36 +14,24 @@ class GameRenderer {
         this.cellSize = 10; 
         this.camera = { x: 0, y: 0, zoom: 1 };
         this.resize();
-        window.addEventListener('resize', this.resize.bind(this));
+        // The board also changes size when mobile controls or mission hints expand.
+        this.resizeObserver = new ResizeObserver(() => this.resize());
+        this.resizeObserver.observe(this.canvas.parentElement);
     }
 
     resize() {
-        const container = this.canvas.parentElement;
-        const rect = container.getBoundingClientRect();
-        
-        // Full viewport canvas
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
-        
-        // Calculate cell size keeping aspect ratio, accounting for right panel (320px) on desktop
-        const availableWidth = rect.width > 600 ? rect.width - 320 : rect.width;
-        const aspectX = availableWidth / this.gameState.cols;
-        const aspectY = rect.height / this.gameState.rows;
-        
-        this.cellSize = Math.max(5, Math.floor(Math.min(aspectX, aspectY) * 0.95));
-        
-        const gridPixelWidth = this.gameState.cols * this.cellSize;
-        const gridPixelHeight = this.gameState.rows * this.cellSize;
-        
-        // Center the grid initially, shifted slightly left to accommodate the right panel (w-80 = 320px)
-        if (this.camera.zoom === 1 && this.camera.x === 0 && this.camera.y === 0) {
-            this.camera.x = (rect.width - 320 - gridPixelWidth) / 2;
-            this.camera.y = (rect.height - gridPixelHeight) / 2;
-            
-            // Prevent shifting too far left on small screens
-            if (this.camera.x < 10) this.camera.x = 10;
-        }
-        
+        const panelWidth = window.innerWidth > 1024 ? 288 : 0;
+        const availableWidth = Math.max(1, rect.width - panelWidth - 24);
+        const topInset = window.innerWidth <= 1024 && window.innerWidth > window.innerHeight && this.gameState.scenario ? 85 : 0;
+        const availableHeight = Math.max(1, rect.height - 24 - topInset);
+        this.cellSize = 10;
+        this.camera.zoom = Math.min(availableWidth / (this.gameState.cols * this.cellSize), availableHeight / (this.gameState.rows * this.cellSize));
+        this.camera.x = (rect.width - panelWidth - this.gameState.cols * this.cellSize * this.camera.zoom) / 2;
+        this.camera.y = topInset + (rect.height - topInset - this.gameState.rows * this.cellSize * this.camera.zoom) / 2;
         this.render();
     }
 
@@ -75,6 +63,8 @@ class GameRenderer {
         // 4. Draw Cells
         this.drawCells();
 
+        this.drawMissionZones();
+
         // 5. Draw Hover/Preview (if in placement phase)
         if (inputHandler && this.gameState.phase === CONSTANTS.PHASE_PLACEMENT && this.gameState.isCurrentPlayerHuman()) {
             this.drawHoverPreview(inputHandler);
@@ -86,6 +76,19 @@ class GameRenderer {
         }
 
         this.ctx.restore();
+    }
+
+    drawMissionZones() {
+        if (!this.gameState.scenario) return;
+        const ctx = this.ctx, size = this.cellSize;
+        for (const z of this.gameState.scenario.map.zones) {
+            ctx.save();
+            ctx.strokeStyle = '#ffd48a'; ctx.fillStyle = 'rgba(255,196,110,.12)'; ctx.lineWidth = 2;
+            const x = z.cMin * size, y = z.rMin * size, w = (z.cMax-z.cMin+1)*size, h = (z.rMax-z.rMin+1)*size;
+            ctx.fillRect(x,y,w,h); ctx.setLineDash([5,4]); ctx.strokeRect(x,y,w,h); ctx.setLineDash([]);
+            ctx.font = 'bold 11px monospace'; ctx.fillStyle = '#ffe0ab'; ctx.fillText(z.label,x,y-7);
+            ctx.restore();
+        }
     }
 
     drawTerritories() {

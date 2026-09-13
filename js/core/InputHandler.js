@@ -53,6 +53,7 @@ class InputHandler {
     }
 
     setPattern(key) {
+        if (this.gameState.scenario && !this.gameState.scenario.patterns.includes(key)) return;
         this.activePatternKey = key;
         this.currentPattern = CONSTANTS.PATTERNS[key].pattern;
         this.uiManager.render(); // force update hover

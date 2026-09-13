@@ -127,16 +127,25 @@
                     </div>
 
                     <div class="p-6 sm:p-8">
+                        <section id="modeSelection">
+                            <h2>Wie möchtest du spielen?</h2><p>Wähle einen Spielmodus. Für den Einstieg empfehlen wir die Kampagne.</p>
+                            <div class="mode-cards">
+                                <button id="btnCampaign" class="mode-card"><small>EMPFOHLEN ZUM EINSTIEG</small><strong>Kampagne</strong><span>Entdecke den Mars in zwei Akten. Lerne Schritt für Schritt und folge der Geschichte.</span><b>Zur Marskarte →</b></button>
+                                <button id="btnChooseSkirmish" class="mode-card"><small>DER KLASSISCHE MODUS</small><strong>Freies Gefecht</strong><span>Kämpfe gegen Computer oder Freunde am selben Gerät. Alle Muster sind verfügbar.</span><b>Gefecht vorbereiten →</b></button>
+                                <button id="btnStartSandbox" class="mode-card"><small>OHNE GEGNER UND LIMITS</small><strong>Sandbox</strong><span>Experimentiere mit lebenden Mustern. Kein Budgetlimit, kein Missionsziel.</span><b>Ausprobieren →</b></button>
+                            </div>
+                        </section>
+                        <section id="skirmishSetup" hidden><button id="btnBackModes" class="quiet-button">← Spielmodus wählen</button>
                         <h2 id="setupTitle" class="text-3xl font-bold mb-6 text-center text-white cursor-pointer select-none hover:text-mars-300 transition-colors">
-                            Missions-Setup
+                            Freies Gefecht
                         </h2>
 
                         <div class="flex flex-col items-center">
                             <!-- Main Settings (Always visible) -->
                             <div class="w-full space-y-6 text-center">
                                 <div>
-                                    <h3 class="text-xl font-bold text-mars-300 border-b border-mars-800 pb-2 mb-4">Menschliche Allianz</h3>
-                                    <label class="block text-base text-gray-300 mb-2">Für welche Häuser übernehmt ihr das Kommando?</label>
+                                    <h3 class="text-xl font-bold text-mars-300 border-b border-mars-800 pb-2 mb-4">Wer spielt welches Haus?</h3>
+                                    <label class="block text-base text-gray-300 mb-2">Wähle für jedes Haus „Mensch“ oder „Computer“. Mehrere Menschen spielen abwechselnd an diesem Gerät.</label>
 
                                 </div>
                                 
@@ -198,21 +207,19 @@
                                         <input type="checkbox" id="cfgBatchMode" class="w-5 h-5 accent-orange-500 rounded bg-gray-800 border-gray-700">
                                         <label for="cfgBatchMode" class="text-sm font-bold text-orange-400 cursor-pointer">Batch-Evolution (Auto-Restart)</label>
                                     </div>
-                                    <div class="flex items-center gap-3 pt-4 sm:col-span-2 md:col-span-1">
-                                        <button id="btnStartSandbox" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded text-xs uppercase tracking-widest shadow-lg transition-all">
-                                            Sandbox-Modus starten
-                                        </button>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
 
+                        <p class="mode-description">Klassischer Modus · Alle Genome · Zufallskarte · Bis zu vier Häuser</p>
                         <div class="mt-10 flex justify-center">
                             <button id="btnStartGame"
                                 class="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-orange-500 text-white font-extrabold py-4 px-16 rounded-full shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all transform hover:scale-105 active:scale-95 uppercase tracking-widest">
-                                Mission Starten
+                                Gefecht starten
                             </button>
                         </div>
+                        </section>
                     </div>
                 </div>
             </div>
@@ -261,7 +268,7 @@
                     </h4>
 
                     <div class="flex items-center justify-between mb-2 gap-2">
-                        <span class="text-[10px] text-gray-400 truncate flex-1">R: Rotieren | Strg+Z: Undo</span>
+                        <span class="input-help text-gray-400 flex-1"><span class="desktop-help">R: Drehen · Strg+Z: Zurück</span><span class="touch-help">Tippen: setzen · Zwei Finger: Zoom / Verschieben</span></span>
                         <div class="flex gap-1">
                             <button id="btnUndo"
                                 class="p-1.5 flex items-center justify-center bg-gray-800 hover:bg-gray-700 rounded text-gray-300 transition"
@@ -411,8 +418,14 @@
     <script src="js/core/AI.js"></script>
     <script src="js/core/AIEvolver.js"></script>
     <script src="js/core/InputHandler.js"></script>
+    <script src="js/campaign/Missions.js"></script>
+    <script src="js/campaign/Story.js"></script>
+    <script src="js/campaign/Act2.js"></script>
+    <script src="js/campaign/ObjectiveSystem.js"></script>
+    <script src="js/campaign/CampaignManager.js"></script>
     <script src="js/core/GameState.js"></script>
     <script src="js/ui/GameRenderer.js"></script>
+    <script src="js/ui/GameAudio.js"></script>
     <script src="js/ui/UIManager.js"></script>
     <script src="js/main.js"></script>
 </body>

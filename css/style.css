@@ -104,3 +104,243 @@ canvas {
     box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.3) !important;
     transform: translateY(-1px);
 }
+
+/* Expedition command: self-contained styles, also usable without the utility CDN. */
+[hidden] { display: none !important; }
+.campaign-entry { display:flex; justify-content:space-between; gap:16px; width:100%; padding:20px; margin-bottom:26px; border:1px solid #55cfc0; border-radius:8px; background:linear-gradient(110deg,#153b3d,#102127); color:#8affe9; font-weight:800; letter-spacing:.12em; }
+.campaign-entry span { font-size:12px; letter-spacing:0; font-weight:400; }
+.campaign-screen { position:fixed; inset:0; z-index:100; overflow:auto; background:#090f13; color:#dce5e5; font-family:Inter,ui-sans-serif,system-ui,sans-serif; padding:0 max(28px,calc((100vw - 1400px)/2)); background-image:radial-gradient(ellipse at 25% 38%,#49271f66,transparent 53%); }
+.campaign-screen button,.campaign-screen a { cursor:pointer; }
+.campaign-screen button:focus-visible,.campaign-screen a:focus-visible,.mission-hud a:focus-visible { outline:2px solid #a0fff0; outline-offset:5px; }
+.expedition-header { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:25px 0; border-bottom:1px solid #ffffff17; }
+.expedition-brand { color:#f3f1ed; font-size:23px; font-weight:900; letter-spacing:-1px; text-decoration:none; line-height:1; }
+.expedition-brand span { color:#ec865f; }.expedition-brand small { display:block; font-size:8px; letter-spacing:2px; color:#8a9498; margin-top:8px; }
+.mission-eyebrow { font:10px ui-monospace,monospace; letter-spacing:2px; color:#c6997f; }.quiet-button { background:transparent; color:#aabbbd; border:1px solid #ffffff24; border-radius:5px; padding:11px 15px; text-decoration:none; font-size:12px; }
+.expedition-intro { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:42px 0 28px; }
+.expedition-intro h1 { font-size:clamp(30px,3.1vw,49px); letter-spacing:-2px; line-height:1.15; font-weight:650; margin:13px 0; }.expedition-intro h1 em { font-style:normal; color:#dfa98c; }.expedition-intro p { color:#8d9c9f; font-size:13px; }
+.expedition-progress { text-align:right; min-width:170px; }.expedition-progress strong { font-size:48px; font-weight:300; }.expedition-progress strong span { font-size:21px; color:#647378; }.expedition-progress small { display:block; font:9px monospace; letter-spacing:2px; color:#839295; }.expedition-progress>div { color:#e3b780; margin-top:14px; font-size:12px; }.expedition-progress>div span { color:#839295; margin-left:8px; }
+.expedition-layout { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr); border:1px solid #ffffff18; border-radius:12px; overflow:hidden; background:#0b1218a8; }
+.mars-chart { position:relative; min-height:530px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; background:radial-gradient(ellipse at center,#4f2c242e,transparent 70%); }
+.chart-caption { z-index:2; display:flex; justify-content:space-between; padding:22px; color:#95a3a5; font:9px monospace; letter-spacing:1px; }.chart-caption span { color:#53656b; font-size:8px; }
+.mars-globe { position:relative; width: min(92%,530px); aspect-ratio:1; margin:-15px auto -10px; border-radius:50%; background:radial-gradient(circle at 65% 35%,#b67b56,#713b2c 45%,#2c1b1c 74%); box-shadow:inset -48px -18px 65px #03090ecc,inset 4px 0 10px #ffc09944,0 0 70px #bb5f2820; }
+.mars-surface { position:absolute; inset:0; border-radius:50%; background-image:url('../assets/Mars_Overview01.png'); background-size:cover; background-position:center; mix-blend-mode:luminosity; opacity:.32; box-shadow:inset -65px -5px 70px #000; }
+.mars-grid { position:absolute; inset:0; border-radius:50%; background:repeating-linear-gradient(0deg,transparent 0 49px,#ffe0c013 50px 51px),repeating-linear-gradient(90deg,transparent 0 64px,#ffe0c012 65px 66px); box-shadow:inset -60px -10px 95px #060c14; }
+.route-lines { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }.route-lines line { stroke:#edb38a55; stroke-width:.3; stroke-dasharray:1 1; }.route-lines line.explored { stroke:#7cffe0; stroke-width:.45; stroke-dasharray:none; }
+.sector-node { position:absolute; transform:translate(-50%,-50%); width:29px; height:29px; border-radius:50%; border:1px solid #dab28d66; color:#e7cec0; background:#322d2c; font:10px monospace; z-index:3; transition:box-shadow .2s; }.sector-node.selected { outline:1px solid #ffd1aa99; outline-offset:7px; background:#f6c6a2; color:#36231b; box-shadow:0 0 28px #ffc79855; }.sector-node.conquered { background:#27594f; color:#99ffe1; border-color:#72e7ce; box-shadow:0 0 20px #55ffb944; }.sector-node:disabled { background:#202229; color:#8b807b; cursor:default; }
+.planet-label { position:absolute; color:#dfbca7aa; font:8px monospace; letter-spacing:2px; }.planet-label small { display:block; font-size:6px; opacity:.5; margin-top:5px; }.label-tharsis { top:40%;left:14%; }.label-chryse { top:23%;left:52%; }.label-valles { top:82%;left:30%; }
+.chart-legend { display:flex; gap:20px; justify-content:center; color:#92a1a5; font:9px monospace; padding:18px 0; }.chart-legend span:first-child { color:#8ed9c8; }.chart-transmission { display:flex; align-items:center; gap:7px; padding:15px 22px; border-top:1px solid #ffffff10; font:8px monospace; letter-spacing:1px; color:#8ab6ac; }.chart-transmission>span:last-child { margin-left:auto; color:#576e75; }.signal-dot { width:5px;height:5px;border-radius:50%;background:#83ddbd;box-shadow:0 0 8px #83ddbd; }
+.mission-briefing { padding:30px; border-left:1px solid #ffffff17; background:#111a20d9; }.mission-briefing>.mission-eyebrow { display:flex; justify-content:space-between; }.mission-briefing>.mission-eyebrow span { color:#94b7b4; letter-spacing:0; text-transform:uppercase; }.mission-briefing h2 { font-size:32px; font-weight:600; letter-spacing:-1px; margin:18px 0 3px; }.mission-location { font-size:11px; color:#728b93; }.mission-briefing blockquote { font-family:Georgia,serif; color:#e1b797; font-size:19px; margin:22px 0 12px; }.mission-briefing p { font-size:12px; line-height:1.8; color:#9fadb2; }.brief-objective { border-left:2px solid #81d1bc; background:#83dbc008; padding:12px 14px; margin:20px 0 13px; }.brief-objective small { display:block; color:#75bba9; font:8px monospace; letter-spacing:2px; margin-bottom:7px; }.brief-objective strong { font-size:12px; font-weight:500; }.bonus-list { list-style:none; padding:0; color:#8d9ca2; font-size:11px; line-height:2; }.mission-meta { display:flex;gap:20px;font:9px monospace;color:#6f858e;margin:19px 0; }.genome-reward { display:flex;justify-content:space-between;align-items:center;gap:15px;border-top:1px solid #ffffff13;padding:17px 0; }.genome-reward span { font:8px monospace;letter-spacing:1px;color:#8b9b9e; }.genome-reward strong { font-size:12px;color:#9cdcc5; }.launch-button { display:flex;justify-content:space-between;align-items:center;gap:22px;background:#c1e9d9;color:#102b26;border:0;padding:16px 20px;width:100%;border-radius:5px;font-size:12px;font-weight:750; }.launch-button:hover { background:#e0fff0; }
+.genome-archive { padding:28px 0; }.genome-archive h3 { font-size:15px;font-weight:400;margin-top:8px;color:#a6b6b9; }.genome-cards { display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:18px; }.genome-card { border:1px solid #ffffff18;border-radius:6px;padding:12px;background:#121e23; }.genome-card svg { width:60px;height:35px;fill:#a5e6ce; }.genome-card strong { display:block;font-size:11px;font-weight:500;margin:8px 0 4px; }.genome-card small { font-size:9px;color:#718b93; }.genome-card.locked { opacity:.35; }.genome-card.locked svg { filter:blur(2px); }.campaign-footer { padding:0 0 24px;color:#60767e;font:9px monospace;display:flex;justify-content:space-between;gap:12px; }
+.mission-hud { position:fixed;z-index:25;left:18px;top:90px;width:min(360px,calc(100vw - 40px));background:#0c1722ed;border:1px solid #83dfbe44;border-radius:9px;padding:15px 18px;box-shadow:0 8px 30px #0006;pointer-events:auto; }.mission-hud .mission-eyebrow { display:flex;justify-content:space-between;color:#7abfad;font-size:8px;letter-spacing:1px; }.mission-hud a { color:#a2cabe; }.mission-hud h2 { font-size:19px;margin:8px 0;color:#f0e5d7; }.mission-hud p { font-size:11px;line-height:1.6;color:#b7c5c9;margin:6px 0; }.hud-telemetry { display:flex;gap:18px;color:#80bba8;font:8px monospace;margin:12px 0; }.mission-hud summary { font-size:10px;color:#dcb18c;cursor:pointer; }.mission-result { max-width:600px;margin:8vh auto;padding:36px;border:1px solid #79bca733;border-radius:14px;background:#101d24; }.result-stars { font-size:43px;letter-spacing:14px;color:#e6c18c;margin:25px 0; }.mission-result h1 { font-size:36px;line-height:1.2;letter-spacing:-1px; }.mission-result h2 { color:#8eb8ad;font-size:15px;margin:14px 0; }.mission-result p { line-height:1.8;color:#a3b7bd;font-size:13px; }.result-objectives { list-style:none;padding:20px 0;line-height:2.4;color:#c6d5cf;font-size:12px; }.result-actions { display:flex;align-items:center;gap:14px;margin:20px 0; }.result-actions a { white-space:nowrap; }
+@media(max-width:800px) { .campaign-screen{padding:0 18px}.expedition-header>.mission-eyebrow{display:none}.expedition-intro{padding-top:26px}.expedition-progress{min-width:100px}.expedition-progress strong{font-size:32px}.expedition-layout{grid-template-columns:1fr}.mars-chart{min-height:340px}.mars-globe{max-width:390px}.mission-briefing{border-left:0;border-top:1px solid #ffffff17;padding:23px}.genome-cards{grid-template-columns:repeat(4,1fr)}.campaign-footer{flex-direction:column}.mission-hud{top:78px;width:250px;padding:10px 13px}.mission-hud h2{font-size:15px}.mission-result{padding:24px}.mission-result h1{font-size:28px} }
+@media(prefers-reduced-motion:reduce) { .campaign-screen * { transition:none!important; } }
+.mode-description { color:#98a7b2;text-align:center;font-size:12px;margin-top:20px; }.sandbox-entry{max-width:280px;margin:15px auto 0}.briefing-voice{font:8px monospace;color:#719f9b;letter-spacing:1px;margin:18px 0 6px}.story-archive{border:1px solid #ffffff16;border-radius:8px;padding:22px;margin-top:24px;background:#101a20}.story-archive h3{font-size:20px;color:#dec1a7;margin:10px 0}.story-archive p{font-size:12px;line-height:1.8;color:#9bb0b6;max-width:850px}.story-archive small{display:block;color:#6c858d;font-size:10px;margin-top:14px}.story-archive details{border-top:1px solid #ffffff12;margin-top:13px;padding-top:13px}.story-archive summary{font-size:12px;color:#a2d4c3;cursor:pointer}.genome-card{min-width:0;overflow-wrap:anywhere}.expedition-layout>*{min-width:0}.campaign-screen{overflow-x:hidden}.in-mission #canvasContainer{background:radial-gradient(ellipse at center,#291c1744,transparent 80%)}
+@media(max-width:800px){.expedition-intro{align-items:flex-start}.expedition-progress{min-width:80px}.expedition-progress small{font-size:7px;letter-spacing:1px}.expedition-intro h1{letter-spacing:-1px}.chart-caption{font-size:8px;padding:18px 13px}.chart-caption span{font-size:6px}.genome-card{padding:8px}.genome-card strong{font-size:9px}.campaign-entry{flex-direction:column;text-align:left}.in-mission .mission-hud{top:74px;left:10px;right:10px;width:auto}.in-mission .mission-hud details p{max-height:90px;overflow:auto}.in-mission #rightPanel{z-index:30}}
+.progress-tools label,.result-code label { display:block;font-size:12px;color:#aecdc5;margin:16px 0 8px; }
+.code-controls { display:flex;gap:10px;max-width:620px; }
+.code-controls input,.result-code input { min-width:0;flex:1;background:#091319;border:1px solid #659e8e66;border-radius:5px;padding:12px;color:#b5f0dc;font:14px monospace; }
+.progress-tools ul { list-style:none;padding:12px 0;line-height:2;color:#99b9b0;font-size:12px; }
+.progress-tools>button { margin-top:20px; }
+.progress-tools #progressMessage { color:#cfdbac; }
+.result-code input { width:100%; }
+.result-code small { display:block;color:#93b6ac;margin-top:10px;font:11px monospace; }
+@media(max-width:550px) { .code-controls { flex-direction:column; } }
+
+/* Readable type and comfortably spaced controls across desktop and touch screens. */
+.campaign-screen { font-size:16px; }
+.mission-briefing p, .story-archive p, .mission-result p, .expedition-intro p,
+.brief-objective strong, .bonus-list, .result-objectives, .progress-tools ul { font-size:16px; line-height:1.7; color:#bdcbd0; }
+.mission-eyebrow, .briefing-voice, .brief-objective small, .mission-meta,
+.genome-reward span, .campaign-footer, .chart-caption, .chart-caption span,
+.chart-transmission, .chart-legend, .expedition-brand small { font-size:12px; line-height:1.5; letter-spacing:1px; }
+.mission-location, .genome-card small, .story-archive small, .expedition-progress small,
+.result-code small { font-size:14px; line-height:1.5; color:#a3b6be; }
+.quiet-button, .launch-button, .genome-reward strong, .genome-card strong,
+.progress-tools label, .result-code label, .story-archive summary,
+.code-controls input, .result-code input, .mode-description { font-size:16px; }
+.campaign-screen button:not(.sector-node), .campaign-screen input,
+.campaign-screen summary, .campaign-screen .quiet-button { min-height:48px; }
+.campaign-screen summary { padding:12px 0; }
+.expedition-header { flex-wrap:wrap; }
+.expedition-layout { grid-template-columns:minmax(0,1.25fr) minmax(390px,1fr); }
+.mission-briefing { padding:32px; }
+.mission-briefing blockquote { font-size:23px; }
+.mission-meta, .genome-reward, .chart-caption, .chart-transmission, .chart-legend { flex-wrap:wrap; gap:12px; }
+.genome-cards { grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); }
+.genome-card.locked { opacity:.7; }
+.planet-label { font-size:11px; letter-spacing:1px; }
+.planet-label small { font-size:10px; opacity:.85; }
+.sector-node { width:44px;height:44px;font-size:15px; }
+.sector-list { display:grid;grid-template-columns:1fr;gap:8px;padding:20px; }
+.sector-list button { display:flex;align-items:center;gap:14px;text-align:left;padding:12px 16px;border:1px solid #ffffff25;border-radius:6px;background:#142129;color:#d6e5e1;font-size:16px; }
+.sector-list button span:last-child { margin-left:auto; }
+.sector-list button[aria-pressed="true"] { border-color:#9ce4cd;background:#203d3a; }
+.sector-list button:disabled { color:#8f9ea4;background:#101820;cursor:default; }
+.mission-hud p { font-size:16px; }
+.mission-hud .mission-eyebrow, .hud-telemetry { font-size:12px;line-height:1.5; }
+.mission-hud summary { font-size:15px;min-height:44px;padding:10px 0; }
+.mission-hud a { padding:8px;min-height:44px;display:inline-flex;align-items:center; }
+.mission-hud { width:380px; }
+.input-help { font-size:13px;white-space:normal; }
+.touch-help { display:none; }
+#btnUndo, #btnRotate, #btnEraser, #btnResetSandbox, #btnHelp, #btnSettings { min-width:44px;min-height:44px; }
+#btnFinishTurn, .pattern-btn { min-height:48px;font-size:16px; }
+#canvasContainer { min-width:0;min-height:0;padding:0; }
+#gameCanvas { display:block; }
+#app > main { min-height:0; }
+@media(max-width:1100px) {
+    .expedition-layout { grid-template-columns:1fr; }
+    .mission-briefing { border-left:0;border-top:1px solid #ffffff20; }
+    .sector-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .mars-globe { max-width:530px;margin:12px auto; }
+}
+@media(max-width:1024px) {
+    #app > header { height:auto;min-height:64px;padding:8px 12px;gap:8px;flex-wrap:wrap; }
+    #app > header > div:first-child { flex:1;gap:10px;flex-wrap:wrap; }
+    #app > header h1 { font-size:20px; }
+    #gamePhaseDisplay { min-width:0;font-size:12px;letter-spacing:0;padding:6px 10px; }
+    #topStats { gap:12px;order:3;width:100%;justify-content:space-between; }
+    #topStats > div:nth-child(2), #territoryBarContainer { display:none!important; }
+    #topStats > div:first-child { flex-direction:row;gap:8px; }
+    #currentPlayerDisplay { font-size:14px; }
+    #topStats > div:last-child > span:first-child { display:none; }
+    #simSpeedContainer { gap:8px; }
+    #simSpeed { height:32px; }
+    #app > main { flex-direction:column; }
+    .in-mission .mission-hud, .mission-hud { position:relative;inset:auto;width:auto;flex-shrink:0;margin:0;border-radius:0;padding:8px 14px;max-height:190px;overflow:auto;box-shadow:none; }
+    .mission-hud h2 { font-size:18px;margin:0; }
+    .mission-hud p { font-size:15px;margin:3px 0; }
+    .mission-hud .mission-eyebrow { font-size:12px;align-items:center; }
+    .mission-hud a { min-height:44px;padding:4px 8px; }
+    .hud-telemetry { display:none; }
+    .mission-hud summary { font-size:14px;padding:8px 0; }
+    #rightPanel { position:relative;inset:auto;width:100%;height:230px;max-height:35dvh;flex-shrink:0;transform:none!important;border-top:1px solid #497264; }
+    #rightPanel > div { padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start;overflow:auto; }
+    #panelPlayerHeader { margin:0;padding:0 8px;border:0!important;box-shadow:none!important;display:flex;align-items:center;gap:8px; }
+    #panelPlayerName { display:none; }
+    #panelPlayerHeader > div { margin:0; }
+    #budgetDisplay { font-size:24px; }
+    #panelPlayerHeader + div { margin:0; }
+    #rightPanel h4 { display:none; }
+    #rightPanel .input-help { font-size:13px; }
+    #rightPanel > div > .items-center { grid-column:1/-1; margin:0; }
+    #patternList { grid-column:1/-1;display:flex;gap:8px;overflow-x:auto;flex-shrink:0;padding-bottom:4px; }
+    #patternList .pattern-btn { width:auto;flex-shrink:0;gap:12px;margin:0; }
+    #btnTogglePanel { display:none; }
+    .desktop-help { display:none; }.touch-help { display:inline; }
+    #eventLog { font-size:11px;letter-spacing:0;height:26px; }
+}
+@media(max-width:550px) {
+    .campaign-screen { padding:0 14px; }
+    .expedition-header { gap:12px; }
+    .expedition-intro { flex-direction:column;gap:16px; }
+    .expedition-progress { text-align:left;display:flex;align-items:center;gap:12px;flex-wrap:wrap; }
+    .expedition-progress strong { font-size:30px; }.expedition-progress small { font-size:12px; }
+    .expedition-progress > div { margin:0; }
+    .expedition-intro h1 { font-size:34px; }
+    .sector-list { grid-template-columns:1fr;padding:14px; }
+    .mars-globe { width:96%; }
+    .planet-label { font-size:10px; }
+    .label-tharsis { left:8%;top:32%; }
+    .mission-briefing { padding:22px 18px; }
+    .mission-briefing > .mission-eyebrow { gap:12px;flex-wrap:wrap; }
+    .genome-cards { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .genome-card { padding:14px; }.genome-card strong { font-size:16px; }
+    .result-actions { flex-direction:column;align-items:stretch; }
+    .result-actions a { text-align:center; }
+    #app > header { padding:4px 8px;gap:4px; }
+    #app > header > div:last-child { gap:0; }
+    #app > header h1 { font-size:17px; }
+    #currentPlayerDisplay { max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+}
+@media(max-width:1024px) and (orientation:landscape) {
+    #app > main { flex-direction:row; }
+    #rightPanel { width:280px;height:100%;max-height:none; }
+    #rightPanel > div { display:flex; }
+    #patternList { flex-direction:column;overflow:visible; }
+    .in-mission .mission-hud { position:absolute;z-index:15;top:0;left:0;right:280px;max-height:72px;opacity:.96; }
+    .mission-hud h2,.mission-hud > p { display:none; }
+    .mission-hud:focus-within { max-height:170px; }
+    .mission-hud .mission-eyebrow { float:left;margin-right:14px; }
+    #topStats { width:auto;order:0; }
+}
+#boardZoomControls { position:absolute;bottom:8px;right:300px;display:flex;gap:4px;z-index:5;background:#0c1722ed;border:1px solid #688b8155;border-radius:8px;padding:3px; }
+#boardZoomControls button { min-width:44px;min-height:44px;font-size:20px;color:#d4ede3;border-radius:4px; }
+#boardZoomControls button[data-zoom="fit"] { font-size:14px;padding:0 10px; }
+#boardZoomControls button:hover { background:#27403b; }
+@media(max-width:1024px) { #boardZoomControls { right:8px; } }
+
+/* Start with one decision; house configuration belongs only to free skirmishes. */
+#startMenu > .glass-panel { max-width:1100px; }
+#modeSelection h2 { font-size:30px;font-weight:700;color:#f0e7da;margin-bottom:8px; }
+#modeSelection > p { font-size:16px;color:#b9c9ce;margin-bottom:24px; }
+.mode-cards { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px; }
+.mode-card { display:flex;flex-direction:column;gap:16px;text-align:left;padding:24px;border:1px solid #637b8255;border-radius:12px;background:#142129;color:#d8e6e3;min-height:260px; }
+.mode-card:first-child { border-color:#85ddc5;background:#173130; }
+.mode-card small { font-size:12px;color:#a9c7bb;letter-spacing:.5px; }
+.mode-card strong { font-size:25px; }
+.mode-card span { font-size:16px;line-height:1.6; }
+.mode-card b { margin-top:auto;font-size:16px;color:#aeedd5; }
+.mode-card:hover,.mode-card:focus-visible { background:#24413e;outline:2px solid #a5edd4;outline-offset:2px; }
+.house-controller { display:flex;flex-direction:column;gap:10px;align-items:center;padding:12px;border:1px solid #ffffff22;border-radius:8px;color:#e0e8e7; }
+.house-controller img { height:65px;object-fit:contain; }
+.house-controller strong { font-size:16px; }
+.house-controller select { width:100%;min-height:48px;padding:8px;background:#182c35;border:1px solid #749e95;border-radius:6px;font-size:16px; }
+#humanHousesContainer { padding:0;gap:12px;background:none; }
+#skirmishSetup #setupTitle { margin:12px 0; }
+#skirmishSetup .mode-description { margin-top:12px; }
+#skirmishSetup .mt-10 { margin-top:20px; }
+@media(orientation:landscape) and (max-width:1100px) {
+    #startMenu { padding:10px; }
+    #startMenu > .glass-panel { max-height:100%; }
+    #startMenu > .glass-panel > div:first-child { display:none; }
+    #startMenu > .glass-panel > div:last-child { padding:18px; }
+    #modeSelection h2 { font-size:24px; }
+    #modeSelection > p { margin-bottom:14px; }
+    .mode-cards { gap:10px; }
+    .mode-card { padding:16px;gap:10px;min-height:220px; }
+    .mode-card strong { font-size:22px; }
+    .mode-card span { font-size:15px;line-height:1.5; }
+    #humanHousesContainer { grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
+@media(orientation:portrait) and (max-width:650px) {
+    .mode-cards { grid-template-columns:1fr; }
+    .mode-card { min-height:0; }
+    #modeSelection > p::after { content:' Zum Spielen drehe dein Gerät ins Querformat.';color:#e2c398; }
+}
+@media(orientation:landscape) and (max-height:550px) {
+    #startMenu > .glass-panel > div:last-child { padding:12px 18px; }
+    #modeSelection h2 { font-size:22px;margin-bottom:4px; }
+    #modeSelection > p { font-size:14px;margin-bottom:10px; }
+    .mode-card { min-height:0;padding:12px;gap:8px; }
+    .mode-card small { display:none; }
+    .mode-card strong { font-size:20px; }
+    .mode-card span { font-size:14px;line-height:1.45; }
+    .mode-card b { font-size:14px; }
+}
+.audio-settings { position:relative;font-size:15px;color:#bddacf;margin-top:12px; }
+.audio-settings summary { min-height:44px;padding:10px 0;cursor:pointer; }
+.audio-options { padding:14px;border:1px solid #789d8e55;border-radius:8px;background:#122129;min-width:230px; }
+.audio-options button { display:block;min-height:44px;padding:8px;border:1px solid #8ac5b2;border-radius:5px;width:100%;font-size:15px; }
+.audio-options label { display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;font-size:15px; }
+.audio-options input { width:120px;min-height:44px;accent-color:#a1e0c7; }
+.audio-options p { font-size:14px!important; }
+.expedition-header .audio-settings { margin:0; }
+.expedition-header .audio-options { position:absolute;right:0;top:100%;z-index:10;width:290px; }
+.narration-button { margin:12px 0; }
+#rightPanel .audio-settings { grid-column:1/-1; }
+@media(max-width:550px) { .expedition-header .audio-options { position:relative;width:auto; } }
+.campaign-completion { margin:0 0 24px;padding:20px 24px;border:1px solid #8ad7bb66;border-radius:10px;background:#17302b; }
+.campaign-completion h2 { font-size:24px;color:#c4f1df;margin-bottom:8px; }
+.campaign-completion p { font-size:16px;line-height:1.6;color:#bdd1cb;margin:6px 0; }
+/* Selection and completion are different states, including on conquered sectors. */
+.sector-node.selected, .sector-node.conquered.selected { color:#15232b;background:#ffe1a3;border:3px solid #fff4d5;outline:3px solid #ffbd5f;outline-offset:7px;box-shadow:0 0 0 13px #ffca6430,0 0 38px #ffbc6477;font-size:18px;z-index:4; }
+.sector-list button[aria-pressed="true"] { background:#473722;border:2px solid #ffcf82;border-left:7px solid #ffcf82;color:#fff0d2;font-weight:700; }
+.sector-list button[aria-pressed="true"] span:last-child { color:#ffe1a3;font-size:12px; }
+.selected-mission-label { display:inline-block;padding:8px 12px;background:#ffd286;color:#302315;border-radius:5px;font-size:13px;letter-spacing:1px;font-weight:800;margin-bottom:18px; }
+.act-tabs { display:flex;gap:12px;margin:0 0 20px;flex-wrap:wrap; }
+.act-tabs button { min-height:48px;padding:12px 20px;border:1px solid #71978c;border-radius:7px;color:#cce2db;background:#14272b;font-size:16px; }
+.act-tabs button[aria-pressed="true"] { background:#b9e8d5;color:#102d23;font-weight:700; }
+.act-tabs button:disabled { opacity:.55;cursor:default; }
+.objective-progress { color:#ffe1a3!important;font-weight:600; }
+@media(max-width:1024px) and (orientation:landscape) { .mission-hud > .objective-progress { display:block;clear:both;font-size:13px;margin:0; } .in-mission .mission-hud { max-height:85px; } }

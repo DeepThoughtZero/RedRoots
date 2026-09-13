@@ -65,7 +65,8 @@ class UIManager {
 
     initStartMenu() {
         // Load saved config
-        const saved = localStorage.getItem('redroots_config');
+        let saved = null;
+        try { saved = localStorage.getItem('redroots_config'); } catch { /* Private browsing: use defaults. */ }
         if (saved) {
             try {
                 const c = JSON.parse(saved);
@@ -103,32 +104,28 @@ class UIManager {
                 CONSTANTS.PLAYER_COLORS.forEach((player, i) => {
                     const isSelected = this.humanFlags[i];
                     
-                    const wrapper = document.createElement('div');
-                    wrapper.className = `relative cursor-pointer rounded-2xl border-2 transition-all p-4 flex flex-col items-center justify-center gap-3 ${
-                        isSelected ? 'border-mars-500 bg-mars-900/40 shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'border-white/5 bg-black/40 opacity-30 hover:opacity-70 hover:border-white/10'
-                    }`;
-                    
-                    wrapper.innerHTML = `
-                        <div class="relative w-full aspect-video overflow-hidden rounded-lg">
-                            <img src="${player.asset}" alt="${player.name}" class="w-full h-full object-contain ${isSelected ? 'drop-shadow-[0_0_12px_rgba(255,255,255,0.5)] scale-110' : 'grayscale'} transition-all duration-500">
-                        </div>
-                        <span class="text-xs font-black uppercase tracking-widest ${isSelected ? 'text-mars-300' : 'text-gray-500'}">${player.name.split(' ')[1]}</span>
-                        <div class="absolute top-2 right-2 text-sm drop-shadow-md">
-                            ${isSelected ? '👤' : '🤖'}
-                        </div>
-                    `;
-                    
-                    wrapper.addEventListener('click', () => {
-                        this.humanFlags[i] = !this.humanFlags[i];
-                        // Ensure at least one human or at least keep it flexible (AI vs AI is also cool)
-                        updateHouseUI();
-                    });
-                    
+                    const wrapper = document.createElement('label');
+                    wrapper.className = 'house-controller';
+                    wrapper.innerHTML = `<img src="${player.asset}" alt=""><strong>${player.name}</strong><select aria-label="Steuerung für ${player.name}"><option value="human">Mensch</option><option value="ai">Computer</option></select>`;
+                    const select = wrapper.querySelector('select');
+                    select.value = isSelected ? 'human' : 'ai';
+                    select.addEventListener('change', () => { this.humanFlags[i] = select.value === 'human'; });
                     humanHousesContainer.appendChild(wrapper);
                 });
             };
             updateHouseUI();
         }
+
+        document.getElementById('btnChooseSkirmish').onclick = () => {
+            document.getElementById('modeSelection').hidden = true;
+            document.getElementById('skirmishSetup').hidden = false;
+            document.getElementById('btnBackModes').focus();
+        };
+        document.getElementById('btnBackModes').onclick = () => {
+            document.getElementById('skirmishSetup').hidden = true;
+            document.getElementById('modeSelection').hidden = false;
+            document.getElementById('btnChooseSkirmish').focus();
+        };
 
         // Developer Mode (5 clicks on title)
         const setupTitle = document.getElementById('setupTitle');
@@ -147,7 +144,7 @@ class UIManager {
                     } else {
                         devSettings.classList.add('hidden');
                         setupTitle.classList.remove('text-orange-500');
-                        setupTitle.textContent = "Missions-Setup";
+                        setupTitle.textContent = "Freies Gefecht";
                         this.logEvent("Entwicklermodus deaktiviert.");
                     }
                     setupClickCount = 0;
@@ -226,7 +223,7 @@ class UIManager {
                 config.rounds = 7;
             }
 
-            localStorage.setItem('redroots_config', JSON.stringify(config));
+            try { localStorage.setItem('redroots_config', JSON.stringify(config)); } catch { /* Gameplay remains available. */ }
             this.startGame(config);
         });
 
@@ -239,9 +236,10 @@ class UIManager {
 
         // Audio for Briefing
         this.audioBriefing = new Audio('assets/Intro_Rules.mp3');
-        this.audioBriefing.loop = true;
+        this.audioBriefing.loop = false;
 
         const showHelp = () => {
+            if (this.audio) { this.audio.stopNarration(); this.audio.ambience.pause(); }
             helpOverlay.classList.remove('hidden');
             this.audioBriefing.play().catch(e => console.warn("Audio playback failed:", e));
             
@@ -273,17 +271,6 @@ class UIManager {
                     }
                 }, 300);
             });
-        }
-
-        // Check first start
-        const briefingShown = localStorage.getItem('redroots_briefing_shown');
-        if (!briefingShown) {
-            // Hide start menu initially
-            this.elStartMenu.classList.add('hidden');
-            // Trigger help overlay
-            setTimeout(() => {
-                if (btnHelp) btnHelp.click();
-            }, 500);
         }
 
         if (this.elBtnRestartGame) {
@@ -319,7 +306,8 @@ class UIManager {
 
         if (this.elBtnSettingsConfirm) {
             this.elBtnSettingsConfirm.addEventListener('click', () => {
-                location.reload();
+                if (this.audio) this.audio.stopNarration();
+                location.href = location.pathname + (this.gameState?.scenario ? '?campaign' : '');
             });
         }
 
@@ -409,6 +397,7 @@ class UIManager {
         const sortedPatterns = Object.entries(CONSTANTS.PATTERNS).sort((a, b) => a[1].cost - b[1].cost);
         for (const [key, pData] of sortedPatterns) {
             const btn = document.createElement('button');
+            btn.dataset.pattern = key;
             btn.className = `pattern-btn ${key === 'cell' ? 'active' : ''}`;
             btn.innerHTML = `
                 <span>${pData.name}</span>
@@ -429,16 +418,44 @@ class UIManager {
     }
 
     startGame(config) {
+        if (this.audio) {
+            this.audio.stopNarration();
+            this.elRightPanel.querySelector('div').insertAdjacentHTML('beforeend', (config.scenario ? this.audio.narrationButton(config.scenario, 'briefing') : '') + this.audio.controls());
+        }
         // Hide start menu
         this.elStartMenu.classList.add('opacity-0', 'pointer-events-none');
         this.elTopStats.classList.remove('hidden');
         
         // Initialize Core Systems
         this.gameState = new GameState(config);
+        this.elPatternList.querySelectorAll('[data-pattern]').forEach(btn => {
+            btn.hidden = !!config.scenario && !config.scenario.patterns.includes(btn.dataset.pattern);
+        });
         this.renderer = new GameRenderer(this.canvas, this.gameState);
+        let zoomControls = document.getElementById('boardZoomControls');
+        if (!zoomControls) {
+            zoomControls = document.createElement('div');
+            zoomControls.id = 'boardZoomControls';
+            zoomControls.setAttribute('aria-label', 'Spielfeld-Zoom');
+            zoomControls.innerHTML = '<button type="button" data-zoom="0.8" aria-label="Spielfeld verkleinern">−</button><button type="button" data-zoom="fit" aria-label="Ganzes Spielfeld anzeigen">Einpassen</button><button type="button" data-zoom="1.25" aria-label="Spielfeld vergrößern">+</button>';
+            this.canvas.parentElement.append(zoomControls);
+            zoomControls.addEventListener('click', event => {
+                const factor = event.target.dataset.zoom;
+                if (!factor) return;
+                if (factor === 'fit') { this.renderer.resize(); return; }
+                const cam = this.renderer.camera;
+                const centerX = (this.canvas.width - (window.innerWidth > 1024 ? 288 : 0)) / 2;
+                const centerY = this.canvas.height / 2;
+                const nextZoom = Math.max(.1, Math.min(8, cam.zoom * Number(factor)));
+                cam.x = centerX - (centerX - cam.x) * nextZoom / cam.zoom;
+                cam.y = centerY - (centerY - cam.y) * nextZoom / cam.zoom;
+                cam.zoom = nextZoom;
+                this.render();
+            });
+        }
         this.inputHandler = new InputHandler(this.canvas, this.gameState, this);
         
-        this.evolver = new AIEvolver(this.gameState);
+        this.evolver = config.isDojoMode ? new AIEvolver(this.gameState) : null;
         this.ai = new AI(this.gameState); // Single instance, will swap genomes
 
         if (config.isDojoMode) {
@@ -465,7 +482,7 @@ class UIManager {
             const x = speedVal / 100;
             const delay = Math.max(16, Math.round(500 * Math.pow(1 - x, 3)));
             
-            this.gameState.simSpeedMs = delay;
+            this.gameState.simSpeedMs = config.scenario?.evolutionDelayMs ?? delay;
         };
         this.elSimSpeed.addEventListener('input', updateSimSpeed);
         updateSimSpeed(); // Initial read
@@ -496,7 +513,7 @@ class UIManager {
                 this.elRightPanel.classList.add('translate-x-full');
             }
             
-            this.elSimSpeedContainer.classList.remove('hidden');
+            this.elSimSpeedContainer.classList.toggle('hidden', !!this.gameState.scenario?.evolutionDelayMs);
             this.elTerritoryBarContainer.classList.remove('hidden');
             this.elCurrentPlayerDisplay.textContent = 'Evolution läuft...';
             this.elCurrentPlayerDisplay.style.color = '#fff';
@@ -566,7 +583,12 @@ class UIManager {
                 this.ai.genome = this.aiGenomes[pId].params;
             }
             
-            this.ai.takeTurn();
+            if (this.gameState.scenario && !this.gameState.scenario.enemy) {
+                this.gameState.nextPlayerTurn();
+            } else {
+                if (this.gameState.scenario) this.ai.genome = this.ai.getDefaultGenome(this.gameState.playerStrengths[pId]);
+                this.ai.takeTurn();
+            }
         } else {
             this.elBtnFinishTurn.disabled = false;
             this.elBtnFinishTurn.classList.remove('opacity-50');
@@ -575,6 +597,7 @@ class UIManager {
 
     handleStateUpdate() {
         this.updateBudgetDisplay();
+        if (this.campaign) this.campaign.updateHUD();
         if (this.gameState.phase === CONSTANTS.PHASE_SIMULATION || this.gameState.phase === CONSTANTS.PHASE_SETUP) {
             this.updateTerritoryBars();
         }
@@ -582,6 +605,7 @@ class UIManager {
     }
 
     handleGameOver(winnerId) {
+        if (this.gameState.objectiveSystem) { this.campaign.showResult(); return; }
         this.elRightPanel.classList.add('translate-x-full');
         let title = "MISSION BEENDET";
         let msg = "";

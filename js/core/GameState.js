@@ -71,6 +71,7 @@ class GameState {
         this.onCycleUpdate = null; // Called each simulation step
         
         this.simSpeedMs = 100; // Updated by UI slider
+        if (config.scenario) MissionManager.apply(this, config.scenario);
     }
 
     start() {
@@ -184,6 +185,7 @@ class GameState {
 
         if (!this.isSandbox) {
             this.budgets[this.currentPlayer] -= pattern.length;
+            if (this.objectiveSystem && this.currentPlayer === 0) this.objectiveSystem.spent += pattern.length;
         }
         this.notifyStateUpdate();
         return true;
@@ -206,6 +208,7 @@ class GameState {
             this.grid.setCell(r, c, CONSTANTS.OWNER_NONE, false);
             if (!this.isSandbox) {
                 this.budgets[this.currentPlayer] += 1;
+                if (this.objectiveSystem && this.currentPlayer === 0) this.objectiveSystem.spent -= 1;
             }
             this.notifyStateUpdate();
             return true;
@@ -226,6 +229,7 @@ class GameState {
         
         // Restore budget
         this.budgets[this.currentPlayer] += delta.cost;
+        if (this.objectiveSystem && this.currentPlayer === 0) this.objectiveSystem.spent -= delta.cost;
         
         this.notifyStateUpdate();
         return true;
@@ -247,9 +251,12 @@ class GameState {
             if (this.onCycleUpdate) this.onCycleUpdate(step + 1, this.stepsPerRound);
             
             // Check win condition only in camp regions (much faster than full scan)
-            if (this.checkWinCondition()) {
+            if (this.objectiveSystem ? this.objectiveSystem.evaluate(this, 'generation') : this.checkWinCondition()) {
                 this._stopRenderLoop();
                 this.notifyStateUpdate(); // Final render
+                if (this.scenario?.resultHoldMs) {
+                    await new Promise(resolve => setTimeout(resolve, this.scenario.resultHoldMs));
+                }
                 this.changePhase(CONSTANTS.PHASE_GAMEOVER);
                 if (this.onGameOver) this.onGameOver(this.winner);
                 return;
@@ -263,7 +270,7 @@ class GameState {
                 break;
             }
 
-            if (hashHistory.includes(hash)) {
+            if (!this.objectiveSystem && hashHistory.includes(hash)) {
                 console.log(`Periodic state detected at step ${step}. Ending simulation phase early.`);
                 break;
             }
@@ -287,6 +294,13 @@ class GameState {
         this.grid.markAllOld();
         this.territory.updateTerritories(this.grid, this.radius);
         
+        if (this.objectiveSystem && this.objectiveSystem.evaluate(this, 'round')) {
+            this.notifyStateUpdate();
+            this.changePhase(CONSTANTS.PHASE_GAMEOVER);
+            if (this.onGameOver) this.onGameOver(this.winner);
+            return;
+        }
+
         // Reset budgets dynamically
         this.calculateBudgets();
 

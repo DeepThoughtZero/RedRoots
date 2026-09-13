@@ -1,0 +1,9 @@
+{
+  "method": "CPU sound design using existing AudioGen Mars ambience and synthesized layers; short fades at loop boundaries. GPU generation unavailable.",
+  "profiles": {
+    "research": "Ventilation and electrical hum inside the research station",
+    "canyon": "Resonant canyon wind",
+    "ice": "Thin icy air, sparse soft crystalline resonances",
+    "outpost": "Generator vibration and dusty outpost wind"
+  }
+}
