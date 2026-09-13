@@ -84,10 +84,11 @@ class GameRenderer {
         for (const z of this.gameState.scenario.map.zones) {
             ctx.save();
             const sterile = this.gameState.scenario.objective.sterile?.includes(z.id);
-            ctx.strokeStyle = sterile ? '#ff6578' : '#ffd48a'; ctx.fillStyle = sterile ? 'rgba(255,70,95,.18)' : 'rgba(255,196,110,.12)'; ctx.lineWidth = 2;
+            const captured = this.gameState.scenario.objective.type === 'captureCamps' && this.gameState.objectiveSystem.collected.has(z.id);
+            ctx.strokeStyle = captured ? '#8bf5c7' : sterile ? '#ff6578' : '#ffd48a'; ctx.fillStyle = captured ? 'rgba(92,255,174,.2)' : sterile ? 'rgba(255,70,95,.18)' : 'rgba(255,196,110,.12)'; ctx.lineWidth = 2;
             const x = z.cMin * size, y = z.rMin * size, w = (z.cMax-z.cMin+1)*size, h = (z.rMax-z.rMin+1)*size;
             ctx.fillRect(x,y,w,h); ctx.setLineDash([5,4]); ctx.strokeRect(x,y,w,h); ctx.setLineDash([]);
-            ctx.font = 'bold 11px monospace'; ctx.fillStyle = sterile ? '#ff9fab' : '#ffe0ab'; ctx.fillText(z.label,x,y-7);
+            ctx.font = 'bold 11px monospace'; ctx.fillStyle = sterile ? '#ff9fab' : '#ffe0ab'; ctx.fillText(captured ? `✓ ${z.label}` : z.label,x,y-7);
             ctx.restore();
         }
     }

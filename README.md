@@ -52,7 +52,7 @@ Das Spiel besteht aus purem HTML, CSS und JavaScript. Es werden keine externen S
 
 ## Kampagne: Das Gedächtnis des roten Bodens
 
-Drei Akte mit fünfzehn handgebauten Missionen sind spielbar. Akt I führt Haus Marineris durch Überleben, Expansion, ein Gleiterpass, ein Rennen um Wasser und eine Invasion. Missionsziele werden während der Evolution und nach der Gebietsauswertung geprüft. Gelbe Markierungen zeigen Ziele auf dem Spielfeld; der Funkkanal liefert konkrete taktische Hinweise.
+Vier Akte mit zwanzig handgebauten Missionen sind spielbar. Akt I führt Haus Marineris durch Überleben, Expansion, ein Gleiterpass, ein Rennen um Wasser und eine Invasion. Missionsziele werden während der Evolution und nach der Gebietsauswertung geprüft. Gelbe Markierungen zeigen Ziele auf dem Spielfeld; der Funkkanal liefert konkrete taktische Hinweise.
 
 Mission 1 beginnt ausschließlich mit Einzelzellen: Eine Anordnung, die zwölf Generationen überlebt, muss selbst gefunden werden. Die erste Mission läuft bewusst langsam (0,8 Sekunden je Generation) und zeigt den Endzustand kurz vor dem Ergebnis. Der Sieg schaltet die Block-Vorlage frei; nach Mission 2 folgen Gleiter und Blinker. Auch beim Wiederholen bleiben die missionsspezifischen Musterbeschränkungen bestehen.
 
@@ -60,7 +60,7 @@ Die Marskarte öffnet weitere Sektoren nach einem Sieg. Zwei optionale Herausfor
 
 Auf der Marskarte findest du unten **Expedition / Spielstand**:
 
-- **Code kopieren**: portabler `RR3`-Code mit allen erreichten Sternwertungen. Auf einem anderen Gerät unter **Übernehmen** einlösen. Die Prüfziffer erkennt Tippfehler; der Code ist bewusst kein geheimes Passwort.
+- **Code kopieren**: portabler `RR4`-Code mit allen erreichten Sternwertungen. Auf einem anderen Gerät unter **Übernehmen** einlösen. Die Prüfziffer erkennt Tippfehler; der Code ist bewusst kein geheimes Passwort.
 - **Sektorpasswörter** öffnen Mission 1 bis 5; die Testcodes stehen in der Tabelle unten. Frühere Missionen erhalten mindestens einen Stern, samt Forschung und Archivfunden. Höhere lokale Wertungen bleiben bestehen.
 - **Kampagne zurücksetzen**: nach Bestätigung beginnt die Kampagne wieder bei Mission 1. Die Gefecht-Einstellungen bleiben erhalten. Mit einem vorher gesicherten Expeditionscode lässt sich der alte Stand wiederherstellen.
 
@@ -94,15 +94,33 @@ Das freie Gefecht bleibt mit allen 13 Mustern und den bisherigen Zufallskarten v
 - `js/campaign/ObjectiveSystem.js`: Sieg/Niederlage, Generationen, Materialverbrauch und Bonuswertung.
 - `js/campaign/Story.js`: Funkbriefings, Missionsberichte und freischaltbare Archivfunde.
 - `js/campaign/CampaignManager.js`: Marskarte, Missions-HUD, Ergebnisansicht und versionierter Fortschritt.
-- [Geschichte und weitere Akte](docs/CAMPAIGN_STORY.md): durchgehender Handlungsbogen; Akte IV–V sind geplant, noch nicht spielbar.
+- [Geschichte und weitere Akte](docs/CAMPAIGN_STORY.md): durchgehender Handlungsbogen; Akt V ist geplant, noch nicht spielbar.
 
-### Prüfen und lokal starten
+### Prüfen und Qualitätssicherung
 
-`node tests/campaign.test.cjs` prüft konkrete Lösungswege für Akt I sowie Niederlagen, Rückgängig-Kosten, Fortschritt und die klassische Siegbedingung. Für den Browser: `python3 -m http.server 8765`, dann `http://localhost:8765/index.html`. Es gibt keinen Build-Schritt. Die bestehende Oberfläche lädt Tailwind und Schriften weiterhin über CDNs.
+Das Spiel verfügt über ein mehrstufiges, abhängigkeitsfreies Testkonzept (ausführliche Dokumentation: [docs/TEST_CONCEPT.md](docs/TEST_CONCEPT.md)).
 
-`node tests/act2.test.cjs` prüft die fünf neuen Lösungswege, Schutz- und Halteziele sowie Spielstandmigration. Alte lokale Spielstände und RR1-Codes bleiben gültig; neue RR3-Codes übertragen alle fünfzehn Wertungen (RR2 bleibt importierbar). Nach Akt I öffnet sich Akt II automatisch.
+```bash
+# Gesamte Testsuite (alle 5 Ebenen) ausführen:
+node tests/run-all.cjs
 
-Akt II setzt die Rettung der Hellas-Siedlungen fort: zwei Versorgungswege, gleichzeitige Schleusenkontrolle, Evakuierung unter Wildwuchs, drei Forschungsarchive und ein gemeinsamer Schutzgürtel. Knappere Budgets, mehrere Ziele und gefährdete Schutzzonen verlangen abgestimmte Conway-Muster. Akt III führt diese Geschichte unter Olympus fort. Akte IV–V sind noch nicht spielbar.
+# Einzelne Testebenen prüfen:
+node tests/integrity.test.cjs    # Ebene 1: Syntax, Script-Tags, Missions-Geometrie
+node tests/core.test.cjs         # Ebene 2: Conway B3/S23, Felsen, Territorien, Budget
+node tests/ai.test.cjs           # Ebene 3: KI-Budgetdisziplin & Grenzfälle
+node tests/campaign.test.cjs     # Ebene 4: Akt I Lösungswege, Reset & Codes
+node tests/act2.test.cjs         # Ebene 4: Akt II Versorgung & Hold-Zonen
+node tests/act3.test.cjs         # Ebene 4: Akt III Schalter, Pulse & Quarantäne
+node tests/audio.test.cjs        # Ebene 5: GameAudio, Ducking, Tab-Pause & TTS
+node tests/audio-assets.test.cjs # Ebene 5: Audio-Aufnahmen & SHA-256 Integrität
+
+# Git Pre-Push Hook aktivieren (verhindert Push bei Testfehlern):
+./scripts/install-hooks.sh
+```
+
+Für den Browser: `python3 -m http.server 8765`, dann `http://localhost:8765/index.html`. Es gibt keinen Build-Schritt. Die bestehende Oberfläche lädt Tailwind und Schriften weiterhin über CDNs.
+
+Akt II setzt die Rettung der Hellas-Siedlungen fort: zwei Versorgungswege, gleichzeitige Schleusenkontrolle, Evakuierung unter Wildwuchs, drei Forschungsarchive und ein gemeinsamer Schutzgürtel. Akt III führt diese Geschichte unter Olympus mit sequenziellen Schaltern und Quarantänezonen fort. Akt IV ergänzt fünf schwere Gefechte gegen Tharsis und Viridion. Akt V ist noch nicht spielbar.
 
 ## 🛠️ Architektur
 
@@ -123,7 +141,7 @@ Die fertigen MP3-Dateien unter `assets/audio/` werden mit der Website ausgeliefe
 
 Erzeugung: `python3 scripts/generate_audio.py` nutzt die lokalen AiStack-Dienste Qwen3-TTS (deutsche Erzählerstimme `uncle_fu`), Speaches und AudioGen. Der Speaches-Schlüssel wird aus der Umgebung oder der lokalen AiStack-Konfiguration gelesen und niemals in Assets gespeichert. Sprache wird auf −16 LUFS, die in acht Takes erzeugte Atmosphäre auf −23 LUFS normalisiert. `manifest.json` enthält die Texte; `verification.json` enthält die Transkriptprüfung. `node tests/audio.test.cjs` prüft die Audio-Steuerung ohne GPU.
 
-Alle 30 aktuellen Briefings und erfolgreichen Missionsberichte aus Akt I–III sind als deutsche Qwen3-Aufnahmen enthalten und per Speaches geprüft. Die Browserstimme bleibt für dynamische Niederlagenberichte zuständig. Die Funkkennung lautet „Landefähre“. `verification.json` dokumentiert Transkripte und Prüfsummen; `mastering.json` enthält die Pegelmessungen. `node tests/audio-assets.test.cjs` prüft, dass Aufnahmen und aktuelle Sektortexte zusammenpassen. Versionierte Audio-URLs verhindern, dass alte Aufnahmen aus dem Browsercache abgespielt werden.
+Alle 40 aktuellen Briefings und erfolgreichen Missionsberichte aus Akt I–IV sind als deutsche Qwen3-Aufnahmen enthalten und per Speaches geprüft. Die Browserstimme bleibt für dynamische Niederlagenberichte zuständig. Die Funkkennung lautet „Landefähre“. `verification.json` dokumentiert Transkripte und Prüfsummen; `mastering.json` enthält die Pegelmessungen. `node tests/audio-assets.test.cjs` prüft, dass Aufnahmen und aktuelle Sektortexte zusammenpassen. Versionierte Audio-URLs verhindern, dass alte Aufnahmen aus dem Browsercache abgespielt werden.
 
 ### Missionsabhängige Atmosphäre und Abbrechen
 
@@ -133,7 +151,7 @@ Die Missionen aller drei Akte verwenden unterschiedliche Klangkulissen: Landewin
 
 ### Missionsbilder
 
-Die zehn Missionen von Akt I und II besitzen eigene Illustrationen im Stil der bisherigen Mars- und Häuserbilder. Im Briefing lässt sich das Motiv in voller Größe öffnen. Die WebP-Dateien liegen in `assets/missions/`; `manifest.json` dokumentiert die integrierte Bildgenerierung, Stilreferenzen und vollständigen Prompts. Die Bilder illustrieren die Geschichte, nicht den exakten Aufbau des taktischen Spielfelds.
+Die fünfzehn Missionen von Akt I, II und IV besitzen eigene Illustrationen im Stil der bisherigen Mars- und Häuserbilder. Im Briefing lässt sich das Motiv in voller Größe öffnen. Die WebP-Dateien liegen in `assets/missions/`; `manifest.json` dokumentiert die integrierte Bildgenerierung, Stilreferenzen und vollständigen Prompts. Die Bilder illustrieren die Geschichte, nicht den exakten Aufbau des taktischen Spielfelds.
 
 ### Langsamere Genom-Forschung
 
@@ -149,10 +167,26 @@ Die zehn Missionen von Akt I und II besitzen eigene Illustrationen im Stil der b
 | 9 | Acorn |
 | 10 | B-Heptomino |
 
-Akt III ergänzt Rabbits nach Sektor 12, Switch Engine nach Sektor 14 und Lidka nach Sektor 15. Die Gleiterkanone bleibt zukünftigen Akten vorbehalten. Frühere Missionen behalten beim Wiederholen ihre begrenzte Auswahl. Vorhandene Sterne und Sektorabschlüsse bleiben erhalten; die Forschung wird aus der neuen Staffelung abgeleitet. Freies Gefecht und Sandbox behalten sämtliche Figuren.
+Akt III ergänzt Rabbits nach Sektor 12, Switch Engine nach Sektor 14 und Lidka nach Sektor 15. Die Gleiterkanone folgt erst nach Sektor 19. Frühere Missionen behalten beim Wiederholen ihre begrenzte Auswahl. Vorhandene Sterne und Sektorabschlüsse bleiben erhalten; die Forschung wird aus der neuen Staffelung abgeleitet. Freies Gefecht und Sandbox behalten sämtliche Figuren.
 
 ### Akt III – Das stille Netz
 
 Fünf schwierige Missionen unter Olympus: drei Schalter in fester Reihenfolge, eine nach hundert Generationen noch lebende und bis Generation 140 ausgestorbene Kolonie, zwei gleichzeitige Abfangmanöver, Archivbergung gegen schwere KI unter Quarantäne und drei sechzehn Generationen lang gemeinsam gehaltene Relais. Rote Bereiche müssen frei von **jeder** lebenden Flora bleiben; auch eigene Zellen verletzen die Quarantäne.
 
 Nach Akt II öffnet sich Sektor 11. Alte Sterne und Codes bleiben erhalten. Die Sektortexte und Berichte werden automatisch vorgelesen. Akt III verwendet vorläufig passende vorhandene Missionsillustrationen über das optionale `image`-Feld. `node tests/act3.test.cjs` prüft Lösungswege, Niederlagen und Codekompatibilität.
+
+### Akt IV – Der rote Sturm
+
+Fünf neue Gefechte (Sektoren 16–20): Die gebrochene Waffenruhe, Die Zangenstellung, Zwischen den Fronten, Die letzte Gegenoffensive und Das Auge des Sturms. Schwere KI sät jede Runde nach. Für eine Camp-Eroberung müssen mindestens drei eigene Zellen und eine Mehrheit gegenüber fremder Flora acht bzw. zwölf Generationen ununterbrochen im Ziel leben. Erst der Verlust aller Camps stoppt die Aussaat des jeweiligen Hauses. Bereits lebende Pflanzen bleiben bestehen. Rettungsplätze müssen auch nach der Eroberung geschützt werden.
+
+Nach einem Sieg führt **Nächster Sektor · Marskarte** zum ausgewählten Folgesektor mit Karte, Bild und automatischem Briefing. Dort startest du die nächste Mission bewusst. Bestehende Spielstände schalten Akt IV nach Abschluss von Akt III frei.
+
+Weitere Testpasswörter (nur hier dokumentiert):
+
+| Passwort | Einstieg |
+| --- | --- |
+| `PALISADE-WAFFENRUHE` | Mission 16 – Die gebrochene Waffenruhe |
+| `PALISADE-ZANGE` | Mission 17 – Die Zangenstellung |
+| `PALISADE-FRONTEN` | Mission 18 – Zwischen den Fronten |
+| `PALISADE-GEGENSTOSS` | Mission 19 – Die letzte Gegenoffensive |
+| `PALISADE-STURMAUGE` | Mission 20 – Das Auge des Sturms |

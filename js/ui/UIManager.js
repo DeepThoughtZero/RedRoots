@@ -583,7 +583,7 @@ class UIManager {
                 this.ai.genome = this.aiGenomes[pId].params;
             }
             
-            if (this.gameState.scenario && !this.gameState.scenario.enemy) {
+            if (this.gameState.scenario && (this.gameState.defeatedPlayers?.has(pId) || (this.gameState.scenario.enemies ? !this.gameState.scenario.enemies.some(e => e.house === pId) : !this.gameState.scenario.enemy))) {
                 this.gameState.nextPlayerTurn();
             } else {
                 if (this.gameState.scenario) this.ai.genome = this.ai.getDefaultGenome(this.gameState.playerStrengths[pId]);

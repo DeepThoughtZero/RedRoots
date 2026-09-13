@@ -59,8 +59,8 @@ const CAMPAIGN_MISSIONS = [
 
 class MissionManager {
     static config(mission) {
-        return { rows: mission.map.rows || 30, cols: mission.map.cols || 48, rounds: mission.rounds, steps: mission.steps, playerCount: 2,
-            humanFlags: [true, false], radius: mission.radius || 5, budgetFactor: mission.budgetFactor || 25, rocks: 0, collisionRule: 'majority', scenario: mission };
+        return { rows: mission.map.rows || 30, cols: mission.map.cols || 48, rounds: mission.rounds, steps: mission.steps, playerCount: mission.enemies ? Math.max(1, ...mission.enemies.map(e => e.house)) + 1 : 2,
+            humanFlags: [true, false, false, false], radius: mission.radius || 5, budgetFactor: mission.budgetFactor || 25, rocks: 0, collisionRule: 'majority', scenario: mission };
     }
     static apply(state, mission) {
         state.scenario = mission;
@@ -70,8 +70,13 @@ class MissionManager {
         mission.map.territory.forEach(([owner, ...a]) => rect(a, (r, c) => state.territory.territoryMap[r][c] = owner));
         mission.map.rocks.forEach(a => rect(a, (r, c) => state.grid.setCell(r, c, CONSTANTS.OWNER_ROCK, true)));
         (mission.map.seeds || []).forEach(s => CONSTANTS.PATTERNS[s.pattern].pattern.forEach(([r, c]) => state.grid.setCell(s.r + r, s.c + (s.mirror ? -c : c), s.owner, true)));
-        state.budgets = [mission.budget, mission.enemy ? (mission.enemyBudget ?? 8) : 0];
-        state.playerStrengths[1] = mission.enemyStrength || 'easy';
+        state.budgets = Array(state.playerCount).fill(0);
+        state.budgets[0] = mission.budget;
+        if (mission.enemies) mission.enemies.forEach(e => { state.budgets[e.house] = e.budget; state.playerStrengths[e.house] = e.strength || 'hard'; });
+        else state.budgets[1] = mission.enemy ? (mission.enemyBudget ?? 8) : 0;
+        if (!mission.enemies) state.playerStrengths[1] = mission.enemyStrength || 'easy';
+        state.defeatedPlayers = new Set();
+        state.aiRandomSeed = Number.isInteger(mission.aiSeed) ? mission.aiSeed >>> 0 : undefined;
         state.objectiveSystem = new ObjectiveSystem(mission);
     }
 }

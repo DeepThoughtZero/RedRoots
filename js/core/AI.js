@@ -6,6 +6,13 @@ class AI {
         this.genome = genome || this.getDefaultGenome(gameState.playerStrengths[gameState.currentPlayer] || 'medium');
     }
 
+    random() {
+        const state = this.gameState;
+        if (!Number.isInteger(state.aiRandomSeed)) return Math.random();
+        state.aiRandomSeed = (1664525 * state.aiRandomSeed + 1013904223) >>> 0;
+        return state.aiRandomSeed / 4294967296;
+    }
+
     getDefaultGenome(strength) {
         if (strength === 'easy') {
             return {
@@ -170,7 +177,7 @@ class AI {
                 const affordable = candidates.filter(c => budget >= c.cost && c.weight > 0);
                 if (affordable.length > 0) {
                     const totalWeight = affordable.reduce((sum, c) => sum + c.weight, 0);
-                    let r = Math.random() * totalWeight;
+                    let r = this.random() * totalWeight;
                     for (const cand of affordable) {
                         r -= cand.weight;
                         if (r <= 0) {
@@ -224,8 +231,8 @@ class AI {
                     let rotations = this.getOptimalRotation(r, c, chosenKey, pId);
                     
                     // Difficulty specific rotation overrides
-                    if (Math.random() < this.genome.random_rotation_chance) {
-                        rotations = Math.floor(Math.random() * 4);
+                    if (this.random() < this.genome.random_rotation_chance) {
+                        rotations = Math.floor(this.random() * 4);
                     }
                     
                     let currentPattern = pattern;
@@ -331,7 +338,7 @@ class AI {
         if (validSpots.length > 0) {
             // Weighted selection
             const totalWeight = validSpots.reduce((sum, spot) => sum + spot.weight, 0);
-            let random = Math.random() * totalWeight;
+            let random = this.random() * totalWeight;
             for (const spot of validSpots) {
                 random -= spot.weight;
                 if (random <= 0) return spot;

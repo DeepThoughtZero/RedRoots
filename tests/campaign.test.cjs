@@ -3,7 +3,7 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const store = new Map();
 const context = vm.createContext({ console, setTimeout, requestAnimationFrame: () => 1, cancelAnimationFrame: () => {}, localStorage: { getItem: k => store.get(k) || null, setItem: (k,v) => store.set(k,v) } });
-for (const file of ['js/utils/Constants.js','js/core/Grid.js','js/core/Territory.js','js/campaign/Missions.js','js/campaign/Story.js','js/campaign/Act2.js','js/campaign/Act3.js','js/campaign/ObjectiveSystem.js','js/campaign/CampaignManager.js','js/core/GameState.js']) vm.runInContext(readFileSync(file,'utf8'),context);
+for (const file of ['js/utils/Constants.js','js/core/Grid.js','js/core/Territory.js','js/campaign/Missions.js','js/campaign/Story.js','js/campaign/Act2.js','js/campaign/Act3.js','js/campaign/Act4.js','js/campaign/ObjectiveSystem.js','js/campaign/CampaignManager.js','js/core/GameState.js']) vm.runInContext(readFileSync(file,'utf8'),context);
 const api = vm.runInContext('({GameState, MissionManager, CAMPAIGN_MISSIONS, CONSTANTS, CampaignState})', context);
 const {GameState, MissionManager, CAMPAIGN_MISSIONS: missions, CONSTANTS: C, CampaignState} = api;
 function create(i) { const s = new GameState(MissionManager.config(missions[i])); s.simSpeedMs=0; s.start(); return s; }

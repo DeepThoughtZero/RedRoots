@@ -148,5 +148,55 @@
     "id": "A3_M05_debriefing",
     "text": "Die Relais übernehmen. Die Zentrale verstummt, doch in Hellas laufen die Pumpen weiter. Voss legt den Sprengzünder weg. Wir haben das Netz gerettet, indem wir es getrennt haben. Dann trifft eine Meldung aus dem Norden ein: Ein Sturm legt weitere alte Wurzelkanäle frei.",
     "voice": "uncle_fu"
+  },
+  {
+    "id": "A4_M01_briefing",
+    "text": "Ein roter Sturm legt alte Wasserkanäle frei. Die Zentrale von Tharsis hilft uns, doch ihre nördlichen Garnisonen gehorchen nicht mehr. Gelbe Flora marschiert auf unser Habitat zu. Fange den Angriff ab, erobere das Sperrcamp und halte den Rückweg bis Generation 112 offen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A4_M01_debriefing",
+    "text": "Das Sperrcamp schweigt. Die Gefangenen glaubten, Hellas wolle ihre Wasserreserven beschlagnahmen. Voss öffnet den Kanal für beide Seiten: „Wir bringen Evakuierungsfähren.“ Doch weiter nördlich hat eine Garnison zwei Pumpen besetzt. Sie droht, den Zufluss zu kappen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A4_M02_briefing",
+    "text": "Zwei Tharsis-Camps kontrollieren die Wasserader. Jedes schützt die Versorgung des anderen. Wir müssen beide erobern, bevor die Garnison den Kanal überflutet. Teile deinen Angriff auf. Solange auch nur ein Camp übrig bleibt, wächst ihre gelbe Front weiter.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A4_M02_debriefing",
+    "text": "Beide Camps sind gesichert. Unter den Pumpen liegt ein offener Wartungsschacht; Wildwuchs strömt in die Wasserader. Die Besatzer wollten ihn mit immer mehr eigener Flora verdrängen. Jetzt treffen die Fronten aufeinander. Zwei Rettungsplätze liegen dazwischen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A4_M03_briefing",
+    "text": "Viridion, das Haus der grünen Kolonien, fordert die nördlichen Wasserwege für sich. Seine Truppen kämpfen gegen Tharsis – mitten durch unsere Evakuierung. Schütze beide Rettungsplätze 160 Generationen vor jeder fremden Flora. Beide Gegner säen nach jeder Runde erneut. Ein einziger Durchbruch beendet die Rettung.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A4_M03_debriefing",
+    "text": "Die letzte Fähre verlässt den Sturm. Familien aller drei Häuser sitzen an Bord. Viridion hört ihre Stimmen und bietet einen Korridor an. Doch zwei Kommandoposten kämpfen weiter. Wir müssen ihre Aussaat stoppen, bevor sie die geretteten Wasserwege wieder verbinden.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A4_M04_briefing",
+    "text": "Ein grüner und ein gelber Kommandoposten verweigern die Waffenruhe. Erobere beide, während unsere Zivilstation im Süden geschützt bleibt. Jeder gefallene Posten stoppt die neue Aussaat seines Hauses. Vorhandene Kolonien verschwinden dadurch nicht. Halte die Station bis Generation 128 frei von fremder Flora.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A4_M04_debriefing",
+    "text": "Die beiden Kommandoposten geben auf. Ihre Karten zeigen die eigentliche Gefahr: Drei letzte Garnisonen verteidigen den Sturmspeicher. Wenn ihre Kolonien zusammenwachsen, versagt die Trennung der Wasseradern. Voss fordert alle Häuser auf, ihre Evakuierungsrouten offenzulegen. Diesmal antworten sie.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A4_M05_briefing",
+    "text": "Drei Garnisonen blockieren den Sturmspeicher. Zwei gehören Tharsis, eine Viridion. Erobere alle, während Wildwuchs die Evakuierung bedroht. Der neue Kanonenbauplan ist mächtig, aber teuer und schwer unterzubringen. Entscheide, wo dein Material am meisten bewirkt. Halte den Rettungsplatz bis Generation 160 offen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A4_M05_debriefing",
+    "text": "Die letzte Garnison schweigt. Zum ersten Mal fließt Wasser durch gemeinsam gewartete Leitungen, während die Pflanzenkolonien getrennt bleiben. Der Sturm zieht weiter. Voss fragt nicht mehr, wem der Mars gehört. Sie fragt, wer morgen Verantwortung übernimmt. Die Häuser müssen jetzt eine gemeinsame Ordnung finden.",
+    "voice": "uncle_fu"
   }
 ]

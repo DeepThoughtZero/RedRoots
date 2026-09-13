@@ -1,7 +1,7 @@
 // Verify recordings against current mission texts without requiring local AI services.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const context=vm.createContext({});
-for(const file of ['Missions','Story','Act2','Act3'])vm.runInContext(fs.readFileSync(`js/campaign/${file}.js`,'utf8'),context);
+for(const file of ['Missions','Story','Act2','Act3','Act4'])vm.runInContext(fs.readFileSync(`js/campaign/${file}.js`,'utf8'),context);
 const missions=vm.runInContext('CAMPAIGN_MISSIONS',context);
 const manifest=JSON.parse(fs.readFileSync('assets/audio/manifest.json'));
 const reports=JSON.parse(fs.readFileSync('assets/audio/verification.json'));

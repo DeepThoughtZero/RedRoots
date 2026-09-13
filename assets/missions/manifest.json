@@ -74,6 +74,36 @@
       "file": "A2_M05.webp",
       "source": "exec-78a2346c-4b5a-46ac-ae4d-c52640779cf7.png",
       "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. Epic hopeful Mars panorama of two separate cyan living pump gardens glowing on rocky islands with a barren protective corridor between them; cyan and magenta settlement lights safely shining in the distance, pale wild flora beyond the perimeter, storm clearing at sunrise. No large planets in sky."
+    },
+    {
+      "id": "A4_M01",
+      "file": "A4_M01.webp",
+      "source": "exec-d9918567-a3e2-4cff-8610-4319c5f03574.png",
+      "prompt": "Use case: stylized-concept. Create a new 16:9 landscape mission illustration matching these existing game images as STYLE REFERENCES: realistic cinematic science fiction, layered copper-red Mars geology, weathered dark industrial habitats, detailed waxy succulent flora with branching luminous lattice structures, cyan player flora versus yellow Tharsis and green Viridion. Atmospheric scale, dramatic light, sharp readable silhouette at banner size. No labels, no logos, no UI, no watermark, no large planets in sky. Any humans are tiny helmeted explorers. Scene: A yellow-lit Tharsis fortified water checkpoint in a vast rusty Martian dust storm, advancing yellow lattice flora threatening a small cyan expedition habitat; a narrow trail of cyan succulent roots intercepts the invasion. Tense first battle, no weapons, no text."
+    },
+    {
+      "id": "A4_M02",
+      "file": "A4_M02.webp",
+      "source": "exec-e212426b-858e-450a-80ed-6edea7c16a0f.png",
+      "prompt": "Use case: stylized-concept. Create a new 16:9 landscape mission illustration matching these existing game images as STYLE REFERENCES: realistic cinematic science fiction, layered copper-red Mars geology, weathered dark industrial habitats, detailed waxy succulent flora with branching luminous lattice structures, cyan player flora versus yellow Tharsis and green Viridion. Atmospheric scale, dramatic light, sharp readable silhouette at banner size. No labels, no logos, no UI, no watermark, no large planets in sky. Any humans are tiny helmeted explorers. Scene: Two distant yellow-lit fortified pumping outposts astride a deep red Mars canyon, cyan bioluminescent plant colonies approaching on two distinct flanking rock terraces, dramatic dust storm, enormous industrial sluices. Tactical double siege, no guns, no text."
+    },
+    {
+      "id": "A4_M03",
+      "file": "A4_M03.webp",
+      "source": "exec-d41bbdb2-5ea9-4dd2-b630-734ee54d4e53.png",
+      "prompt": "Use case: stylized-concept. Create a new 16:9 landscape mission illustration matching these existing game images as STYLE REFERENCES: realistic cinematic science fiction, layered copper-red Mars geology, weathered dark industrial habitats, detailed waxy succulent flora with branching luminous lattice structures, cyan player flora versus yellow Tharsis and green Viridion. Atmospheric scale, dramatic light, sharp readable silhouette at banner size. No labels, no logos, no UI, no watermark, no large planets in sky. Any humans are tiny helmeted explorers. Scene: Two evacuation shuttle landing pads in a wind-torn Martian valley, cyan defensive plant colonies protecting helmeted settlers while vast yellow and bright green plant fronts clash beyond the perimeter. Hope amidst biological warfare and red dust, no guns, no text."
+    },
+    {
+      "id": "A4_M04",
+      "file": "A4_M04.webp",
+      "source": "exec-adda2dde-d2a7-48f7-aa1d-fbd19ead7d6c.png",
+      "prompt": "Use case: stylized-concept. Create a new 16:9 landscape mission illustration matching these existing game images as STYLE REFERENCES: realistic cinematic science fiction, layered copper-red Mars geology, weathered dark industrial habitats, detailed waxy succulent flora with branching luminous lattice structures, cyan player flora versus yellow Tharsis and green Viridion. Atmospheric scale, dramatic light, sharp readable silhouette at banner size. No labels, no logos, no UI, no watermark, no large planets in sky. Any humans are tiny helmeted explorers. Scene: A cyan root colony divides into two precise offensive routes toward rival fortified command posts, one neon yellow and one neon green, while a tiny civilian dome glows safely behind them. Rusty Mars machinery and dark storm clouds; escalating battle, no weapons, no text."
+    },
+    {
+      "id": "A4_M05",
+      "file": "A4_M05.webp",
+      "source": "exec-b8da3a48-2490-42bd-a82e-57aa12c5bf45.png",
+      "prompt": "Use case: stylized-concept. Create a new 16:9 landscape mission illustration matching these existing game images as STYLE REFERENCES: realistic cinematic science fiction, layered copper-red Mars geology, weathered dark industrial habitats, detailed waxy succulent flora with branching luminous lattice structures, cyan player flora versus yellow Tharsis and green Viridion. Atmospheric scale, dramatic light, sharp readable silhouette at banner size. No labels, no logos, no UI, no watermark, no large planets in sky. Any humans are tiny helmeted explorers. Scene: Epic wide panorama inside the eye of an immense rusty Martian dust storm: three heavily fortified water storage bastions, two yellow and one green, facing multiple cyan living plant offensives, gray-white wild roots approaching an evacuation pad in foreground. Vast scale, shafts of amber light through red swirling dust, grounded science fiction, no guns, no text."
     }
   ]
 }

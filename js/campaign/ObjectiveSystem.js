@@ -1,6 +1,6 @@
 // Mission outcomes are evaluated independently of the skirmish camp victory rule.
 class ObjectiveSystem {
-    constructor(mission) { this.mission = mission; this.generations = 0; this.streak = 0; this.spent = 0; this.result = null; this.collected = new Set(); this.hold = 0; this.progressText = ''; }
+    constructor(mission) { this.mission = mission; this.generations = 0; this.streak = 0; this.spent = 0; this.result = null; this.collected = new Set(); this.hold = 0; this.progressText = ''; this.captureTicks = new Map(); this.maxPopulation = 0; }
     inZone(state, zone, owner, territory = false) {
         for (let r = zone.rMin; r <= zone.rMax; r++) for (let c = zone.cMin; c <= zone.cMax; c++) {
             if ((territory ? state.territory.getOwnerAt(r, c) : state.grid.getOwner(r, c)) === owner) return true;
@@ -10,15 +10,17 @@ class ObjectiveSystem {
     evaluate(state, event) {
         if (this.result) return true;
         const o = this.mission.objective;
+        this.maxPopulation = Math.max(this.maxPopulation, state.grid.owners.reduce((sum,v)=>sum+(v===1?1:0),0));
         if (event === 'generation') {
             this.generations++;
             this.streak = state.grid.owners.some(v => v === 1) ? this.streak + 1 : 0;
         }
         const zone = this.mission.map.zones.find(z => z.id === o.zone);
-        const lostCamp = state.territory.camps.some(c => c.id === 0 && this.inZone(state, c, 2));
+        const hostiles = Array.from({length: state.playerCount - 1}, (_, i) => i + 2);
+        const lostCamp = state.territory.camps.some(c => c.id === 0 && hostiles.some(owner => this.inZone(state, c, owner)));
         const lostProtected = (o.protect || []).some(id => {
             const z = this.mission.map.zones.find(zone => zone.id === id);
-            return this.inZone(state, z, 2) || this.inZone(state, z, CONSTANTS.OWNER_NEUTRAL);
+            return [...hostiles, CONSTANTS.OWNER_NEUTRAL].some(owner => this.inZone(state, z, owner));
         });
         const lostSterile = (o.sterile || []).some(id => { const z = this.mission.map.zones.find(z => z.id === id); return [1,2,3,4,CONSTANTS.OWNER_NEUTRAL].some(owner => this.inZone(state,z,owner)); });
         let wrongOrder = false;
@@ -61,10 +63,28 @@ class ObjectiveSystem {
             won = this.generations >= o.value && state.grid.owners.some(v => v === 1);
         }
         if (o.type === 'territoryZones') this.progressText = `${targets.filter(z => this.inZone(state, z, 0, true)).length} / ${targets.length} Pumpen versorgt`;
+        if (o.type === 'captureCamps') {
+            if (event === 'generation') for (const target of targets) {
+                if (this.collected.has(target.id)) continue;
+                let own=0, other=0;
+                for(let r=target.rMin;r<=target.rMax;r++)for(let c=target.cMin;c<=target.cMax;c++){ const owner=state.grid.getOwner(r,c); if(owner===1)own++; else if(hostiles.includes(owner)||owner===CONSTANTS.OWNER_NEUTRAL)other++; }
+                const hasMajority = own >= 3 && own > other;
+                const ticks = hasMajority ? (this.captureTicks.get(target.id) || 0) + 1 : 0;
+                this.captureTicks.set(target.id,ticks);
+                if (ticks >= o.hold) this.collected.add(target.id);
+            }
+            for (const enemy of this.mission.enemies || []) {
+                const bases = targets.filter(z => z.house === enemy.house);
+                if (bases.length && bases.every(z => this.collected.has(z.id))) { state.defeatedPlayers.add(enemy.house); state.budgets[enemy.house] = 0; }
+            }
+            this.progressText = `${this.collected.size} / ${targets.length} Camps erobert · ${o.hold} Generationen halten: mindestens 3 eigene Zellen und Pflanzenmehrheit`;
+            if (this.collected.size === targets.length && this.generations < (o.minGenerations || 0)) this.progressText = `Camps gesichert · ${o.minGenerations-this.generations} Generationen Rückweg schützen`;
+            won = this.collected.size === targets.length && this.generations >= (o.minGenerations || 0) && state.grid.owners.some(v => v === 1);
+        }
         const expired = event === 'round' && state.currentRound >= state.maxRounds;
         if (!lostCamp && !lostRace && !lostProtected && !lostSterile && !wrongOrder && !won && !expired) return false;
         const success = won && !lostCamp && !lostRace && !lostProtected && !lostSterile && !wrongOrder;
-        const bonuses = this.mission.bonuses.map(b => success && (b.type === 'rounds' ? state.currentRound <= b.value : b.type === 'generations' ? this.generations <= b.value : this.spent <= b.value));
+        const bonuses = this.mission.bonuses.map(b => success && (b.type === 'rounds' ? state.currentRound <= b.value : b.type === 'generations' ? this.generations <= b.value : b.type === 'population' ? this.maxPopulation <= b.value : this.spent <= b.value));
         this.result = { success, stars: success ? 1 + bonuses.filter(Boolean).length : 0, bonuses,
             reason: wrongOrder ? 'Die Schalter wurden in falscher Reihenfolge berührt.' : lostSterile ? 'Die Quarantäne wurde durch lebende Flora verletzt.' : lostProtected ? 'Fremde Flora hat die geschützte Zone erreicht.' : lostCamp ? 'Unser Habitat wurde überwuchert.' : lostRace ? 'Hellas hat das Wasser zuerst erreicht.' : !success ? 'Das Zeitfenster ist geschlossen.' : this.mission.debriefing };
         state.winner = success ? 0 : 1;

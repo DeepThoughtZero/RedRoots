@@ -2,7 +2,7 @@
 
 ## Spielbarer Umfang
 
-Akt I, II und III bestehen aus je fünf implementierten Missionen. Akte IV–V sind die verbindende Geschichte für spätere Erweiterungen, noch keine spielbaren Inhalte. Das freie Gefecht und die Sandbox bleiben unabhängige Startoptionen mit ihrer bisherigen Genbibliothek und ihren bisherigen Regeln. Die Kampagne folgt zunächst Haus Marineris.
+Akt I–IV bestehen aus je fünf implementierten Missionen. Akt V ist ein Entwurf für die spätere Fortsetzung. Das freie Gefecht und die Sandbox bleiben unabhängige Startoptionen mit ihrer bisherigen Genbibliothek und ihren bisherigen Regeln. Die Kampagne folgt zunächst Haus Marineris.
 
 ## Prämisse
 
@@ -48,11 +48,17 @@ Der Konflikt wechselt von Rivalität zu notwendiger Zusammenarbeit. Flora ist ke
 
 Der Akt beantwortet die Frage nach dem alten Netz. Weder Flora noch Anlage brauchen übernatürliches Bewusstsein. Der Konflikt um Abschalten oder Erhalten wird durch eine dritte, im Conway-Spiel bewiesene Lösung aufgelöst. Kein zusätzlicher Dialogbaum. Spätere Akte bauen auf dem bereits geretteten Netz auf.
 
-## Akt IV – Der rote Sturm (geplant)
+## Akt IV – Der rote Sturm (implementiert)
 
-Ein Sturm setzt bislang getrennte Lebensräume über verschüttete Wasserkanäle in Verbindung. Die Häuser müssen ihre Grenzen öffnen, um Evakuierungskorridore zu schaffen. Frühere Hilfe entscheidet über Unterstützung und Startvorräte, nicht über künstliche Sackgassen.
+Der Sturm öffnet alte Wasserkanäle im Norden. Obwohl die Häuser Hilfe zusagen, verweigern örtliche Garnisonen die Waffenruhe: Aus Angst um ihre Vorräte säen sie weiter und gefährden damit alle Siedlungen.
 
-Vale erkennt: Eine vollständige Vernichtung würde auch die funktionierende Terraformierung zerstören. Die zentrale Steuerung von Tharsis kann die lokalen Wechselwirkungen nicht schnell genug auffangen. Mehr Macht und mehr Wachstum lösen das Problem nicht. Missionen verlangen Schutz, begrenzte Aussaat, Isolation und gleichzeitige Relaiskontrolle.
+16. **Die gebrochene Waffenruhe:** Ein Tharsis-Posten blockiert die Versorgung. Angriff und Abfangen einer feindlichen Kolonie müssen gleichzeitig gelingen.
+17. **Die Zangenstellung:** Zwei befestigte Pumpwerke erfordern getrennte Angriffe. Erst wenn beide fallen, endet die feindliche Nachsaat.
+18. **Zwischen den Fronten:** Viridion und Tharsis kämpfen durch einen Evakuierungskorridor. Zwei Rettungsplätze müssen trotz beider aktiver Gegner offen bleiben.
+19. **Die letzte Gegenoffensive:** Zwei rivalisierende Kommandoposten müssen fallen, während eine Zivilstation geschützt wird. Die Häuser teilen endlich ihre Evakuierungsrouten. Als späte Forschung folgt die Gleiterkanone.
+20. **Das Auge des Sturms:** Drei Garnisonen blockieren den Sturmspeicher. Mehrere Angriffsachsen, Wildwuchs und ein langer Rückzug erzwingen Nachsteuerung. Die Rettung gelingt durch gemeinsames Handeln, nicht durch die Vernichtung der Flora.
+
+Das Ende löst die akute Sturmkrise. Gemeinsam gewartete Wasserleitungen versorgen die Siedlungen, während Pflanzenkolonien getrennt bleiben. Voss stellt die nächste Frage: Wer übernimmt dauerhaft Verantwortung? Es gibt keinen implementierten Entscheidungsbaum oder versteckte Belohnung für frühere politische Entscheidungen.
 
 ## Akt V – Olympus (geplant)
 

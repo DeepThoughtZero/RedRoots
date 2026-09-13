@@ -20,9 +20,8 @@ Das aktive Spiel startet über **`index.html`**. Kein Build-Schritt, kein Framew
 ```bash
 python3 -m http.server 8765 --bind 127.0.0.1
 # http://127.0.0.1:8765/index.html
-node tests/campaign.test.cjs
-node tests/audio.test.cjs
-node tests/act2.test.cjs
+node tests/run-all.cjs
+# Einzeltests: node tests/core.test.cjs, ai.test.cjs, campaign.test.cjs, act2.test.cjs, act3.test.cjs, audio.test.cjs, integrity.test.cjs
 ```
 
 Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beenden. Unterschiedliche Ports haben unterschiedliche Browserspeicher.
@@ -73,7 +72,7 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 
 ## Kampagne und Geschichte
 
-**Spielbar sind fünfzehn Missionen in Akt I–III.** Akt II ergänzt territoriale Versorgung, gleichzeitige Zielbesetzung, Evakuierung mit Schutzzone, dauerhaft gesammelte Archive und ununterbrochenes Halten mehrerer Pumpen. Akt III ergänzt geordnete Kontakte, zeitlich begrenztes Leben, Doppelabfangmanöver und sterile Zonen. Akte IV–V bleiben geplant.
+**Spielbar sind zwanzig Missionen in Akt I–IV.** Akt II ergänzt territoriale Versorgung, gleichzeitige Zielbesetzung, Evakuierung mit Schutzzone, dauerhaft gesammelte Archive und ununterbrochenes Halten mehrerer Pumpen. Akt III ergänzt geordnete Kontakte, zeitlich begrenztes Leben, Doppelabfangmanöver und sterile Zonen. Akt V bleibt geplant.
 
 Mission 1 beginnt nur mit Einzelzellen und schaltet den Block frei. Ihr Überlebensziel umfasst zwölf Generationen, mit festen 800 ms pro Generation und 1000 ms sichtbarem Endzustand; andere Missionen behalten den Temporegler. Mission 2 erlaubt Zelle/Block und schaltet den Gleiter frei; der Blinker folgt nach Mission 3. Keine vorgefertigte Lösung in Mission 1 auswählen; alternative Conway-Lösungen bleiben gültig. Die Kampagne folgt derzeit Haus Marineris. Zentrale Geschichte: Eine verschwiegene Expedition namens PALISADE entwickelte die vermeintlich neuen Genome Jahrzehnte zuvor. Kesslers Sperrnetz, die Wasserkrise und der Konflikt mit Hellas führen zur Frage gemeinsamer Verantwortung. Keine Aliens, Zeitreise oder magisch denkende Flora einführen. Vor Storyänderungen `docs/CAMPAIGN_STORY.md` lesen.
 
@@ -93,7 +92,7 @@ Für neue Missionen:
 - `redroots_audio_v1`: Audio-Einstellungen.
 - Weitere bestehende Keys betreffen Hilfe/Dojo; Kampagnenreset darf diese nicht pauschal löschen.
 - Gespeichert werden Abschlüsse, nicht der laufende Missionszustand. Browserprofil, Website und Port bestimmen den Speicherbereich; keine automatische Synchronisierung.
-- Neue `RR3`-Expeditionscodes übertragen fünfzehn Sternwertungen; RR1 mit fünf und RR2 mit zehn Wertungen bleiben importierbar. Sie sind absichtlich keine kryptografisch geschützten Zugangsdaten.
+- Neue `RR4`-Expeditionscodes übertragen zwanzig Sternwertungen; RR1 mit fünf und RR2 mit zehn und RR3 mit fünfzehn Wertungen bleiben importierbar. Sie sind absichtlich keine kryptografisch geschützten Zugangsdaten.
 - Import vereinigt Fortschritte und behält die jeweils bessere Wertung. Sektorpasswörter geben früheren Missionen mindestens einen Stern und ihre Forschung/Archive.
 - Reset verlangt eine Bestätigung und betrifft nur die Kampagne. Ungültige Codes dürfen den Spielstand nicht verändern.
 - Speicherfehler behandeln und korrekt anzeigen. Keine Speicherung behaupten, wenn localStorage blockiert ist.
@@ -122,13 +121,16 @@ Speaches benötigt auf dieser Workstation einen Schlüssel. Nur für den lokalen
 
 Briefings und Missionsberichte automatisch vorlesen; bei Autoplay-Sperre mit der nächsten Interaktion nachholen. Hintergrund bleibt separat zuschaltbar und regelbar und darf Hinweise nicht übertönen. Niederlagen nutzen bei Verfügbarkeit die deutsche Browser-Sprachausgabe. Missionsatmosphären stehen in den Szenariodaten; zusätzliche CPU-Sounddesign-Varianten sind im Audio-Herkunftsmanifest gekennzeichnet. Vorlesen ist pausierbar; beim Szenenwechsel stoppen, bei verborgenem Tab pausieren. Texte müssen ohne Ton verständlich bleiben.
 
-**Audiozustand:** Alle 30 Briefings und erfolgreichen Berichte in Akt I–III sind mit Qwen3-TTS (`uncle_fu`, Deutsch) aufgenommen und per Speaches geprüft. Die Missionen verwenden `narration: recorded`; `audioRevision` verhindert veraltete Browser-Caches. Dynamische Niederlagen bleiben bei der Browserstimme. `verification.json` enthält aktuelle Transkripte und drei SHA-256-Prüfsummen, `mastering.json` die gemessenen Pegel. `node tests/audio-assets.test.cjs` prüft Textmanifest, aktuelle Story und Aufnahmeintegrität ohne GPU. Bei Textänderungen neue Aufnahmen erstellen und prüfen; alternativ die betroffenen Missionen ausdrücklich auf Browserstimme zurückstellen. Erst nach bestandener QA die Revision erhöhen. Der Generator regeneriert veraltete, geänderte oder nicht bestandene Clips. Keine GPU-Resets/Rechnerneustarts ohne Autorisierung.
+**Audiozustand:** Alle 40 Briefings und erfolgreichen Berichte in Akt I–IV sind mit Qwen3-TTS (`uncle_fu`, Deutsch) aufgenommen und per Speaches geprüft. Die Missionen verwenden `narration: recorded`; `audioRevision` verhindert veraltete Browser-Caches. Dynamische Niederlagen bleiben bei der Browserstimme. `verification.json` enthält aktuelle Transkripte und drei SHA-256-Prüfsummen, `mastering.json` die gemessenen Pegel. `node tests/audio-assets.test.cjs` prüft Textmanifest, aktuelle Story und Aufnahmeintegrität ohne GPU. Bei Textänderungen neue Aufnahmen erstellen und prüfen; alternativ die betroffenen Missionen ausdrücklich auf Browserstimme zurückstellen. Erst nach bestandener QA die Revision erhöhen. Der Generator regeneriert veraltete, geänderte oder nicht bestandene Clips. Keine GPU-Resets/Rechnerneustarts ohne Autorisierung.
 
 ## Verifikation und Übergabe
 
-- Engine-/Kampagnenänderungen: `node tests/campaign.test.cjs` und `node tests/act2.test.cjs`.
-- Audio-Steuerung: `node tests/audio.test.cjs`.
-- Geänderte JS-Dateien mit `node --check` prüfen; `git diff --check` für Patch-Hygiene.
+- Gesamte Testsuite: `node tests/run-all.cjs` (wird automatisch über den Git-Hook `.git/hooks/pre-push` erzwungen; Aktivierung via `./scripts/install-hooks.sh`).
+- Engine- & Core-Unit-Tests: `node tests/core.test.cjs`.
+- KI-Disziplin & Grenzfälle: `node tests/ai.test.cjs`.
+- Kampagnenänderungen: `node tests/campaign.test.cjs`, `node tests/act2.test.cjs` und `node tests/act3.test.cjs`.
+- Audio-Steuerung: `node tests/audio.test.cjs` und `node tests/audio-assets.test.cjs`.
+- Geänderte JS-Dateien mit `node --check` prüfen; `git diff --check` für Patch-Hygiene (beides in `node tests/integrity.test.cjs` gebündelt).
 - UI-Änderungen im Browser testen, besonders 844×390 (Handy quer), 1024×768 (Tablet quer) und Desktop. Prüfen: Modusauswahl, keine unklaren Zusatzoptionen, Lesbarkeit, Scrollbarkeit, Panel-/HUD-Überlagerungen und erreichbare Aktionen.
 - Bei Eingabe-/Kameraänderungen tatsächliche Platzierung, Zoom, Einpassen und Formatwechsel prüfen. Bei Audioänderungen echte MP3-Wiedergabe, Pause, Hintergrundabsenkung und gespeicherte Regler prüfen.
 - Browser-Tests in separaten Testkontexten ausführen; nicht den echten Nutzerfortschritt zurücksetzen.
@@ -141,10 +143,12 @@ Storyverständlichkeit: Rollen beim ersten Auftreten erklären und anschließend
 
 ## Missionsillustrationen
 
-Jede der zehn Missionen lädt `assets/missions/<Missions-ID>.webp` im Briefing. Neue Missionen benötigen ein passendes Bild oder einen bewussten Fallback. Stilreferenzen: `Mars_Terraforming01.png` und `Marineris_Cyan.png`; realistische Marslandschaften, verwitterte Technik und leuchtende Flora. Vollständige Prompts und Herkunft in `assets/missions/manifest.json`. Keine wichtigen Hinweise ausschließlich im Bild vermitteln. Querformat kompakt halten und Vergrößerung anbieten; keine Bilder über dem Spielfeld platzieren.
+Jede Mission lädt `assets/missions/<Missions-ID>.webp` im Briefing (Akt III verwendet passende bestehende Motive über `mission.image`). Neue Missionen benötigen ein passendes Bild oder einen bewussten Fallback. Stilreferenzen: `Mars_Terraforming01.png` und `Marineris_Cyan.png`; realistische Marslandschaften, verwitterte Technik und leuchtende Flora. Vollständige Prompts und Herkunft in `assets/missions/manifest.json`. Keine wichtigen Hinweise ausschließlich im Bild vermitteln. Querformat kompakt halten und Vergrößerung anbieten; keine Bilder über dem Spielfeld platzieren.
 
 Sektortexte statt Expeditionsarchiv: Kein separates Storyarchiv oder „Wer spricht? Wo sind wir?“-Glossar anzeigen. Rollen und Orte knapp im passenden Briefing erklären (etwa 40–55 Wörter). Entdeckungen in kurzen Abschlussberichten erzählen; auf der Marskarte nur bei bereits abgeschlossenen Sektoren direkt unter dem Briefing zeigen. Keine spätere Enthüllung vorwegnehmen. Audio-Manifest bei Textänderungen aktualisieren.
 
 Genom-Progression: Block nach 1, Gleiter nach 2, Blinker nach 3; keine Genombelohnung nach 4/5; R-Pentomino nach 6, LWSS nach 7, Diehard nach 8, Acorn nach 9, B-Heptomino nach 10. Weitere komplexe Muster erst in späteren Akten. `reward: null` ist gültig und darf keine leere Belohnungskarte oder ungültigen Genome erzeugen. Mission.patterns begrenzt auch Wiederholungen unabhängig vom globalen Fortschritt. Sterne/Abschlüsse alter Saves erhalten; Genome werden aus aktueller Belohnungstabelle abgeleitet.
 
-Akt III: `node tests/act3.test.cjs` ausführen. orderedZones verliert bei vorzeitigem Kontakt eines späteren Schalters. pulse verlangt eigenes Leben exakt bei aliveAt und vollständige Auslöschung ab emptyAfter. sterile-Zonen verlieren bei lebender Flora jedes Eigentümers, auch eigener. Niederlagen haben Vorrang vor zeitgleichem Sieg. holdZones zählt ununterbrochene Generationen, keine Rundenereignisse. Rote Darstellung steriler Zonen in GameRenderer beibehalten. Bilder können über mission.image vorhandene Motive bewusst wiederverwenden. Rabbits erst nach 12, Switch Engine nach 14, Lidka nach 15; Gleiterkanone bleibt gesperrt. CAMPAIGN_ACTS ist die Quelle für Aktnamen und Navigation.
+Akt III: `node tests/act3.test.cjs` ausführen. orderedZones verliert bei vorzeitigem Kontakt eines späteren Schalters. pulse verlangt eigenes Leben exakt bei aliveAt und vollständige Auslöschung ab emptyAfter. sterile-Zonen verlieren bei lebender Flora jedes Eigentümers, auch eigener. Niederlagen haben Vorrang vor zeitgleichem Sieg. holdZones zählt ununterbrochene Generationen, keine Rundenereignisse. Rote Darstellung steriler Zonen in GameRenderer beibehalten. Bilder können über mission.image vorhandene Motive bewusst wiederverwenden. Rabbits erst nach 12, Switch Engine nach 14, Lidka nach 15; Gleiterkanone folgt nach Sektor 19. CAMPAIGN_ACTS ist die Quelle für Aktnamen und Navigation.
+
+Akt IV: `js/campaign/Act4.js` nach Act3 laden; `node tests/act4.test.cjs` prüft Lösungswege gegen echte schwere KI. Deklarative `enemies` verwenden Hausindizes 2 (Viridion) und 3 (Tharsis), inaktive Häuser überspringen. `aiSeed` erzeugt wiederholbare Gegnerzüge; freies Gefecht bleibt zufällig. `captureCamps` verlangt mindestens drei eigene Zellen und Pflanzenmehrheit über ununterbrochene Generationen. Eroberungen bleiben gesichert. Erst alle Camps eines Hauses setzen es in `defeatedPlayers` und stoppen sein Budget/Nachsaat; existierende Flora bleibt. Schutzverlust hat Vorrang vor Sieg. Neue RR4-Codes umfassen 20 Wertungen, RR1/2/3 bleiben kompatibel. Erfolgreiches Weitergehen führt zur Marskarte mit `sector`-Parameter, nicht direkt in die nächste Mission. Akt IV besitzt fünf eigene Illustrationen und zehn geprüfte Sprachaufnahmen.
