@@ -1,0 +1,182 @@
+[
+  {
+    "id": "A1_M01_briefing",
+    "seconds": 21.47,
+    "integratedLUFS": -16.76,
+    "truePeakDBTP": -2.22
+  },
+  {
+    "id": "A1_M01_debriefing",
+    "seconds": 16.27,
+    "integratedLUFS": -16.53,
+    "truePeakDBTP": -2.18
+  },
+  {
+    "id": "A1_M02_briefing",
+    "seconds": 18.21,
+    "integratedLUFS": -16.52,
+    "truePeakDBTP": -2.11
+  },
+  {
+    "id": "A1_M02_debriefing",
+    "seconds": 14.68,
+    "integratedLUFS": -16.58,
+    "truePeakDBTP": -2.03
+  },
+  {
+    "id": "A1_M03_briefing",
+    "seconds": 21.55,
+    "integratedLUFS": -16.81,
+    "truePeakDBTP": -2.05
+  },
+  {
+    "id": "A1_M03_debriefing",
+    "seconds": 13.79,
+    "integratedLUFS": -16.9,
+    "truePeakDBTP": -2.28
+  },
+  {
+    "id": "A1_M04_briefing",
+    "seconds": 19.41,
+    "integratedLUFS": -17.27,
+    "truePeakDBTP": -2.09
+  },
+  {
+    "id": "A1_M04_debriefing",
+    "seconds": 14.68,
+    "integratedLUFS": -16.58,
+    "truePeakDBTP": -1.9
+  },
+  {
+    "id": "A1_M05_briefing",
+    "seconds": 17.82,
+    "integratedLUFS": -17.02,
+    "truePeakDBTP": -1.72
+  },
+  {
+    "id": "A1_M05_debriefing",
+    "seconds": 18.99,
+    "integratedLUFS": -16.87,
+    "truePeakDBTP": -2.27
+  },
+  {
+    "id": "A2_M01_briefing",
+    "seconds": 17.55,
+    "integratedLUFS": -16.83,
+    "truePeakDBTP": -2.16
+  },
+  {
+    "id": "A2_M01_debriefing",
+    "seconds": 12.85,
+    "integratedLUFS": -16.83,
+    "truePeakDBTP": -2.07
+  },
+  {
+    "id": "A2_M02_briefing",
+    "seconds": 17.63,
+    "integratedLUFS": -17.03,
+    "truePeakDBTP": -1.98
+  },
+  {
+    "id": "A2_M02_debriefing",
+    "seconds": 14.21,
+    "integratedLUFS": -16.87,
+    "truePeakDBTP": -1.89
+  },
+  {
+    "id": "A2_M03_briefing",
+    "seconds": 19.41,
+    "integratedLUFS": -17.1,
+    "truePeakDBTP": -2.08
+  },
+  {
+    "id": "A2_M03_debriefing",
+    "seconds": 16.93,
+    "integratedLUFS": -16.9,
+    "truePeakDBTP": -2.0
+  },
+  {
+    "id": "A2_M04_briefing",
+    "seconds": 23.64,
+    "integratedLUFS": -16.89,
+    "truePeakDBTP": -1.96
+  },
+  {
+    "id": "A2_M04_debriefing",
+    "seconds": 16.69,
+    "integratedLUFS": -17.15,
+    "truePeakDBTP": -1.74
+  },
+  {
+    "id": "A2_M05_briefing",
+    "seconds": 20.11,
+    "integratedLUFS": -16.59,
+    "truePeakDBTP": -2.09
+  },
+  {
+    "id": "A2_M05_debriefing",
+    "seconds": 18.21,
+    "integratedLUFS": -16.74,
+    "truePeakDBTP": -1.93
+  },
+  {
+    "id": "A3_M01_briefing",
+    "seconds": 17.16,
+    "integratedLUFS": -17.14,
+    "truePeakDBTP": -2.01
+  },
+  {
+    "id": "A3_M01_debriefing",
+    "seconds": 18.21,
+    "integratedLUFS": -16.96,
+    "truePeakDBTP": -2.18
+  },
+  {
+    "id": "A3_M02_briefing",
+    "seconds": 21.0,
+    "integratedLUFS": -16.81,
+    "truePeakDBTP": -2.11
+  },
+  {
+    "id": "A3_M02_debriefing",
+    "seconds": 21.47,
+    "integratedLUFS": -17.05,
+    "truePeakDBTP": -1.79
+  },
+  {
+    "id": "A3_M03_briefing",
+    "seconds": 18.83,
+    "integratedLUFS": -17.19,
+    "truePeakDBTP": -1.88
+  },
+  {
+    "id": "A3_M03_debriefing",
+    "seconds": 18.05,
+    "integratedLUFS": -16.73,
+    "truePeakDBTP": -2.15
+  },
+  {
+    "id": "A3_M04_briefing",
+    "seconds": 20.45,
+    "integratedLUFS": -16.87,
+    "truePeakDBTP": -1.96
+  },
+  {
+    "id": "A3_M04_debriefing",
+    "seconds": 15.88,
+    "integratedLUFS": -17.1,
+    "truePeakDBTP": -1.85
+  },
+  {
+    "id": "A3_M05_briefing",
+    "seconds": 20.53,
+    "integratedLUFS": -16.83,
+    "truePeakDBTP": -1.56
+  },
+  {
+    "id": "A3_M05_debriefing",
+    "seconds": 20.11,
+    "integratedLUFS": -16.68,
+    "truePeakDBTP": -2.14
+  }
+]

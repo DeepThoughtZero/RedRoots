@@ -24,3 +24,7 @@ context.window.speechSynthesis={getVoices:()=>[{lang:'de-DE'}],speak:u=>{spoken=
 context.CAMPAIGN_MISSIONS.push({id:'A2_M01',narration:'browser',briefing:'Die Landefähre wartet.',debriefing:'Die Siedlungen sind gerettet.'});
 audio.narrate('A2_M01_briefing',true);assert.equal(spoken.text,'Die Landefähre wartet.');assert.equal(spoken.voice.lang,'de-DE');assert.equal(audio.voice.paused,true);audio.narrate('A2_M01_briefing');assert.equal(paused,true);audio.narrate('A2_M01_briefing');assert.equal(paused,false);spoken.onend();audio.narrate('A2_M01_debriefing',true);assert.equal(spoken.text,'Die Siedlungen sind gerettet.');assert.equal(audio.ambience.volume,.35*.25);
 console.log('PASS: current story uses German browser voice, pause/resume, automatic report and ducking');
+context.CAMPAIGN_MISSIONS.push({id:'A3_M05',narration:'recorded',audioRevision:'test-current'});
+audio.stopNarration();audio.enterScene({id:'A3_M05'},'briefing');assert.ok(audio.voice.src.endsWith('A3_M05_briefing.mp3?v=test-current'));assert.equal(audio.voice.paused,false);
+audio.enterScene({id:'A3_M05'},'debriefing');assert.ok(audio.voice.src.endsWith('A3_M05_debriefing.mp3?v=test-current'));
+console.log('PASS: recorded missions use versioned MP3 assets for briefing and report');

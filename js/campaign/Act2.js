@@ -62,4 +62,4 @@ CAMPAIGN_MISSIONS.push(
         map:{rows:40,cols:64,territory:[[0,3,4,12,27]],rocks:[[0,34,9,35],[18,34,39,35]],camps:[{id:0,rMin:3,rMax:5,cMin:4,cMax:7}],seeds:[{pattern:'glider',r:0,c:62,owner:-1,mirror:true}],zones:[{id:'left',label:'PUMPE WEST',rMin:22,rMax:29,cMin:24,cMax:31},{id:'right',label:'PUMPE OST',rMin:22,rMax:29,cMin:42,cMax:49},{id:'settlement',label:'SIEDLUNG',rMin:32,rMax:38,cMin:25,cMax:32}]}
     }
 );
-CAMPAIGN_MISSIONS.forEach(m => { m.act ??= 1; m.narration = 'browser'; });
+CAMPAIGN_MISSIONS.forEach(m => { m.act ??= 1; m.narration = 'recorded'; });

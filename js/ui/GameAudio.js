@@ -1,4 +1,4 @@
-// Local ambience assets and browser narration; no connection to the development AI services.
+// Static local recordings and ambience; browser speech is reserved for dynamic reports.
 class GameAudio {
     constructor() {
         this.settings = { ambient: false, ambienceVolume: .35, voiceVolume: .85 };
@@ -116,7 +116,9 @@ class GameAudio {
         if (!automatic && this.current === key && !this.voice.paused) { this.voice.pause(); return; }
         if (this.current !== key) {
             this.voice.pause(); this.current = key;
-            this.voice.src = `assets/audio/${key}.mp3`;
+            const mission = CAMPAIGN_MISSIONS.find(m => key === `${m.id}_briefing` || key === `${m.id}_debriefing`);
+            const revision = mission?.audioRevision ? `?v=${encodeURIComponent(mission.audioRevision)}` : '';
+            this.voice.src = `assets/audio/${key}.mp3${revision}`;
         }
         if (this.voice.ended) this.voice.currentTime = 0;
         this.voice.play().catch(error => {

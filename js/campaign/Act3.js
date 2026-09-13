@@ -57,4 +57,4 @@ CAMPAIGN_MISSIONS.push(
         map:{rows:40,cols:72,territory:[[0,3,3,10,41]],rocks:[[0,18,12,19],[24,18,32,19],[0,50,12,51],[24,50,32,51]],zones:[{id:'west',label:'RELAIS WEST',rMin:23,rMax:31,cMin:23,cMax:31},{id:'center',label:'RELAIS MITTE',rMin:23,rMax:31,cMin:39,cMax:47},{id:'east',label:'RELAIS OST',rMin:23,rMax:31,cMin:55,cMax:63},{id:'gap',label:'TRENNSTREIFEN · FREI HALTEN',rMin:34,rMax:39,cMin:0,cMax:71}]}
     }
 );
-CAMPAIGN_MISSIONS.forEach(m => { m.narration = 'browser'; });
+CAMPAIGN_MISSIONS.forEach(m => { m.narration = 'recorded'; m.audioRevision = '20260913-v1'; });

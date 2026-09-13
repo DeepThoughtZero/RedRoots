@@ -1,5 +1,8 @@
 """Generate static campaign assets with the local AiStack services; never needed by players."""
-import json, pathlib, urllib.request, subprocess, re, difflib, hashlib, os, time, urllib.error
+import argparse, json, pathlib, urllib.request, subprocess, re, difflib, hashlib, os, time, urllib.error
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--remaster', action='store_true', help='Re-master existing raw takes and repeat transcription without re-synthesizing valid speech.')
+args=parser.parse_args()
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / 'assets/audio'
 RAW = pathlib.Path('/tmp/redroots-audio'); RAW.mkdir(exist_ok=True)
@@ -13,6 +16,11 @@ def post(url, data):
             print('Audio service is starting; retrying shortly.', flush=True)
             time.sleep(5)
 def ff(args): subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y',*map(str,args)],check=True)
+def master_speech(raw, final):
+    result=subprocess.run(['ffmpeg','-hide_banner','-i',str(raw),'-af','loudnorm=I=-16:TP=-2:LRA=11:print_format=json','-f','null','-'],capture_output=True,text=True,check=True)
+    stats=json.JSONDecoder().raw_decode(result.stderr[result.stderr.rfind('{'):])[0]
+    mastering=f"loudnorm=I=-16:TP=-2:LRA=11:measured_I={stats['input_i']}:measured_TP={stats['input_tp']}:measured_LRA={stats['input_lra']}:measured_thresh={stats['input_thresh']}:offset={stats['target_offset']}:linear=true"
+    ff(['-i',raw,'-af',mastering,'-b:a','64k','-ac','1','-ar','22050',final])
 def norm(text): return re.sub(r'[^\w\s]','',text.lower()).split()
 # Keep the service credential local; never put it into assets, reports or process arguments.
 stt_key = os.environ.get('SPEACHES_API_KEY', '')
@@ -31,12 +39,20 @@ for item in json.loads((OUT/'manifest.json').read_text()):
     text = text.replace('Ares-1', 'Ares eins')
     if text[-1] not in '.!?': text+='.'
     expected_hash = hashlib.sha256(' '.join(norm(text)).encode()).hexdigest()
-    stale = previous_report.get(item['id'], {}).get('expectedSpokenSha256') != expected_hash
+    previous = previous_report.get(item['id'], {})
+    stale = (previous.get('expectedSpokenSha256') != expected_hash
+             or previous.get('sourceTextSha256') != hashlib.sha256(item['text'].encode()).hexdigest()
+             or previous.get('status') != 'pass'
+             or (final.exists() and previous.get('audioSha256') != hashlib.sha256(final.read_bytes()).hexdigest()))
     if not final.exists() or stale:
         (RAW/(item['id']+'.json')).unlink(missing_ok=True)
         print('Generating',item['id'],flush=True)
         raw.write_bytes(post('http://127.0.0.1:8880/v1/audio/speech',{'model':'qwen3-tts','input':text,'voice':item['voice'],'language':'german','instruct':'Speak in German, calmly and clearly, as a thoughtful expedition narrator. Natural pacing, restrained dramatic tension. No added sounds or laughter.','response_format':'mp3','speed':1.0}))
-        ff(['-i',raw,'-af','loudnorm=I=-16:TP=-1.5:LRA=11','-b:a','64k','-ac','1','-ar','22050',final])
+        master_speech(raw,final)
+    elif args.remaster:
+        if not raw.exists(): raise SystemExit(f'Missing original take: {raw}')
+        master_speech(raw,final)
+        (RAW/(item['id']+'.json')).unlink(missing_ok=True)
     transcript_file=RAW/(item['id']+'.json')
     if transcript_file.exists(): data=json.loads(transcript_file.read_text())
     else:
@@ -44,7 +60,7 @@ for item in json.loads((OUT/'manifest.json').read_text()):
         if res.returncode: print('STT unavailable:',res.stderr,flush=True); data={'text':''}
         else: data=json.loads(res.stdout);transcript_file.write_text(json.dumps(data))
     a,b=norm(text),norm(data.get('text','')); similarity=difflib.SequenceMatcher(None,' '.join(a),' '.join(b)).ratio();coverage=len(set(a)&set(b))/max(1,len(set(a)))
-    status='pass' if similarity>=.78 and coverage>=.7 else 'review'
+    status='pass' if similarity>=.78 and coverage>=.7 else ('fail' if not b or similarity<.58 else 'review')
     report.append({**item,'transcript':data.get('text',''),'similarity':round(similarity,3),'coverage':round(coverage,3),'status':status,'audioSha256':hashlib.sha256(final.read_bytes()).hexdigest(),'sourceTextSha256':hashlib.sha256(item['text'].encode()).hexdigest(),'expectedSpokenSha256':hashlib.sha256(' '.join(a).encode()).hexdigest()})
     previous_report[item['id']] = report[-1]
     (OUT/'verification.json').write_text(json.dumps(list(previous_report.values()),ensure_ascii=False,indent=2))
@@ -72,4 +88,8 @@ if not (OUT/'mars-ambient.mp3').exists():
     stats=json.JSONDecoder().raw_decode(measurement[measurement.rfind('{'):])[0]
     mastering=f"loudnorm=I=-23:TP=-3:LRA=6:measured_I={stats['input_i']}:measured_TP={stats['input_tp']}:measured_LRA={stats['input_lra']}:measured_thresh={stats['input_thresh']}:offset={stats['target_offset']}:linear=true"
     ff(['-i',loop,'-af',processing+','+mastering,'-ar','32000','-ac','1','-b:a','64k',OUT/'mars-ambient.mp3'])
-print('Audio generation complete.',flush=True)
+pending=[item['id'] for item in report if item['status'] != 'pass']
+if pending:
+    print('Audio needs review: ' + ', '.join(pending), flush=True)
+    raise SystemExit(1)
+print('Audio generation and transcript verification complete.',flush=True)
