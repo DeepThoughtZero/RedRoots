@@ -28,3 +28,27 @@ context.CAMPAIGN_MISSIONS.push({id:'A3_M05',narration:'recorded',audioRevision:'
 audio.stopNarration();audio.enterScene({id:'A3_M05'},'briefing');assert.ok(audio.voice.src.endsWith('A3_M05_briefing.mp3?v=test-current'));assert.equal(audio.voice.paused,false);
 audio.enterScene({id:'A3_M05'},'debriefing');assert.ok(audio.voice.src.endsWith('A3_M05_debriefing.mp3?v=test-current'));
 console.log('PASS: recorded missions use versioned MP3 assets for briefing and report');
+
+// Ebene 5a Erweiterung: Crossfade-Engine & Situations-Mixer
+const initialSrc = audio.ambience.src;
+audio.crossfadeTo('assets/audio/mars-planning-1.mp3');
+assert.equal(audio.ambience.src, 'assets/audio/mars-planning-1.mp3');
+assert.notEqual(audio.ambience.src, initialSrc);
+
+audio.setSituation('simulation');
+assert.equal(audio.currentSituation, 'simulation');
+assert.ok(audio.ambience.src.startsWith('assets/audio/mars-'));
+
+audio.setSituation('tension');
+assert.equal(audio.currentSituation, 'tension');
+assert.ok(audio.ambience.src.startsWith('assets/audio/mars-'));
+
+audio.advanceTrack();
+assert.ok(audio.ambience.src.startsWith('assets/audio/mars-'));
+
+audio.startGameAmbience({ ambience: 'ice' });
+assert.equal(audio.currentTheme, 'ice');
+assert.equal(audio.currentSituation, 'planning');
+assert.equal(audio.ambience.src, 'assets/audio/mars-ice.mp3');
+
+console.log('PASS: dual-channel crossfading, situational pools, non-repeating shuffle, game start ambience');

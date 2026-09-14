@@ -16,7 +16,7 @@
   },
   {
     "id": "A1_M02_debriefing",
-    "text": "Das Archiv stammt von 2110: PALISADE, geleitet von der Forscherin Ada Kessler. Es beschreibt unser Genom bis ins Detail. Auftraggeber und Expeditionsende wurden geschwärzt. Eine Spur führt durch die Schlucht.",
+    "text": "Das Archiv stammt von zweitausendeinhundertzehn: PALISADE, geleitet von der Forscherin Ada Kessler. Es beschreibt unser Genom bis ins Detail. Auftraggeber und Expeditionsende wurden geschwärzt. Eine Spur führt durch die Schlucht.",
     "voice": "uncle_fu"
   },
   {
@@ -71,7 +71,7 @@
   },
   {
     "id": "A2_M03_briefing",
-    "text": "Ein unmarkierter Gleiter treibt auf den Evakuierungsplatz zu. Die letzte Fähre braucht noch 96 Generationen. Fange die fremde Flora ab und erhalte eine eigene Kolonie. Eine einzige fremde Zelle am Landeplatz gefährdet alle Wartenden – gleichgültig, zu welchem Haus sie gehören.",
+    "text": "Ein unmarkierter Gleiter treibt auf den Evakuierungsplatz zu. Die letzte Fähre braucht noch sechsundneunzig Generationen. Fange die fremde Flora ab und erhalte eine eigene Kolonie. Eine einzige fremde Zelle am Landeplatz gefährdet alle Wartenden – gleichgültig, zu welchem Haus sie gehören.",
     "voice": "uncle_fu"
   },
   {
@@ -111,7 +111,7 @@
   },
   {
     "id": "A3_M02_briefing",
-    "text": "Die Kammer prüft ein kurzlebiges Versorgungssystem. Unsere Flora muss nach hundert Generationen noch leben und anschließend vollständig verschwinden. Spätestens nach Generation 140 muss die Kammer leer sein. Kein Radieren während der Evolution. Hier helfen weder ein ewiger Block noch grenzenloses Wachstum.",
+    "text": "Die Kammer prüft ein kurzlebiges Versorgungssystem. Unsere Flora muss nach hundert Generationen noch leben und anschließend vollständig verschwinden. Spätestens nach Generation hundertvierzig muss die Kammer leer sein. Kein Radieren während der Evolution. Hier helfen weder ein ewiger Block noch grenzenloses Wachstum.",
     "voice": "uncle_fu"
   },
   {
@@ -121,7 +121,7 @@
   },
   {
     "id": "A3_M03_briefing",
-    "text": "Zwei unmarkierte Gleiter bedrohen getrennte Rettungsplätze. Voss hält die Fähren bereit, doch die Stollen brauchen 96 Generationen zum Druckausgleich. Fange beide Fronten ab und bewahre eigene Flora. Ein einziger Durchbruch an einem der Plätze schneidet die Rückkehr ab.",
+    "text": "Zwei unmarkierte Gleiter bedrohen getrennte Rettungsplätze. Voss hält die Fähren bereit, doch die Stollen brauchen sechsundneunzig Generationen zum Druckausgleich. Fange beide Fronten ab und bewahre eigene Flora. Ein einziger Durchbruch an einem der Plätze schneidet die Rückkehr ab.",
     "voice": "uncle_fu"
   },
   {
@@ -151,7 +151,7 @@
   },
   {
     "id": "A4_M01_briefing",
-    "text": "Ein roter Sturm legt alte Wasserkanäle frei. Die Zentrale von Tharsis hilft uns, doch ihre nördlichen Garnisonen gehorchen nicht mehr. Gelbe Flora marschiert auf unser Habitat zu. Fange den Angriff ab, erobere das Sperrcamp und halte den Rückweg bis Generation 112 offen.",
+    "text": "Ein roter Sturm legt alte Wasserkanäle frei. Die Zentrale von Tharsis hilft uns, doch ihre nördlichen Garnisonen gehorchen nicht mehr. Gelbe Flora marschiert auf unser Habitat zu. Fange den Angriff ab, erobere das Sperrcamp und halte den Rückweg bis Generation hundertzwölf offen.",
     "voice": "uncle_fu"
   },
   {
@@ -171,7 +171,7 @@
   },
   {
     "id": "A4_M03_briefing",
-    "text": "Viridion, das Haus der grünen Kolonien, fordert die nördlichen Wasserwege für sich. Seine Truppen kämpfen gegen Tharsis – mitten durch unsere Evakuierung. Schütze beide Rettungsplätze 160 Generationen vor jeder fremden Flora. Beide Gegner säen nach jeder Runde erneut. Ein einziger Durchbruch beendet die Rettung.",
+    "text": "Viridion, das Haus der grünen Kolonien, fordert die nördlichen Wasserwege für sich. Seine Truppen kämpfen gegen Tharsis – mitten durch unsere Evakuierung. Schütze beide Rettungsplätze hundertsechzig Generationen vor jeder fremden Flora. Beide Gegner säen nach jeder Runde erneut. Ein einziger Durchbruch beendet die Rettung.",
     "voice": "uncle_fu"
   },
   {
@@ -181,7 +181,7 @@
   },
   {
     "id": "A4_M04_briefing",
-    "text": "Ein grüner und ein gelber Kommandoposten verweigern die Waffenruhe. Erobere beide, während unsere Zivilstation im Süden geschützt bleibt. Jeder gefallene Posten stoppt die neue Aussaat seines Hauses. Vorhandene Kolonien verschwinden dadurch nicht. Halte die Station bis Generation 128 frei von fremder Flora.",
+    "text": "Ein grüner und ein gelber Kommandoposten verweigern die Waffenruhe. Erobere beide, während unsere Zivilstation im Süden geschützt bleibt. Jeder gefallene Posten stoppt die neue Aussaat seines Hauses. Vorhandene Kolonien verschwinden dadurch nicht. Halte die Station bis Generation hundertachtundzwanzig frei von fremder Flora.",
     "voice": "uncle_fu"
   },
   {
@@ -191,7 +191,7 @@
   },
   {
     "id": "A4_M05_briefing",
-    "text": "Drei Garnisonen blockieren den Sturmspeicher. Zwei gehören Tharsis, eine Viridion. Erobere alle, während Wildwuchs die Evakuierung bedroht. Der neue Kanonenbauplan ist mächtig, aber teuer und schwer unterzubringen. Entscheide, wo dein Material am meisten bewirkt. Halte den Rettungsplatz bis Generation 160 offen.",
+    "text": "Drei Garnisonen blockieren den Sturmspeicher. Zwei gehören Tharsis, eine Viridion. Erobere alle, während Wildwuchs die Evakuierung bedroht. Der neue Kanonenbauplan ist mächtig, aber teuer und schwer unterzubringen. Entscheide, wo dein Material am meisten bewirkt. Halte den Rettungsplatz bis Generation hundertsechzig offen.",
     "voice": "uncle_fu"
   },
   {

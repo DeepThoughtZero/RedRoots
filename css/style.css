@@ -348,8 +348,6 @@ canvas {
 /* Mission illustrations stay outside the board and never carry essential text. */
 .mission-art { display:block;position:relative;margin:0 0 24px;border:1px solid #bfe9de38;border-radius:8px;overflow:hidden;background:#090f13; }
 .mission-art img { display:block;width:100%;height:auto;aspect-ratio:1672/941;object-fit:cover; }
-.mission-art span { position:absolute;right:8px;bottom:8px;padding:7px 10px;border-radius:4px;background:#071219dd;color:#e0f2ed;font-size:13px; }
-.mission-art:hover,.mission-art:focus-visible { outline:2px solid #ffe1a3;outline-offset:3px; }
 @media(max-width:1024px) and (orientation:landscape) { .mission-art img { max-height:220px;object-fit:contain; } }
 .sector-report { margin-top:20px;padding:16px;border-left:2px solid #9cdcc5;background:#83dbc008; }
 .sector-report p { margin:8px 0 0; }

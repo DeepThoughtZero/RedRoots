@@ -28,7 +28,7 @@ CAMPAIGN_MISSIONS.push(
     {
         id:'A2_M03',act:2,title:'Die letzte Fähre',region:'Hellas · Evakuierung der südlichen Kuppel',kind:'Abfangen & Evakuieren',point:[57,56],ambience:'outpost',
         quote:'Diesmal zählt, was nicht wächst.',voice:'DIE HELLAS-KOMMANDANTIN',
-        briefing:"Ein unmarkierter Gleiter treibt auf den Evakuierungsplatz zu. Die letzte Fähre braucht noch 96 Generationen. Fange die fremde Flora ab und erhalte eine eigene Kolonie. Eine einzige fremde Zelle am Landeplatz gefährdet alle Wartenden – gleichgültig, zu welchem Haus sie gehören.",
+        briefing:"Ein unmarkierter Gleiter treibt auf den Evakuierungsplatz zu. Die letzte Fähre braucht noch sechsundneunzig Generationen. Fange die fremde Flora ab und erhalte eine eigene Kolonie. Eine einzige fremde Zelle am Landeplatz gefährdet alle Wartenden – gleichgültig, zu welchem Haus sie gehören.",
         debriefing:"Die Fähre hebt ab – mit Menschen beider Häuser. Im Funk heißt es erstmals „unsere Leute“. Voss übergibt die Forschungsdaten ohne Bedingungen. Sie führen zu den verschwundenen Sicherheitsberichten von Tharsis.",
         hint:'Beobachte die Flugbahn des grauen Gleiters: Er bewegt sich nach links unten. Platziere eine stabile kleine Kolonie in seinem Weg. Conway-Kollisionen können einen Gleiter zerstören oder umlenken. Sichere außerdem lebende eigene Flora abseits der Kollision.',
 

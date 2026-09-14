@@ -18,7 +18,7 @@ CAMPAIGN_MISSIONS.push(
     },
     {
         id:'A3_M02',act:3,title:'Die Kunst zu verschwinden',region:'Olympus · Sterile Versuchskammer',kind:'Vergänglichkeit',point:[48,40],ambience:'research',image:'A1_M02',voice:'UNSERE BIOLOGIN',quote:'Eine Kolonie, die rechtzeitig stirbt, kann eine Stadt retten.',
-        briefing:'Die Kammer prüft ein kurzlebiges Versorgungssystem. Unsere Flora muss nach hundert Generationen noch leben und anschließend vollständig verschwinden. Spätestens nach Generation 140 muss die Kammer leer sein. Kein Radieren während der Evolution. Hier helfen weder ein ewiger Block noch grenzenloses Wachstum.',
+        briefing:'Die Kammer prüft ein kurzlebiges Versorgungssystem. Unsere Flora muss nach hundert Generationen noch leben und anschließend vollständig verschwinden. Spätestens nach Generation hundertvierzig muss die Kammer leer sein. Kein Radieren während der Evolution. Hier helfen weder ein ewiger Block noch grenzenloses Wachstum.',
         debriefing:'Die Kammer wird leer. Das ist kein Fehlschlag, sondern die Sicherung: Ein zeitlich begrenzter Organismus kann Energie liefern, ohne eine dauerhafte Verbindung zu hinterlassen. Dann zeigt die Außenkamera zwei Wildwuchsfronten. Beide steuern auf unsere Rückkehrroute zu.',
         hint:'Diehard ist eine vergängliche Formation. Prüfe, wie lange sie ohne Störung lebt. Ausreichend Abstand zu Wänden und anderen Zellen ist entscheidend: Eine Kollision kann einen dauerhaften Rest erzeugen. Der Test zählt ab der ersten Evolution.',
         patterns:['cell','block','blinker','diehard'],reward:'rabbits',rounds:1,steps:140,budget:7,
@@ -28,7 +28,7 @@ CAMPAIGN_MISSIONS.push(
     },
     {
         id:'A3_M03',act:3,title:'Zwei Fronten, kein Rückweg',region:'Olympus · Versorgungsstollen',kind:'Doppelte Evakuierung',point:[60,53],ambience:'outpost',image:'A2_M03',voice:'DIE HELLAS-KOMMANDANTIN',quote:'Wir lassen niemanden auf der falschen Seite zurück.',
-        briefing:'Zwei unmarkierte Gleiter bedrohen getrennte Rettungsplätze. Voss hält die Fähren bereit, doch die Stollen brauchen 96 Generationen zum Druckausgleich. Fange beide Fronten ab und bewahre eigene Flora. Ein einziger Durchbruch an einem der Plätze schneidet die Rückkehr ab.',
+        briefing:'Zwei unmarkierte Gleiter bedrohen getrennte Rettungsplätze. Voss hält die Fähren bereit, doch die Stollen brauchen sechsundneunzig Generationen zum Druckausgleich. Fange beide Fronten ab und bewahre eigene Flora. Ein einziger Durchbruch an einem der Plätze schneidet die Rückkehr ab.',
         debriefing:'Beide Rückwege bleiben offen. Voss will die Anlage sprengen, bevor weitere Fronten austreten. Unsere Biologin widerspricht: Die gleichen Systeme halten die Wassersiedlungen am Leben. Wir brauchen die vollständige Abschaltfolge – und Tharsis bewacht ihren letzten Speicher.',
         hint:'Beide grauen Gleiter bewegen sich nach links unten. Jede Front benötigt eine eigene Kollision. Platziere sparsam und halte eine Reservekolonie abseits der Flugbahnen am Leben. Eine einzige abgefangene Front reicht diesmal nicht.',
         patterns:[...ACT3_PATTERNS,'rabbits'],reward:null,rounds:2,steps:48,budget:16,
@@ -57,4 +57,4 @@ CAMPAIGN_MISSIONS.push(
         map:{rows:40,cols:72,territory:[[0,3,3,10,41]],rocks:[[0,18,12,19],[24,18,32,19],[0,50,12,51],[24,50,32,51]],zones:[{id:'west',label:'RELAIS WEST',rMin:23,rMax:31,cMin:23,cMax:31},{id:'center',label:'RELAIS MITTE',rMin:23,rMax:31,cMin:39,cMax:47},{id:'east',label:'RELAIS OST',rMin:23,rMax:31,cMin:55,cMax:63},{id:'gap',label:'TRENNSTREIFEN · FREI HALTEN',rMin:34,rMax:39,cMin:0,cMax:71}]}
     }
 );
-CAMPAIGN_MISSIONS.forEach(m => { m.narration = 'recorded'; m.audioRevision = '20260913-v1'; });
+CAMPAIGN_MISSIONS.forEach(m => { m.narration = 'recorded'; m.audioRevision = '20260914-v1'; });

@@ -55,11 +55,12 @@ for item in json.loads((OUT/'manifest.json').read_text()):
         (RAW/(item['id']+'.json')).unlink(missing_ok=True)
     transcript_file=RAW/(item['id']+'.json')
     if transcript_file.exists(): data=json.loads(transcript_file.read_text())
+    elif not stale and previous.get('transcript'): data={'text': previous['transcript']}
     else:
         res=subprocess.run(['curl','--config','-','-fsS','--retry','2','--retry-all-errors','--retry-delay','3','--max-time','300','http://127.0.0.1:8000/v1/audio/transcriptions','-F',f'file=@{final}','-F','model=deepdml/faster-whisper-large-v3-turbo-ct2','-F','language=de'],input=('header = \"Authorization: Bearer ' + stt_key.replace('\\', '\\\\').replace('\"', '\\\"') + '\"\n') if stt_key else '',capture_output=True,text=True)
         if res.returncode: print('STT unavailable:',res.stderr,flush=True); data={'text':''}
         else: data=json.loads(res.stdout);transcript_file.write_text(json.dumps(data))
-    a,b=norm(text),norm(data.get('text','')); similarity=difflib.SequenceMatcher(None,' '.join(a),' '.join(b)).ratio();coverage=len(set(a)&set(b))/max(1,len(set(a)))
+    a,b=norm(text),norm(data.get('text','')); similarity=difflib.SequenceMatcher(None,' '.join(a),' '.join(b),autojunk=False).ratio();coverage=len(set(a)&set(b))/max(1,len(set(a)))
     status='pass' if similarity>=.78 and coverage>=.7 else ('fail' if not b or similarity<.58 else 'review')
     report.append({**item,'transcript':data.get('text',''),'similarity':round(similarity,3),'coverage':round(coverage,3),'status':status,'audioSha256':hashlib.sha256(final.read_bytes()).hexdigest(),'sourceTextSha256':hashlib.sha256(item['text'].encode()).hexdigest(),'expectedSpokenSha256':hashlib.sha256(' '.join(a).encode()).hexdigest()})
     previous_report[item['id']] = report[-1]

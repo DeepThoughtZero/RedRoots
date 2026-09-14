@@ -12,7 +12,7 @@ const CAMPAIGN_STORY = {
         {
             voice: 'UNSERE BIOLOGIN',
             briefing: "Eine stillgelegte Forschungsboje hat unser angeblich neues Genom erkannt. Ihre Spur führt zu einer verlassenen Station. Erweitere dein Einflussgebiet bis dorthin und wecke das Archiv. Wer hat diese Pflanzen schon vor uns auf den Mars gebracht?",
-            debriefing: "Das Archiv stammt von 2110: PALISADE, geleitet von der Forscherin Ada Kessler. Es beschreibt unser Genom bis ins Detail. Auftraggeber und Expeditionsende wurden geschwärzt. Eine Spur führt durch die Schlucht.",
+            debriefing: "Das Archiv stammt von zweitausendeinhundertzehn: PALISADE, geleitet von der Forscherin Ada Kessler. Es beschreibt unser Genom bis ins Detail. Auftraggeber und Expeditionsende wurden geschwärzt. Eine Spur führt durch die Schlucht.",
 
         },
         {

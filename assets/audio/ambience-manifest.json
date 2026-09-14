@@ -1,9 +1,48 @@
 {
-  "method": "CPU sound design using existing AudioGen Mars ambience and synthesized layers; short fades at loop boundaries. GPU generation unavailable.",
+  "method": "Multi-take generation via local AudioGen (RTX 5090), triangular acrossfades, circular loop seam acrossfades, dynamic filtering and 2-pass LUFS mastering (-23 LUFS / -3 dBTP at 32kHz 64k mono).",
+  "situations": {
+    "planning": [
+      "mars-planning-1",
+      "mars-planning-2",
+      "mars-planning-3",
+      "mars-planning-4",
+      "mars-planning-5"
+    ],
+    "simulation": [
+      "mars-simulation-1",
+      "mars-simulation-2",
+      "mars-simulation-3",
+      "mars-simulation-4",
+      "mars-simulation-5"
+    ],
+    "tension": [
+      "mars-tension-1",
+      "mars-tension-2",
+      "mars-tension-3",
+      "mars-tension-4",
+      "mars-tension-5"
+    ]
+  },
   "profiles": {
-    "research": "Ventilation and electrical hum inside the research station",
-    "canyon": "Resonant canyon wind",
-    "ice": "Thin icy air, sparse soft crystalline resonances",
-    "outpost": "Generator vibration and dusty outpost wind"
+    "mars-planning-1": "Meditative Martian wind and deep electronic drone for strategic focus",
+    "mars-planning-2": "Quiet habitat interior with gentle ventilation and subtle electromagnetic hum",
+    "mars-planning-3": "Ethereal Martian twilight breeze over volcanic plateaus for deep contemplation",
+    "mars-planning-4": "Subtle life support drone and gentle thermal creaks in an outpost observatory",
+    "mars-planning-5": "Contemplative canyon air currents and soft sub-bass planetary tone",
+    "mars-simulation-1": "Living Martian biosphere with organic cellular hum and bio-acoustic resonance",
+    "mars-simulation-2": "Dynamic emergent cellular evolution and gentle pulsating spore growth",
+    "mars-simulation-3": "Organic vegetative life multiplying in Martian soil, emergent colony whisper",
+    "mars-simulation-4": "Hydrothermal bio-chamber moisture drone and bacterial colony respiration",
+    "mars-simulation-5": "Atmospheric spore currents dispersing across red plains, resonant life drone",
+    "mars-tension-1": "Ominous wind shear and deep tectonic subterranean rumble during standoffs",
+    "mars-tension-2": "Heavy atmospheric pressure against bulkhead and vibrating industrial siege drone",
+    "mars-tension-3": "Resonant canyon storm winds and deep vibrating metallic defensive tension",
+    "mars-tension-4": "Grim tactical outpost alert winds over contested crater rims",
+    "mars-tension-5": "Turbulent Martian sandstorm gale and strained metal structures in intense standoff",
+    "mars-ambient": "Base habitat wind and gentle sand brushing metal bulkheads",
+    "mars-canyon": "Resonant canyon wind across Valles Marineris",
+    "mars-ice": "Thin icy polar air and sparse crystalline resonances",
+    "mars-outpost": "Generator vibration and dusty outpost wind",
+    "mars-research": "Ventilation and electrical hum inside research stations"
   }
 }

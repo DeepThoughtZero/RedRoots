@@ -4,7 +4,7 @@
     "text": "Du führst die Landefähre des Hauses Marineris. Hier in Chryse, einer weiten Marsebene, soll eure erste Kolonie entstehen. „Ich untersuche unsere Pflanzen“, meldet sich die Biologin. „Unsere Wasservorräte reichen nur noch einen Winter. Finden wir heraus, wie wenige Zellen gemeinsam überleben können.“",
     "voice": "uncle_fu",
     "transcript": "Du führst die Landefähre des Hauses Marinaris. Hier in Krüse, einer weiten Maasebene, soll eure erste Kolonie entstehen. Ich untersuche unsere Pflanzen, meldet sich die Biologin. Unsere Wasservorräte reichen nur noch einen Winter. Finden wir heraus, wie wenige Zellen gemeinsam überleben können.",
-    "similarity": 0.876,
+    "similarity": 0.984,
     "coverage": 0.925,
     "status": "pass",
     "audioSha256": "05f664ccd03d68516af033d5f8651925a0fd1f171a6a77aba64f2d09a760f212",
@@ -37,15 +37,15 @@
   },
   {
     "id": "A1_M02_debriefing",
-    "text": "Das Archiv stammt von 2110: PALISADE, geleitet von der Forscherin Ada Kessler. Es beschreibt unser Genom bis ins Detail. Auftraggeber und Expeditionsende wurden geschwärzt. Eine Spur führt durch die Schlucht.",
+    "text": "Das Archiv stammt von zweitausendeinhundertzehn: PALISADE, geleitet von der Forscherin Ada Kessler. Es beschreibt unser Genom bis ins Detail. Auftraggeber und Expeditionsende wurden geschwärzt. Eine Spur führt durch die Schlucht.",
     "voice": "uncle_fu",
-    "transcript": "Das Archiv stammt von 2110, Palisade, geleitet von der Forscherin Eda Kessler. Es beschreibt unser Genom bis ins Detail. Auftraggeber und Expeditionsende wurden geschwärzt. Eine Spur führt durch die Schlucht.",
-    "similarity": 0.995,
+    "transcript": "Das Archiv stammt von 2110. Palisade geleitet von der Forscherin Ada Kessler. Es beschreibt unser Genom bis ins Detail. Auftraggeber und Expeditionsende wurden geschwärzt. Eine Spur führt durch die Schlucht.",
+    "similarity": 0.932,
     "coverage": 0.966,
     "status": "pass",
-    "audioSha256": "935d93aded7342780975485dd056ae5fa04f8c44e39ad5f43babffc4fdd6d93a",
-    "sourceTextSha256": "41e4b56d24837b23d4e3061138262e8ca49660d43ab92c4c8c75dbb9a07aa04e",
-    "expectedSpokenSha256": "86b243bd2debe67c594771a7f65ad41441de7df471d1e2d8c0253cc5a682ef7b"
+    "audioSha256": "03de96968a23281054f5218e7fb8e2c214de027e78bb06e07752f563e103c2d8",
+    "sourceTextSha256": "67e2341044bc67babab8ebdb820da3fd92ff18fad0a62bbf0e51d6b4df0e57b8",
+    "expectedSpokenSha256": "8b23ed09319e240c428eca40a856713d8180729f667b34afa02f41459e07ece0"
   },
   {
     "id": "A1_M03_briefing",
@@ -76,7 +76,7 @@
     "text": "„Dieses Eis versorgt unsere Familien“, warnt Sera Voss, die Hellas-Kommandantin. Auch unsere Siedlung braucht das Wasser. Ein Hellas-Gleiter nähert sich bereits dem Reservoir. Erreiche es zuerst. Warum verteidigt Voss die Leitungen, als wäre unsere Flora eine Gefahr?",
     "voice": "uncle_fu",
     "transcript": "Dieses Eis versorgt unsere Familien, warnt Seraphos, die Hellas-Kommandantin. Auch unsere Siedlung braucht das Wasser. Ein Hellas-Gleiter nähert sich, bereits dem Reservoir. Erreiche es zuerst. Warum verteidigt Voss die Leitungen, als wäre unsere Flora eine Gefahr?",
-    "similarity": 0.986,
+    "similarity": 0.99,
     "coverage": 0.97,
     "status": "pass",
     "audioSha256": "6fb57300a0843034f894147211c3fe6bb7738b485bf9c149909fd3c053fbc348",
@@ -169,15 +169,15 @@
   },
   {
     "id": "A2_M03_briefing",
-    "text": "Ein unmarkierter Gleiter treibt auf den Evakuierungsplatz zu. Die letzte Fähre braucht noch 96 Generationen. Fange die fremde Flora ab und erhalte eine eigene Kolonie. Eine einzige fremde Zelle am Landeplatz gefährdet alle Wartenden – gleichgültig, zu welchem Haus sie gehören.",
+    "text": "Ein unmarkierter Gleiter treibt auf den Evakuierungsplatz zu. Die letzte Fähre braucht noch sechsundneunzig Generationen. Fange die fremde Flora ab und erhalte eine eigene Kolonie. Eine einzige fremde Zelle am Landeplatz gefährdet alle Wartenden – gleichgültig, zu welchem Haus sie gehören.",
     "voice": "uncle_fu",
-    "transcript": "Ein unmarkierter Gleiter treibt auf den Evakuierungsplatz zu. Die letzte Fähre braucht noch 96 Generationen. Fange die fremde Flore ab und erhalte eine eigene Kolonie. Eine einzige fremde Zelle am Landeplatz gefährdet alle Wartenden gleichgültig, zu welchem Haus sie gehören.",
-    "similarity": 0.996,
-    "coverage": 0.972,
+    "transcript": "Ein unmarkierter Gleiter treibt auf den Evakuierungsplatz zu. Die letzte Fähre braucht noch 96 Generationen. Fange die fremde Flore ab und erhalte eine eigene Kolonie. Eine einzige fremde Zelle am Landeplatz gefährdet alle Wartenden, gleichgültig zu welchem Haus sie gehören.",
+    "similarity": 0.966,
+    "coverage": 0.944,
     "status": "pass",
-    "audioSha256": "665fc337df9847e5fcc0b78c15eceb15b8e0c035d4526016742370b22acbb0bf",
-    "sourceTextSha256": "22f6432cdf3bb1cc7e2e94bd3b9ff6ecf96a1008158e61ba56bea12d2d89b2b4",
-    "expectedSpokenSha256": "4206a4d5db1394d5038b2102f6b232e56f5f1157c60a20d33255066086e4bc5f"
+    "audioSha256": "63ea1e8799c2727b604c9b837a947a5ade6e9ecb47791c9cc1d600966886279e",
+    "sourceTextSha256": "ae8539812ca9a708095a7d83cb528db567f55b6e10d2909ad0fdbed598f97ac7",
+    "expectedSpokenSha256": "f3c9dfc28148a8763d97d90717e9f7981d34008be539ba8d1363074fc6e5fce3"
   },
   {
     "id": "A2_M03_debriefing",
@@ -244,7 +244,7 @@
     "text": "Unter Olympus, dem großen Vulkan, finden wir drei biologische Zugangsschalter. Sie akzeptieren nur die Reihenfolge eins, zwei, drei. Ein falscher Kontakt verriegelt die Anlage. Plane die Ankunft deiner Kolonien: Wir haben nur ein kurzes Zeitfenster, bevor der Zugang wieder verschüttet wird.",
     "voice": "uncle_fu",
     "transcript": "Unter Olympus, dem großen Vulkan, finden wir drei biologische Zugangsschalter. Sie akzeptieren nur die Reihenfolge 1, 2, 3. Ein falscher Kontakt verriegelt die Anlage. Plane die Ankunft deiner Kolonien. Wir haben nur ein kurzes Zeitfenster, bevor der Zugang wieder verschüttet wird.",
-    "similarity": 0.966,
+    "similarity": 0.973,
     "coverage": 0.943,
     "status": "pass",
     "audioSha256": "8153324531dc4ed736acfc8444271f8d2fb9a7061e0e62f699ed91f8fc7e82f5",
@@ -265,15 +265,15 @@
   },
   {
     "id": "A3_M02_briefing",
-    "text": "Die Kammer prüft ein kurzlebiges Versorgungssystem. Unsere Flora muss nach hundert Generationen noch leben und anschließend vollständig verschwinden. Spätestens nach Generation 140 muss die Kammer leer sein. Kein Radieren während der Evolution. Hier helfen weder ein ewiger Block noch grenzenloses Wachstum.",
+    "text": "Die Kammer prüft ein kurzlebiges Versorgungssystem. Unsere Flora muss nach hundert Generationen noch leben und anschließend vollständig verschwinden. Spätestens nach Generation hundertvierzig muss die Kammer leer sein. Kein Radieren während der Evolution. Hier helfen weder ein ewiger Block noch grenzenloses Wachstum.",
     "voice": "uncle_fu",
     "transcript": "Die Kammer prüft ein kurzlebiges Versorgungssystem. Unsere Flora muss nach 100 Generationen noch leben und anschließend vollständig verschwinden. Spätestens nach Generation 140 muss die Kammer leer sein. Kein Radieren während der Evolution. Hier helfen weder ein ewiger Block noch grenzenloses Wachstum.",
-    "similarity": 0.983,
-    "coverage": 0.971,
+    "similarity": 0.956,
+    "coverage": 0.943,
     "status": "pass",
-    "audioSha256": "02d88df1840bfbbb2cbe24bef15f110285608af350f99a30d9a5ce0ab66f19dd",
-    "sourceTextSha256": "10becb6d75b00250e94f883803a6cbe94651afe0a9594de1c1afc6961eb80665",
-    "expectedSpokenSha256": "0d988bd12a18a751321235f7c09301ac6997a0b7af67c52a85d666ed7c1c5ea2"
+    "audioSha256": "170565f83b70cdc3e3f3d73f39b0517346dacbec00ac084a6aae6778dc91af8f",
+    "sourceTextSha256": "04a26b2368e2852667afbc91d2488f82243dd474a303af3c7901532bcd18ece3",
+    "expectedSpokenSha256": "a9d94cfa7469b5bfe175b7ad5419ddf5aab2efb6ea94d3d5f0daaee4ddec4c44"
   },
   {
     "id": "A3_M02_debriefing",
@@ -289,15 +289,15 @@
   },
   {
     "id": "A3_M03_briefing",
-    "text": "Zwei unmarkierte Gleiter bedrohen getrennte Rettungsplätze. Voss hält die Fähren bereit, doch die Stollen brauchen 96 Generationen zum Druckausgleich. Fange beide Fronten ab und bewahre eigene Flora. Ein einziger Durchbruch an einem der Plätze schneidet die Rückkehr ab.",
+    "text": "Zwei unmarkierte Gleiter bedrohen getrennte Rettungsplätze. Voss hält die Fähren bereit, doch die Stollen brauchen sechsundneunzig Generationen zum Druckausgleich. Fange beide Fronten ab und bewahre eigene Flora. Ein einziger Durchbruch an einem der Plätze schneidet die Rückkehr ab.",
     "voice": "uncle_fu",
-    "transcript": "Zwei unmarkierte Gleiter bedrohen getrennte Rettungsplätze. Voss hält die Fähren bereit. Doch die Stollen brauchen 96-Generationen zum Druckausgleich. Fange beide Fronten ab und bewahre eigene Flora. Ein einziger Durchbruch an einem der Plätze schneidet die Rückkehr ab.",
-    "similarity": 0.998,
-    "coverage": 0.943,
+    "transcript": "Zwei unmarkierte Gleiter bedrohen getrennte Rettungsplätze. Voss hält die Fähren bereit, doch die Stollen brauchen 96 Generationen zum Druckausgleich. Fange beide Fronten ab und bewahre eigene Flora. Ein einziger Durchbruch an einem der Plätze schneidet die Rückkehr ab.",
+    "similarity": 0.969,
+    "coverage": 0.971,
     "status": "pass",
-    "audioSha256": "1939bc2ecca582950e5e77789aa78e9e56b49812d403cb644e45be4799870add",
-    "sourceTextSha256": "f692b8eb8e76d2b1873944ef640667dddfc21a35b6b7b4ef0b4e0c8ac19bdb73",
-    "expectedSpokenSha256": "2b2a3b35f54d5343b2b8af70e03d778282772dd4298f133f38b1ab1d05efc1d7"
+    "audioSha256": "9bb9eee208bb77e3eaf547be57dff297b2d0e16879b51230767ff6b0fc9c9666",
+    "sourceTextSha256": "cc04f6dbc63ffc90e2c7a94ae9b1567b9eb95f67cdcf49a8f7b15c8259dc9fed",
+    "expectedSpokenSha256": "d0a427d54694b3d5c71701792c70f6704f64a6d8d4d8c94e814668a37fda7d10"
   },
   {
     "id": "A3_M03_debriefing",
@@ -361,15 +361,15 @@
   },
   {
     "id": "A4_M01_briefing",
-    "text": "Ein roter Sturm legt alte Wasserkanäle frei. Die Zentrale von Tharsis hilft uns, doch ihre nördlichen Garnisonen gehorchen nicht mehr. Gelbe Flora marschiert auf unser Habitat zu. Fange den Angriff ab, erobere das Sperrcamp und halte den Rückweg bis Generation 112 offen.",
+    "text": "Ein roter Sturm legt alte Wasserkanäle frei. Die Zentrale von Tharsis hilft uns, doch ihre nördlichen Garnisonen gehorchen nicht mehr. Gelbe Flora marschiert auf unser Habitat zu. Fange den Angriff ab, erobere das Sperrcamp und halte den Rückweg bis Generation hundertzwölf offen.",
     "voice": "uncle_fu",
     "transcript": "Ein roter Sturm legt alte Wasserkanäle frei. Die Zentrale von Tarsis hilft uns, doch ihre nördlichen Garnisonen gehorchen nicht mehr. Gelbe Flora marschiert auf unser Habitat zu. Fange den Angriff ab, erobere das Sperrcamp und halte den Rückweg bis Generation 112 offen.",
-    "similarity": 0.998,
-    "coverage": 0.976,
+    "similarity": 0.97,
+    "coverage": 0.951,
     "status": "pass",
-    "audioSha256": "7083eaff7d167396e4f0be20b3b5d25a088543ae7e7516824a881ff7037ff3a0",
-    "sourceTextSha256": "13c912387c3b93337738952cc911f3377b43b998df4ee800b28ae431cdd1d6fc",
-    "expectedSpokenSha256": "8ad1b4aba462f7e55c9e72acec2894340ef6d940af28296852a4c6dffac58fee"
+    "audioSha256": "559ad8862468a75ad0680bd9323a5226a4ce814834f4aa26ac73cae6a39ca7c6",
+    "sourceTextSha256": "442aacf1da027d67f8a5363ab8e8cfc3dde9a0af08e759082814d65674e1f373",
+    "expectedSpokenSha256": "f518b0604709632ce00c0f85a10b3b5e509003b4e77c62cb304f9f6197de3934"
   },
   {
     "id": "A4_M01_debriefing",
@@ -409,15 +409,15 @@
   },
   {
     "id": "A4_M03_briefing",
-    "text": "Viridion, das Haus der grünen Kolonien, fordert die nördlichen Wasserwege für sich. Seine Truppen kämpfen gegen Tharsis – mitten durch unsere Evakuierung. Schütze beide Rettungsplätze 160 Generationen vor jeder fremden Flora. Beide Gegner säen nach jeder Runde erneut. Ein einziger Durchbruch beendet die Rettung.",
+    "text": "Viridion, das Haus der grünen Kolonien, fordert die nördlichen Wasserwege für sich. Seine Truppen kämpfen gegen Tharsis – mitten durch unsere Evakuierung. Schütze beide Rettungsplätze hundertsechzig Generationen vor jeder fremden Flora. Beide Gegner säen nach jeder Runde erneut. Ein einziger Durchbruch beendet die Rettung.",
     "voice": "uncle_fu",
     "transcript": "Viridion, das Haus der grünen Kolonien, fordert die nördlichen Wasserwege für sich. Seine Truppen kämpfen gegen Tarsis, mitten durch unsere Evakuierung. Schütze beide Rettungsplätze 160 Generationen vor jeder fremden Flora. Beide Gegner säen nach jeder Runde erneut. Ein einziger Durchbruch beendet die Rettung.",
-    "similarity": 0.998,
-    "coverage": 0.975,
+    "similarity": 0.971,
+    "coverage": 0.95,
     "status": "pass",
-    "audioSha256": "35599a3f085599daeda6c6e7274106a197977120a565f4717e483bfd6cdf79ae",
-    "sourceTextSha256": "369efa2fbb4867d39a27fcbdbe913b99b0d78d4443876836a43e36c25c0a22d1",
-    "expectedSpokenSha256": "f0382408d229c9cc7d8c31e25fbd7d8513a6a52a9325f78db0755b02d1ef8516"
+    "audioSha256": "1493a2f762ddf921a132f99d9fedace8c2f88073a7af3e54b3eab00a4b0be5e9",
+    "sourceTextSha256": "72b0ee011dfad2f9248e44a45af0a162bbb790cb2e82e68595d15a3146eef6c5",
+    "expectedSpokenSha256": "e0e99ec036a8e55c64e37b0a00a7da8b832b7f4097492e90f3a63b3e86668a64"
   },
   {
     "id": "A4_M03_debriefing",
@@ -433,22 +433,22 @@
   },
   {
     "id": "A4_M04_briefing",
-    "text": "Ein grüner und ein gelber Kommandoposten verweigern die Waffenruhe. Erobere beide, während unsere Zivilstation im Süden geschützt bleibt. Jeder gefallene Posten stoppt die neue Aussaat seines Hauses. Vorhandene Kolonien verschwinden dadurch nicht. Halte die Station bis Generation 128 frei von fremder Flora.",
+    "text": "Ein grüner und ein gelber Kommandoposten verweigern die Waffenruhe. Erobere beide, während unsere Zivilstation im Süden geschützt bleibt. Jeder gefallene Posten stoppt die neue Aussaat seines Hauses. Vorhandene Kolonien verschwinden dadurch nicht. Halte die Station bis Generation hundertachtundzwanzig frei von fremder Flora.",
     "voice": "uncle_fu",
-    "transcript": "Ein grüner und ein gelber Kommandoposten verweigern die Waffenruhe. Erobere beide, während unsere Zivilstation im Süden geschützt bleibt. Jeder gefallene Posten stoppt die neue Aussaat seines Hauses. Vorhandene Kolonien verschwinden dadurch nicht. Halte die Station bis Generation 128 frei von fremder Flora.",
-    "similarity": 1.0,
-    "coverage": 1.0,
+    "transcript": "Ein grüner und ein gelber Kommandoposten verweigern die Waffenruhe. Erobäre beide, während unsere Zivilstation im Süden geschützt bleibt. Jeder gefallene Posten stoppt die neue Aussaat seines Hauses. Vorhandene Kolonien verschwinden dadurch nicht. Halte die Station bis Generation 128 frei von fremder Flora.",
+    "similarity": 0.958,
+    "coverage": 0.949,
     "status": "pass",
-    "audioSha256": "fef68cb34c451768ea18c15e4a487e9d9e3f132a83294e7e82bf780d03e11132",
-    "sourceTextSha256": "bee809b6075e5130e000117234674d51433a6362cadc2986bf99b5f51e943147",
-    "expectedSpokenSha256": "a5406e06a1d92f6fc2f792de3c4c096e136c3adfeedf8643c3519d2252dd52d3"
+    "audioSha256": "65503e13aef3189e75d7b8998bb851b4b85133405c6f86e23b6be0b317077827",
+    "sourceTextSha256": "52a9f0edef9adb7eedb57c965adfe4f7362c2916e0d101d7bdd70b993779e09c",
+    "expectedSpokenSha256": "8e87e5209bba2c05225b45ee3f676fca115ef7470d516fc2473b05e03cf96e77"
   },
   {
     "id": "A4_M04_debriefing",
     "text": "Die beiden Kommandoposten geben auf. Ihre Karten zeigen die eigentliche Gefahr: Drei letzte Garnisonen verteidigen den Sturmspeicher. Wenn ihre Kolonien zusammenwachsen, versagt die Trennung der Wasseradern. Voss fordert alle Häuser auf, ihre Evakuierungsrouten offenzulegen. Diesmal antworten sie.",
     "voice": "uncle_fu",
     "transcript": "Die beiden Kommandoposten geben auf. Ihre Karten zeigen die eigentliche Gefahr. Drei letzte Garnisonen verteidigen den Sturmspeicher. Wenn ihre Kolonien zusammenwachsen, versagt die Trennung der Wasseradern. Voss fordert alle Häuser auf, ihre Evakuierungsrouten offen zu legen. Diesmal antworten sie.",
-    "similarity": 0.897,
+    "similarity": 0.997,
     "coverage": 0.969,
     "status": "pass",
     "audioSha256": "6353873462d3f378b61a745af5a3948fa3bce5d4050428fc30247eb9d2c4ff4b",
@@ -457,15 +457,15 @@
   },
   {
     "id": "A4_M05_briefing",
-    "text": "Drei Garnisonen blockieren den Sturmspeicher. Zwei gehören Tharsis, eine Viridion. Erobere alle, während Wildwuchs die Evakuierung bedroht. Der neue Kanonenbauplan ist mächtig, aber teuer und schwer unterzubringen. Entscheide, wo dein Material am meisten bewirkt. Halte den Rettungsplatz bis Generation 160 offen.",
+    "text": "Drei Garnisonen blockieren den Sturmspeicher. Zwei gehören Tharsis, eine Viridion. Erobere alle, während Wildwuchs die Evakuierung bedroht. Der neue Kanonenbauplan ist mächtig, aber teuer und schwer unterzubringen. Entscheide, wo dein Material am meisten bewirkt. Halte den Rettungsplatz bis Generation hundertsechzig offen.",
     "voice": "uncle_fu",
-    "transcript": "Drei Garnisonen blockieren den Sturmspeicher. Zwei gehören Tarsis, eine Viridion, Aero-Bäre alle, während Wildwuchs die Evakuierung bedroht. Der neue Kanonenbauplan ist mächtig, aber teuer und schwer unterzubringen. Entscheide, wo dein Material am meisten bewirkt. Halte den Rettungsplatz bis Generation 160 offen.",
-    "similarity": 0.98,
-    "coverage": 0.95,
+    "transcript": "Drei Garnisonen blockieren den Sturmspeicher. Zwei gehören Tarsis, eine Viridion. Erobera alle, während Wildwuchs die Evakuierung bedroht. Der neue Kanonenbauplan ist mächtig, aber teuer und schwer unterzubringen. Entscheide, wo dein Material am meisten bewirkt. Halte den Rettungsplatz bis Generation 160 offen.",
+    "similarity": 0.968,
+    "coverage": 0.925,
     "status": "pass",
-    "audioSha256": "fd03182543343028cbc89537e358520a02e6173817f2c7a14f946c844b237fc5",
-    "sourceTextSha256": "334f3c734eb85b12637202d181c6c94b1df8d1e82bf0615659feef5eee76b8c4",
-    "expectedSpokenSha256": "99af0817a7ee3d66738b3b16a8ecc6a0e22b6bc90fd0dc63fc9aa43beda7ebdd"
+    "audioSha256": "98ca13afbaf10bfa66ccf3fa75755475774cd0643b23cf2af6fc7d4e1751b9bc",
+    "sourceTextSha256": "e8f0e897ab9b601d68bad36e93cc5c1c9ead50a8667d828c53433cd4b9376281",
+    "expectedSpokenSha256": "2521673e5382738b01a4f553724e475e091e45871f08f223372f02ecfcb69642"
   },
   {
     "id": "A4_M05_debriefing",

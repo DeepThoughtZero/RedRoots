@@ -14,6 +14,7 @@ class UIManager {
         this.elTopStats = document.getElementById('topStats');
         this.elGamePhaseDisplay = document.getElementById('gamePhaseDisplay');
         this.elRoundDisplay = document.getElementById('roundDisplay');
+        this.elRoundStepsDisplay = document.getElementById('roundStepsDisplay');
         this.elCurrentPlayerDisplay = document.getElementById('currentPlayerDisplay');
         
         this.elRightPanel = document.getElementById('rightPanel');
@@ -421,6 +422,7 @@ class UIManager {
         if (this.audio) {
             this.audio.stopNarration();
             this.elRightPanel.querySelector('div').insertAdjacentHTML('beforeend', (config.scenario ? this.audio.narrationButton(config.scenario, 'briefing') : '') + this.audio.controls());
+            this.audio.startGameAmbience(config.scenario);
         }
         // Hide start menu
         this.elStartMenu.classList.add('opacity-0', 'pointer-events-none');
@@ -503,6 +505,7 @@ class UIManager {
         this.elGamePhaseDisplay.textContent = phase;
         
         if (phase === CONSTANTS.PHASE_SIMULATION) {
+            if (this.audio) this.audio.setSituation('simulation');
             this.elGamePhaseDisplay.classList.replace('text-mars-300', 'text-neon-cyan');
             this.logEvent("Evolutionsphase läuft...");
             
@@ -519,14 +522,23 @@ class UIManager {
             this.elCurrentPlayerDisplay.style.color = '#fff';
             this.updateTerritoryBars();
         } else if (phase === CONSTANTS.PHASE_PLACEMENT) {
+            if (this.audio) {
+                const isTense = this.gameState.scenario?.act === 4 || (this.gameState.scenario?.enemies?.length > 1);
+                this.audio.setSituation(isTense ? 'tension' : 'planning');
+            }
             this.elGamePhaseDisplay.classList.replace('text-neon-cyan', 'text-mars-300');
             this.elRoundDisplay.textContent = `${this.gameState.currentRound} / ${this.gameState.maxRounds}`;
+            if (this.elRoundStepsDisplay) {
+                this.elRoundStepsDisplay.textContent = `· ${this.gameState.stepsPerRound} Schritte`;
+            }
             this.elRightPanel.classList.remove('translate-x-full');
             
             if (this.gameState.isSandbox) {
                 this.elBtnFinishTurn.innerHTML = `<span>Simulation starten</span> <span class="ml-1 text-sm">▶️</span>`;
                 this.elBtnFinishTurn.className = 'flex-1 text-white font-bold py-2 px-4 rounded transition btn-sandbox-start';
                 document.getElementById('btnResetSandbox').classList.remove('hidden');
+            } else if (this.gameState.objectiveSystem) {
+                this.elBtnFinishTurn.textContent = `Evolution starten (${this.gameState.stepsPerRound} Schritte) →`;
             }
             
             this.elSimSpeedContainer.classList.add('hidden');
@@ -537,8 +549,10 @@ class UIManager {
 
         if (this.gameState.isSandbox) {
             this.elBudgetDisplay.textContent = "∞";
-            this.elRoundDisplay.parentElement.classList.add('hidden');
+            this.elRoundDisplay.closest('#topStats > div')?.classList.add('hidden');
             this.elTerritoryBarContainer.classList.add('hidden');
+        } else {
+            this.elRoundDisplay.closest('#topStats > div')?.classList.remove('hidden');
         }
     }
 

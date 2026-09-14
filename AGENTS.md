@@ -143,7 +143,7 @@ Storyverständlichkeit: Rollen beim ersten Auftreten erklären und anschließend
 
 ## Missionsillustrationen
 
-Jede Mission lädt `assets/missions/<Missions-ID>.webp` im Briefing (Akt III verwendet passende bestehende Motive über `mission.image`). Neue Missionen benötigen ein passendes Bild oder einen bewussten Fallback. Stilreferenzen: `Mars_Terraforming01.png` und `Marineris_Cyan.png`; realistische Marslandschaften, verwitterte Technik und leuchtende Flora. Vollständige Prompts und Herkunft in `assets/missions/manifest.json`. Keine wichtigen Hinweise ausschließlich im Bild vermitteln. Querformat kompakt halten und Vergrößerung anbieten; keine Bilder über dem Spielfeld platzieren.
+Jede Mission lädt `assets/missions/<Missions-ID>.webp` im Briefing (Akt III verwendet passende bestehende Motive über `mission.image`). Neue Missionen benötigen ein passendes Bild oder einen bewussten Fallback. Stilreferenzen: `Mars_Terraforming01.png` und `Marineris_Cyan.png`; realistische Marslandschaften, verwitterte Technik und leuchtende Flora. Vollständige Prompts und Herkunft in `assets/missions/manifest.json`. Keine wichtigen Hinweise ausschließlich im Bild vermitteln. Querformat kompakt halten; keine Bilder über dem Spielfeld platzieren.
 
 Sektortexte statt Expeditionsarchiv: Kein separates Storyarchiv oder „Wer spricht? Wo sind wir?“-Glossar anzeigen. Rollen und Orte knapp im passenden Briefing erklären (etwa 40–55 Wörter). Entdeckungen in kurzen Abschlussberichten erzählen; auf der Marskarte nur bei bereits abgeschlossenen Sektoren direkt unter dem Briefing zeigen. Keine spätere Enthüllung vorwegnehmen. Audio-Manifest bei Textänderungen aktualisieren.
 
