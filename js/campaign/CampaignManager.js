@@ -32,26 +32,92 @@ class CampaignState {
         if (!this.save()) { this.completed = previous; return false; }
         return true;
     }
-    // Portable, deliberately not secret. The checksum catches transcription errors.
-    static checksum(digits) {
-        return [...digits].reduce((sum, digit, i) => sum + Number(digit) * (i + 7), 17).toString(36).toUpperCase().padStart(2, '0');
+    static get passwords() { return ['PALISADE-LANDUNG', 'PALISADE-WURZEL', 'PALISADE-PASS', 'PALISADE-WASSER', 'PALISADE-GRENZE', 'PALISADE-WASSERSTROM', 'PALISADE-SCHLEUSEN', 'PALISADE-FAEHRE', 'PALISADE-ARCHIVE', 'PALISADE-INSELN', 'PALISADE-SCHLUESSEL', 'PALISADE-STILLE', 'PALISADE-RUECKWEG', 'PALISADE-SIEGEL', 'PALISADE-NETZ', 'PALISADE-WAFFENRUHE', 'PALISADE-ZANGE', 'PALISADE-FRONTEN', 'PALISADE-GEGENSTOSS', 'PALISADE-STURMAUGE']; }
+    static get sectorNames() {
+        return CampaignState.passwords.map(p => p.replace('PALISADE-', ''));
+    }
+    static modInversePow2(a, bits) {
+        let mask = (1n << BigInt(bits)) - 1n;
+        let x = 1n;
+        for (let i = 0; i < 7; i++) x = (x * (2n - (a & mask) * x)) & mask;
+        return x & mask;
+    }
+    static encodeExpedition(ratings) {
+        let K = 0;
+        for (let i = ratings.length - 1; i >= 0; i--) {
+            if (ratings[i] > 0) { K = i + 1; break; }
+        }
+        if (K === 0) return 'CHRYSE-0';
+        const bits = 2 * K;
+        const mask = (1n << BigInt(bits)) - 1n;
+        let raw = 0n;
+        for (let i = 0; i < K; i++) raw |= BigInt((ratings[i] || 0) & 3) << BigInt(2 * i);
+        const A_SEED = 0x5851f42d4c957f2dn | 1n;
+        const B_SEED = 0x9e3779b97f4a7c15n;
+        const A_K = (A_SEED & mask) | 1n;
+        const B_K = (BigInt(K) * B_SEED + 0x1337n) & mask;
+        const N_prime = (raw * A_K + B_K) & mask;
+        const C = Number((N_prime * 37n + BigInt(K) * 73n + 19n) % 97n);
+        const combined = N_prime * 100n + BigInt(C);
+        const str = combined.toString();
+        let formatted;
+        if (str.length <= 5) {
+            formatted = str;
+        } else {
+            const parts = [];
+            for (let i = 0; i < str.length; i += 4) parts.push(str.slice(i, i + 4));
+            formatted = parts.join('-');
+        }
+        return `${CampaignState.sectorNames[K - 1]}-${formatted}`;
+    }
+    static decodeExpedition(input) {
+        if (!input || typeof input !== 'string') return null;
+        const norm = input.trim().toUpperCase().replace(/^PALISADE[-\s]+/, '');
+        if (/^(CHRYSE|START|ARES)[-\s]0$/.test(norm)) {
+            return Array(CAMPAIGN_MISSIONS.length).fill(0);
+        }
+        const sepIdx = norm.search(/[-\s]/);
+        if (sepIdx < 0) return null;
+        const name = norm.slice(0, sepIdx).trim();
+        const numPart = norm.slice(sepIdx + 1).replace(/[-\s]/g, '');
+        const kIndex = CampaignState.sectorNames.indexOf(name);
+        if (kIndex < 0 || !/^\d+$/.test(numPart)) return null;
+        const K = kIndex + 1;
+        const combined = BigInt(numPart);
+        const bits = 2 * K;
+        const mask = (1n << BigInt(bits)) - 1n;
+        const C = Number(combined % 100n);
+        const N_prime = combined / 100n;
+        if (N_prime > mask) return null;
+        const expectedC = Number((N_prime * 37n + BigInt(K) * 73n + 19n) % 97n);
+        if (C !== expectedC) return null;
+        const A_SEED = 0x5851f42d4c957f2dn | 1n;
+        const B_SEED = 0x9e3779b97f4a7c15n;
+        const A_K = (A_SEED & mask) | 1n;
+        const B_K = (BigInt(K) * B_SEED + 0x1337n) & mask;
+        const inv = CampaignState.modInversePow2(A_K, bits);
+        const raw = ((N_prime - B_K) * inv) & mask;
+        const ratings = Array(CAMPAIGN_MISSIONS.length).fill(0);
+        for (let i = 0; i < K; i++) {
+            ratings[i] = Number((raw >> BigInt(2 * i)) & 3n);
+        }
+        return ratings;
     }
     exportCode() {
-        const digits = CAMPAIGN_MISSIONS.map(m => this.completed[m.id]?.stars || 0).join('');
-        return `RR4-${digits}-${CampaignState.checksum(digits)}`;
+        const ratings = CAMPAIGN_MISSIONS.map(m => this.completed[m.id]?.stars || 0);
+        return CampaignState.encodeExpedition(ratings);
     }
-    static get passwords() { return ['PALISADE-LANDUNG', 'PALISADE-WURZEL', 'PALISADE-PASS', 'PALISADE-WASSER', 'PALISADE-GRENZE', 'PALISADE-WASSERSTROM', 'PALISADE-SCHLEUSEN', 'PALISADE-FAEHRE', 'PALISADE-ARCHIVE', 'PALISADE-INSELN', 'PALISADE-SCHLUESSEL', 'PALISADE-STILLE', 'PALISADE-RUECKWEG', 'PALISADE-SIEGEL', 'PALISADE-NETZ', 'PALISADE-WAFFENRUHE', 'PALISADE-ZANGE', 'PALISADE-FRONTEN', 'PALISADE-GEGENSTOSS', 'PALISADE-STURMAUGE']; }
     importCode(input) {
+        if (!input || typeof input !== 'string') return false;
         const code = input.trim().toUpperCase();
         const checkpoint = CampaignState.passwords.indexOf(code);
         let ratings;
         if (checkpoint >= 0) {
             ratings = CAMPAIGN_MISSIONS.map((m, i) => i < checkpoint ? 1 : 0);
         } else {
-            const legacy = /^RR1-([0-3]{5})-([0-9A-Z]{2})$/.exec(code);
-            const match = legacy || /^RR2-([0-3]{10})-([0-9A-Z]{2})$/.exec(code) || /^RR3-([0-3]{15})-([0-9A-Z]{2})$/.exec(code) || /^RR4-([0-3]{20})-([0-9A-Z]{2})$/.exec(code);
-            if (!match || CampaignState.checksum(match[1]) !== match[2]) return false;
-            ratings = [...match[1]].map(Number);
+            const decoded = CampaignState.decodeExpedition(code);
+            if (!decoded) return false;
+            ratings = decoded;
         }
         // Merge instead of replacing: a transferred code never reduces earned stars.
         ratings.forEach((stars, i) => {
@@ -135,7 +201,7 @@ class CampaignManager {
             <section class="genome-archive"><div><div class="mission-eyebrow">FORSCHUNG / GENARCHIV</div><h3>Aus einfachen Regeln entsteht Leben.</h3></div><div class="genome-cards">${Object.keys(CONSTANTS.PATTERNS).map(key => {
                 const p = CONSTANTS.PATTERNS[key], unlocked = this.progress.genomes.includes(key);
                 return `<div class="genome-card ${unlocked ? '' : 'locked'}"><svg viewBox="-1 -1 10 6" aria-hidden="true">${p.pattern.map(([r,c]) => `<rect x="${c}" y="${r}" width=".8" height=".8"/>`).join('')}</svg><strong>${unlocked ? p.name : 'Verschlüsselt'}</strong><small>${unlocked ? p.cost+' Material' : 'Forschung ausstehend'}</small></div>`;
-            }).join('')}</div></section><section class="story-archive progress-tools"><div class="mission-eyebrow">EXPEDITION / SPIELSTAND</div><h3>Deine Reise mitnehmen.</h3><p>Dieser Browser speichert abgeschlossene Missionen, Sterne und Forschung. Mit dem Expeditionscode kannst du sie auf einem anderen Gerät übernehmen. Eine laufende Mission wird nicht gespeichert.</p><label for="expeditionCode">Dein Expeditionscode · inklusive Sterne</label><div class="code-controls"><input id="expeditionCode" readonly value="${this.progress.exportCode()}" spellcheck="false"><button id="copyExpeditionCode" class="quiet-button">Code kopieren</button></div><form id="importExpedition"><label for="importCode">Expeditionscode oder Sektorpasswort eingeben</label><div class="code-controls"><input id="importCode" maxlength="80" placeholder="RR4-… oder PALISADE-…" required autocomplete="off" spellcheck="false"><button class="quiet-button" type="submit">Übernehmen</button></div></form><p>Vorhandene Sterne bleiben erhalten. Sektorpasswörter werten frühere Missionen mit einem Stern und öffnen ihre Forschung und Sektorberichte.</p><button id="resetCampaign" class="quiet-button">Kampagne zurücksetzen</button><div id="resetConfirmation" hidden><p>Alle Kampagnensterne, Sektoren und Sektorberichte auf diesem Gerät zurücksetzen? Sichere zuvor deinen Expeditionscode. Gefecht-Einstellungen bleiben erhalten.</p><button id="confirmReset" class="quiet-button">Ja, Kampagne zurücksetzen</button> <button id="cancelReset" class="quiet-button">Abbrechen</button></div><p id="progressMessage" role="status" aria-live="polite"></p></section><footer class="campaign-footer">${!this.progress.storageAvailable ? 'Speichern nicht verfügbar. Fortschritt bleibt nur bis zum Verlassen dieser Seite erhalten.' : 'Fortschritt wird auf diesem Gerät gespeichert.'}<span>VIER AKTE · 20 handgebaute Missionen</span></footer>`;
+            }).join('')}</div></section><section class="story-archive progress-tools"><div class="mission-eyebrow">EXPEDITION / SPIELSTAND</div><h3>Deine Reise mitnehmen.</h3><p>Dieser Browser speichert abgeschlossene Missionen, Sterne und Forschung. Mit dem Expeditionscode kannst du sie auf einem anderen Gerät übernehmen. Eine laufende Mission wird nicht gespeichert.</p><label for="expeditionCode">Dein Expeditionscode · inklusive Sterne</label><div class="code-controls"><input id="expeditionCode" readonly value="${this.progress.exportCode()}" spellcheck="false"><button id="copyExpeditionCode" class="quiet-button">Code kopieren</button></div><form id="importExpedition"><label for="importCode">Expeditionscode oder Sektorpasswort eingeben</label><div class="code-controls"><input id="importCode" maxlength="80" placeholder="z. B. PASS-… oder PALISADE-…" required autocomplete="off" spellcheck="false"><button class="quiet-button" type="submit">Übernehmen</button></div></form><p>Vorhandene Sterne bleiben erhalten. Sektorpasswörter werten frühere Missionen mit einem Stern und öffnen ihre Forschung und Sektorberichte.</p><button id="resetCampaign" class="quiet-button">Kampagne zurücksetzen</button><div id="resetConfirmation" hidden><p>Alle Kampagnensterne, Sektoren und Sektorberichte auf diesem Gerät zurücksetzen? Sichere zuvor deinen Expeditionscode. Gefecht-Einstellungen bleiben erhalten.</p><button id="confirmReset" class="quiet-button">Ja, Kampagne zurücksetzen</button> <button id="cancelReset" class="quiet-button">Abbrechen</button></div><p id="progressMessage" role="status" aria-live="polite"></p></section><footer class="campaign-footer">${!this.progress.storageAvailable ? 'Speichern nicht verfügbar. Fortschritt bleibt nur bis zum Verlassen dieser Seite erhalten.' : 'Fortschritt wird auf diesem Gerät gespeichert.'}<span>VIER AKTE · 20 handgebaute Missionen</span></footer>`;
         this.overlay.querySelectorAll('[data-act]').forEach(button => button.onclick = () => {
             const act = Number(button.dataset.act);
             const index = CAMPAIGN_MISSIONS.findIndex((n, i) => n.act === act && this.progress.available(i) && !this.progress.completed[n.id]);

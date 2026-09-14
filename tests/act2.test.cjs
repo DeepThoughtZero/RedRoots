@@ -22,7 +22,7 @@ s.grid.setCell(zones[0].rMin,zones[0].cMin,1);s.grid.setCell(zones[1].rMin,zones
 for(let i=0;i<6;i++)obj.evaluate(s,'generation');assert.equal(obj.hold,6);s.grid.setCell(zones[1].rMin,zones[1].cMin,0);obj.evaluate(s,'generation');assert.equal(obj.hold,0);
 s=create(8);obj=s.objectiveSystem;for(const z of s.scenario.map.zones){s.grid.owners.fill(0);s.grid.setCell(z.rMin,z.cMin,1);obj.evaluate(s,'generation');}assert.equal(obj.collected.size,3);assert.equal(obj.result.success,true,'archives persist after cells leave');
 // Act-I saves and legacy codes remain valid; new codes carry all ten ratings.
-storage.set('redroots_campaign_v1',JSON.stringify({campaignVersion:1,completedMissions:Object.fromEntries(missions.slice(0,5).map(m=>[m.id,{stars:3}]))}));let p=new CampaignState();assert.equal(p.available(5),true);assert.equal(p.available(6),false);p.record(missions[5].id,2);const code=p.exportCode();assert.match(code,/^RR4-[0-3]{20}-/);storage.clear();p=new CampaignState();assert.equal(p.importCode(code),true);assert.equal(p.completed.A2_M01.stars,2);assert.equal(p.importCode(`RR1-33333-${CampaignState.checksum('33333')}`),true);assert.equal(p.completed.A2_M01.stars,2);
+storage.set('redroots_campaign_v1',JSON.stringify({campaignVersion:1,completedMissions:Object.fromEntries(missions.slice(0,5).map(m=>[m.id,{stars:3}]))}));let p=new CampaignState();assert.equal(p.available(5),true);assert.equal(p.available(6),false);p.record(missions[5].id,2);const code=p.exportCode();assert.match(code,/^WASSERSTROM-[\d-]+/);storage.clear();p=new CampaignState();assert.equal(p.importCode(code),true);assert.equal(p.completed.A2_M01.stars,2);assert.equal(p.importCode(CampaignState.encodeExpedition([3,3,3,3,3])),true);assert.equal(p.completed.A2_M01.stars,2);
 // Rewards accumulate slowly; replay loadouts stay fixed even with a complete old save.
 let unlocked=new Set(['cell']);
 for(const m of missions){for(const key of m.patterns)assert.ok(unlocked.has(key),`${m.id}: ${key} must be earned first`);if(m.reward)unlocked.add(m.reward);}
@@ -32,5 +32,5 @@ assert.ok(missions.slice(0,10).every(m=>!m.patterns.includes('b_heptomino')));
 storage.set('redroots_campaign_v1',JSON.stringify({campaignVersion:1,completedMissions:Object.fromEntries(missions.slice(0,5).map(m=>[m.id,{stars:3}])),unlockedPatterns:['cell','acorn','rabbits']}));
 p=new CampaignState();assert.equal(p.genomes.includes('acorn'),false);assert.equal(p.genomes.includes(null),false);assert.equal(p.completed.A1_M05.stars,3);
 console.log('PASS: slower genome progression, fixed replay loadouts, old-save stars preserved');
-console.log('PASS: Act II solutions, neutral-flora defeat, RR1 migration and RR2 transfer');
+console.log('PASS: Act II solutions, neutral-flora defeat and progressive expedition code transfer');
 })().catch(e=>{console.error(e);process.exitCode=1});

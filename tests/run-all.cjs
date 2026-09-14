@@ -44,12 +44,12 @@ const suites = [
     {
         name: 'Ebene 4b: Kampagne Akt II (Missionen 6–10)',
         file: 'tests/act2.test.cjs',
-        desc: 'Versorgungsketten, Schleusen, Hold-Zonen, Archive, RR2-Transfer'
+        desc: 'Versorgungsketten, Schleusen, Hold-Zonen, Archive, Expeditionscodes'
     },
     {
         name: 'Ebene 4c: Kampagne Akt III (Missionen 11–15)',
         file: 'tests/act3.test.cjs',
-        desc: 'Reihenfolge-Schalter, Pulse-Aussterben, Quarantäne, RR3-Codes'
+        desc: 'Reihenfolge-Schalter, Pulse-Aussterben, Quarantäne, Expeditionscodes'
     },
     {
         name: 'Ebene 4d: Kampagne Akt IV (Missionen 16–20)',

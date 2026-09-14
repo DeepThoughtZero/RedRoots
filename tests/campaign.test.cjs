@@ -30,9 +30,12 @@ async function evolve(s) { s.currentPlayer=-1; s.phase=C.PHASE_SIMULATION; await
     assert.equal(other.completed.A1_M01.stars,3); assert.equal(other.completed.A1_M02.stars,2);
     assert.equal(new CampaignState().exportCode(),exported);
     const unchanged = other.exportCode();
-    for (const bad of ['RR2-32000-AA', 'RR1-42000-AA', exported.slice(0,-2)+'ZZ', '<script>', 'PALISADE-NOPE']) {
+    for (const bad of ['RR2-32000-AA', 'RR1-42000-AA', exported.slice(0,-2)+'ZZ', '<script>', 'PALISADE-NOPE', exported.slice(0, -1) + ((Number(exported.slice(-1)) + 1) % 10)]) {
         assert.equal(other.importCode(bad),false); assert.equal(other.exportCode(),unchanged);
     }
+    assert.equal(other.importCode('CHRYSE-0'), true);
+    assert.equal(other.importCode(`PALISADE-${exported}`), true);
+    assert.equal(other.importCode(exported.replace(/-/g, ' ')), true);
     assert.equal(other.importCode(' PALISADE-GRENZE '),true); assert.equal(other.available(4),true);
     assert.equal(other.completed.A1_M01.stars,3); assert.equal(other.completed.A1_M02.stars,2); assert.equal(other.completed.A1_M04.stars,1);
     store.set('redroots_config','keep'); assert.equal(other.reset(),true); assert.equal(other.available(1),false);

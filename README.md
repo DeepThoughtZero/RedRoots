@@ -60,7 +60,7 @@ Die Marskarte öffnet weitere Sektoren nach einem Sieg. Zwei optionale Herausfor
 
 Auf der Marskarte findest du unten **Expedition / Spielstand**:
 
-- **Code kopieren**: portabler `RR4`-Code mit allen erreichten Sternwertungen. Auf einem anderen Gerät unter **Übernehmen** einlösen. Die Prüfziffer erkennt Tippfehler; der Code ist bewusst kein geheimes Passwort.
+- **Code kopieren**: portabler, einprägsamer Expeditionscode mit allen bisher erreichten Sternwertungen (z. B. `LANDUNG-309`, `PASS-2145` oder fortgeschritten `STURMAUGE-…`). Auf einem anderen Gerät unter **Übernehmen** einlösen. Der Code spiegelt den erreichten Sektor wider und nutzt kompakte, leicht chiffrierte Ziffern mit Prüfsumme. Sektorpasswörter bleiben regulär als Einstiegspunkte einlösbar.
 - **Sektorpasswörter** öffnen Mission 1 bis 5; die Testcodes stehen in der Tabelle unten. Frühere Missionen erhalten mindestens einen Stern, samt Forschung und Archivfunden. Höhere lokale Wertungen bleiben bestehen.
 - **Kampagne zurücksetzen**: nach Bestätigung beginnt die Kampagne wieder bei Mission 1. Die Gefecht-Einstellungen bleiben erhalten. Mit einem vorher gesicherten Expeditionscode lässt sich der alte Stand wiederherstellen.
 

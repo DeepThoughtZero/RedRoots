@@ -9,8 +9,8 @@ async function finish(s){while(!s.objectiveSystem.result)await battle(s);return 
 function rotated(s,k,rotation,r,c){assert.ok(s.scenario.patterns.includes(k));s.currentPlayer=0;let p=C.PATTERNS[k].pattern;for(let i=0;i<rotation;i++)p=p.map(([r,c])=>[c,-r]);assert.ok(s.placePattern(p,r,c));}
 storage.clear();
 const transferred=new CampaignState();
-for(const [version,n] of [[1,5],[2,10],[3,15],[4,20]]){const digits='3'.repeat(n);assert.equal(transferred.importCode(`RR${version}-${digits}-${CampaignState.checksum(digits)}`),true);}
-assert.match(transferred.exportCode(),/^RR4-3{20}-/);const saved=transferred.exportCode();assert.equal(transferred.importCode('RR4-invalid'),false);assert.equal(transferred.exportCode(),saved);storage.clear();
+for(const n of [5, 10, 15, 20]){ const code = CampaignState.encodeExpedition(Array(n).fill(3)); assert.equal(transferred.importCode(code), true); }
+assert.match(transferred.exportCode(),/^STURMAUGE-[\d-]+/);const saved=transferred.exportCode();assert.equal(transferred.importCode('INVALID-CODE'),false);assert.equal(transferred.exportCode(),saved);storage.clear();
 // Objective rules in isolation: do not let Conway motion mask ownership errors.
 function fillZone(s,z,owner,count=4){let n=0;for(let r=z.rMin;r<=z.rMax;r++)for(let c=z.cMin;c<=z.cMax;c++)s.grid.setCell(r,c,n++<count?owner:0);}
 let fixture=create(16), objective=fixture.objectiveSystem;
