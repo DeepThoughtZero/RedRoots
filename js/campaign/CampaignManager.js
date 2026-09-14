@@ -75,7 +75,24 @@ class CampaignManager {
         this.overlay.setAttribute('aria-label', 'Mars-Expedition');
         document.body.append(this.overlay);
         this.hud = document.createElement('section');
-        this.hud.className = 'mission-hud'; this.hud.hidden = true;
+        this.hud.className = 'mission-hud';
+        this.hud.hidden = true;
+        this.hud.setAttribute('aria-label', 'Missionsinformation');
+        this.hudBody = document.createElement('div');
+        this.hudBody.className = 'mission-hud-body';
+        this.hud.append(this.hudBody);
+        this.hudToggle = document.createElement('button');
+        this.hudToggle.type = 'button';
+        this.hudToggle.className = 'mission-hud-toggle';
+        this.hudToggle.id = 'btnToggleHud';
+        this.hudToggle.setAttribute('aria-label', 'Missions-Info ein- oder ausfahren');
+        this.hudToggle.setAttribute('aria-expanded', 'true');
+        this.hudToggle.title = 'Missions-Info ein- oder ausfahren';
+        this.hudToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="hud-toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>`;
+        this.hudToggle.onclick = () => this.toggleHUD();
+        this.hud.append(this.hudToggle);
+        this.hudCollapsed = false;
+        this.hasAutoCollapsed = false;
         document.querySelector('#app > main').prepend(this.hud);
         document.getElementById('btnCampaign').onclick = () => this.showMap();
         // A page transition disposes all simulation timers, canvas listeners and AI work.
@@ -125,7 +142,9 @@ class CampaignManager {
             this.selected = index >= 0 ? index : CAMPAIGN_MISSIONS.findIndex(n => n.act === act);
             this.showMap();
         });
-        this.ui.audio.enterScene(m, 'briefing');
+        this.ui.audio.stopNarration();
+        this.ui.audio.scene = null;
+        this.ui.audio.startGameAmbience(m);
         this.overlay.querySelector('#campaignClose').onclick = () => { this.ui.audio.stopNarration(); this.ui.audio.scene = null; this.overlay.hidden = true; document.getElementById('btnCampaign').focus(); };
         const message = text => { this.overlay.querySelector('#progressMessage').textContent = text; };
         this.overlay.querySelector('#copyExpeditionCode').onclick = async () => {
@@ -163,20 +182,51 @@ class CampaignManager {
         document.body.classList.add('in-mission');
         this.ui.startGame(MissionManager.config(CAMPAIGN_MISSIONS[index]));
         this.hud.hidden = false;
-        this.ui.elBtnFinishTurn.textContent = `Evolution starten (${this.ui.gameState.stepsPerRound} Schritte) →`;
+        this.hasAutoCollapsed = false;
+        this.expandHUD();
+        this.ui.elBtnFinishTurn.innerHTML = `Evolution starten<br><span class="text-xs font-normal opacity-90">(${this.ui.gameState.stepsPerRound} Schritte) →</span>`;
         this.updateHUD();
         this.ui.elPatternList.querySelector('[data-pattern="cell"]').click();
         this.ui.audio.enterScene(CAMPAIGN_MISSIONS[index], 'briefing');
+    }
+    collapseHUD() {
+        this.hudCollapsed = true;
+        this.hud.classList.add('collapsed');
+        if (this.hudToggle) {
+            this.hudToggle.setAttribute('aria-expanded', 'false');
+            this.hudToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="hud-toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>`;
+        }
+    }
+    expandHUD() {
+        this.hudCollapsed = false;
+        this.hud.classList.remove('collapsed');
+        if (this.hudToggle) {
+            this.hudToggle.setAttribute('aria-expanded', 'true');
+            this.hudToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="hud-toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>`;
+        }
+    }
+    toggleHUD() {
+        if (this.hudCollapsed) this.expandHUD();
+        else this.collapseHUD();
+    }
+    onFirstPlacement() {
+        if (!this.hasAutoCollapsed) {
+            this.hasAutoCollapsed = true;
+            this.collapseHUD();
+        }
     }
     updateHUD() {
         const s = this.ui.gameState;
         if (!s?.objectiveSystem) return;
         const o = s.objectiveSystem, m = s.scenario;
-        this.hintOpen = this.hud.querySelector('details')?.open ?? this.hintOpen;
-        this.hud.innerHTML = `<div class="mission-eyebrow">AKT ${CAMPAIGN_ACTS.find(a => a.id === m.act).roman} / SEKTOR ${String(this.selected+1).padStart(2,'0')}<a href="${location.pathname}?campaign">Marskarte ↗</a></div><h2>${m.title}</h2><p>${m.objective.label}</p>${o.progressText ? `<p class="objective-progress">${o.progressText}</p>` : ''}<div class="hud-telemetry"><span>GEN ${String(o.generations).padStart(3,'0')}</span><span>${m.steps} SCHRITTE / RUNDE</span><span>${o.spent} MATERIAL EINGESETZT</span></div><details><summary>Ziel & taktischer Hinweis</summary><p><strong>${m.objective.label}</strong></p><p>${m.hint}</p>${m.objective.type === 'captureCamps' ? `<p>Je Camp mindestens 3 eigene Zellen und Pflanzenmehrheit für ${m.objective.hold} Generationen halten.</p>` : ''}</details>`;
+        const target = this.hudBody || this.hud;
+        this.hintOpen = target.querySelector('details')?.open ?? this.hintOpen;
+        target.innerHTML = `<div class="mission-eyebrow">AKT ${CAMPAIGN_ACTS.find(a => a.id === m.act).roman} / SEKTOR ${String(this.selected+1).padStart(2,'0')}<a href="${location.pathname}?campaign">Marskarte ↗</a></div><h2>${m.title}</h2><p>${m.objective.label}</p>${o.progressText ? `<p class="objective-progress">${o.progressText}</p>` : ''}<div class="hud-telemetry"><span>GEN ${String(o.generations).padStart(3,'0')}</span><span>${o.spent} MATERIAL EINGESETZT</span></div><details><summary>Ziel & taktischer Hinweis</summary><p><strong>${m.objective.label}</strong></p><p>${m.hint}</p></details>`;
         // Preserve an opened hint across frequent simulation renders.
-        if (this.hintOpen) this.hud.querySelector('details').open = true;
-
+        if (this.hintOpen) target.querySelector('details').open = true;
+        if (!this.hasAutoCollapsed && s.undoStack?.some(d => d.type === 'placement')) {
+            this.onFirstPlacement();
+        }
     }
     showResult() {
         this.ui.audio.stopNarration();

@@ -14,7 +14,6 @@ class UIManager {
         this.elTopStats = document.getElementById('topStats');
         this.elGamePhaseDisplay = document.getElementById('gamePhaseDisplay');
         this.elRoundDisplay = document.getElementById('roundDisplay');
-        this.elRoundStepsDisplay = document.getElementById('roundStepsDisplay');
         this.elCurrentPlayerDisplay = document.getElementById('currentPlayerDisplay');
         
         this.elRightPanel = document.getElementById('rightPanel');
@@ -528,9 +527,6 @@ class UIManager {
             }
             this.elGamePhaseDisplay.classList.replace('text-neon-cyan', 'text-mars-300');
             this.elRoundDisplay.textContent = `${this.gameState.currentRound} / ${this.gameState.maxRounds}`;
-            if (this.elRoundStepsDisplay) {
-                this.elRoundStepsDisplay.textContent = `· ${this.gameState.stepsPerRound} Schritte`;
-            }
             this.elRightPanel.classList.remove('translate-x-full');
             
             if (this.gameState.isSandbox) {
@@ -538,7 +534,7 @@ class UIManager {
                 this.elBtnFinishTurn.className = 'flex-1 text-white font-bold py-2 px-4 rounded transition btn-sandbox-start';
                 document.getElementById('btnResetSandbox').classList.remove('hidden');
             } else if (this.gameState.objectiveSystem) {
-                this.elBtnFinishTurn.textContent = `Evolution starten (${this.gameState.stepsPerRound} Schritte) →`;
+                this.elBtnFinishTurn.innerHTML = `Evolution starten<br><span class="text-xs font-normal opacity-90">(${this.gameState.stepsPerRound} Schritte) →</span>`;
             }
             
             this.elSimSpeedContainer.classList.add('hidden');

@@ -30,7 +30,7 @@ const a=create(15,1),b=create(15,999);assert.deepEqual(Array.from({length:8},()=
 let s=create(15);rotated(s,'lwss',3,14,24);place(s,'block',10,19);assert.equal((await finish(s)).stars,3,'raid and interception');
 s=create(16);place(s,'glider',8,10);place(s,'glider',8,30);assert.equal((await finish(s)).stars,3,'two-camp siege');
 s=create(17);place(s,'block',10,19);place(s,'block',26,43);place(s,'block',18,26);assert.equal((await finish(s)).stars,3,'defense against both active houses');
-s=create(18);rotated(s,'acorn',3,15,26);place(s,'b_heptomino',10,32);assert.equal((await finish(s)).stars,3,'offensive with civilian protection');
+s=create(18);rotated(s,'acorn',3,15,26);place(s,'b_heptomino',10,32);await battle(s);place(s,'acorn',22,34);assert.equal((await finish(s)).stars,3,'offensive with civilian protection');
 s=create(19);for(const c of [12,32,52])place(s,'glider',10,c);place(s,'block',10,23);await battle(s);for(const c of [24,44,64])rotated(s,'r_pentomino',2,24,c);assert.equal((await finish(s)).stars,3,'three-camp battle with second-round reinforcement');
 s=create(17);assert.equal((await finish(s)).success,false,'doing nothing loses the defensive battle');
 console.log('PASS: all five Act IV three-star solutions against actual hard AI');

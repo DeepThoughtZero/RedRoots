@@ -51,4 +51,29 @@ assert.equal(audio.currentTheme, 'ice');
 assert.equal(audio.currentSituation, 'planning');
 assert.equal(audio.ambience.src, 'assets/audio/mars-ice.mp3');
 
-console.log('PASS: dual-channel crossfading, situational pools, non-repeating shuffle, game start ambience');
+// Missionsübersicht vs. Missionsstart Verhalten testen:
+// 1. Übersicht: Ambience aktiv, aber keine automatische Sprachausgabe
+audio.stopNarration();
+audio.scene = null;
+audio.startGameAmbience({ id: 'A1_M01', ambience: 'canyon' });
+assert.equal(audio.voice.paused, true, 'Keine automatische Sprachausgabe in der Missionsübersicht');
+assert.equal(audio.current, null);
+assert.equal(audio.scene, null);
+
+// 2. Klick auf "Briefing vorlesen" startet manuell
+audio.narrate('A1_M01_briefing');
+assert.equal(audio.voice.paused, false, 'Manuelles Briefing startet auf Klick');
+assert.equal(audio.current, 'A1_M01_briefing');
+
+// 3. Missionswechsel in Übersicht stoppt laufendes Audio und startet das neue Briefing NICHT automatisch
+audio.stopNarration();
+audio.scene = null;
+audio.startGameAmbience({ id: 'A2_M01', ambience: 'ice' });
+assert.equal(audio.voice.paused, true, 'Missionswechsel spielt neues Briefing nicht automatisch');
+assert.equal(audio.current, null);
+
+// 4. Start der Mission auf der Karte startet die Sprachausgabe via enterScene
+audio.enterScene({ id: 'A2_M01', ambience: 'ice' }, 'briefing');
+assert.equal(spoken.text, 'Die Landefähre wartet.', 'Missionsstart auf Karte liest Briefing automatisch vor');
+
+console.log('PASS: dual-channel crossfading, situational pools, non-repeating shuffle, game start ambience, mission overview silent briefing');

@@ -77,7 +77,7 @@ class ObjectiveSystem {
                 const bases = targets.filter(z => z.house === enemy.house);
                 if (bases.length && bases.every(z => this.collected.has(z.id))) { state.defeatedPlayers.add(enemy.house); state.budgets[enemy.house] = 0; }
             }
-            this.progressText = `${this.collected.size} / ${targets.length} Camps erobert · ${o.hold} Generationen halten: mindestens 3 eigene Zellen und Pflanzenmehrheit`;
+            this.progressText = `${this.collected.size} / ${targets.length} Camps erobert`;
             if (this.collected.size === targets.length && this.generations < (o.minGenerations || 0)) this.progressText = `Camps gesichert · ${o.minGenerations-this.generations} Generationen Rückweg schützen`;
             won = this.collected.size === targets.length && this.generations >= (o.minGenerations || 0) && state.grid.owners.some(v => v === 1);
         }

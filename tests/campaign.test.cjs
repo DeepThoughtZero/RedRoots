@@ -2,7 +2,7 @@ const {readFileSync} = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const store = new Map();
-const context = vm.createContext({ console, setTimeout, requestAnimationFrame: () => 1, cancelAnimationFrame: () => {}, localStorage: { getItem: k => store.get(k) || null, setItem: (k,v) => store.set(k,v) } });
+const context = vm.createContext({ console, setTimeout, requestAnimationFrame: () => 1, cancelAnimationFrame: () => {}, localStorage: { getItem: k => store.get(k) || null, setItem: (k,v) => store.set(k,v) }, document: { body: { classList: { add() {}, remove() {} } }, querySelector: () => null, createElement: () => ({ append() {}, setAttribute() {}, classList: { add() {} } }) }, location: { pathname: '', search: '' }, URLSearchParams: class { get() { return null; } has() { return false; } } });
 for (const file of ['js/utils/Constants.js','js/core/Grid.js','js/core/Territory.js','js/campaign/Missions.js','js/campaign/Story.js','js/campaign/Act2.js','js/campaign/Act3.js','js/campaign/Act4.js','js/campaign/ObjectiveSystem.js','js/campaign/CampaignManager.js','js/core/GameState.js']) vm.runInContext(readFileSync(file,'utf8'),context);
 const api = vm.runInContext('({GameState, MissionManager, CAMPAIGN_MISSIONS, CONSTANTS, CampaignState})', context);
 const {GameState, MissionManager, CAMPAIGN_MISSIONS: missions, CONSTANTS: C, CampaignState} = api;
@@ -44,5 +44,24 @@ async function evolve(s) { s.currentPlayer=-1; s.phase=C.PHASE_SIMULATION; await
     context.localStorage.setItem = originalSet;
     for (let i=0;i<5;i++) { other.reset(); assert.equal(other.importCode(CampaignState.passwords[i]),true); assert.equal(other.available(i),true); if(i<4) assert.equal(other.available(i+1),false); }
     const classic=new GameState({rows:30,cols:48,rounds:1,steps:3,playerCount:2,radius:5,rocks:0}); assert.equal(classic.objectiveSystem,undefined); classic.grid.setCell(29,10,1); assert.equal(classic.checkWinCondition(),true); assert.equal(classic.winner,0);
-    console.log('PASS: five mission solutions, extinction, race defeat, camp defeat, material undo, persistence validation, skirmish compatibility');
+
+    // Collapsible HUD & Button Zeilenumbruch
+    const mockBtn = { innerHTML: '', textContent: '' };
+    const mockUI = { gameState: s, elBtnFinishTurn: mockBtn, startGame() {}, elPatternList: { querySelector: () => ({ click() {} }) }, audio: { enterScene() {} } };
+    const CM = vm.runInContext('CampaignManager', context);
+    const cm = Object.create(CM.prototype);
+    cm.ui = mockUI;
+    cm.hud = { classList: { c: new Set(), add(k){this.c.add(k)}, remove(k){this.c.delete(k)}, contains(k){return this.c.has(k)} } };
+    cm.hudToggle = { setAttribute(k,v){this[k]=v}, innerHTML: '' };
+    cm.hudBody = { innerHTML: '', querySelector: () => null };
+    cm.hudCollapsed = false; cm.hasAutoCollapsed = false;
+    cm.collapseHUD(); assert.equal(cm.hudCollapsed, true); assert.ok(cm.hud.classList.contains('collapsed')); assert.equal(cm.hudToggle['aria-expanded'], 'false');
+    cm.expandHUD(); assert.equal(cm.hudCollapsed, false); assert.ok(!cm.hud.classList.contains('collapsed')); assert.equal(cm.hudToggle['aria-expanded'], 'true');
+    cm.toggleHUD(); assert.equal(cm.hudCollapsed, true);
+    cm.expandHUD(); cm.hasAutoCollapsed = false; cm.onFirstPlacement();
+    assert.equal(cm.hasAutoCollapsed, true); assert.equal(cm.hudCollapsed, true);
+    cm.expandHUD(); cm.onFirstPlacement(); assert.equal(cm.hudCollapsed, false);
+    cm.start(0); assert.ok(mockBtn.innerHTML.includes('Evolution starten<br>'));
+
+    console.log('PASS: five mission solutions, extinction, race defeat, camp defeat, material undo, persistence validation, skirmish compatibility, collapsible hud, button newline');
 })().catch(e=>{console.error(e);process.exitCode=1});

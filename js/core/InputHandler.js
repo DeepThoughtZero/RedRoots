@@ -188,6 +188,7 @@ class InputHandler {
 
         const success = this.gameState.placePattern(this.currentPattern, r, c);
         if (success) {
+            this.uiManager?.campaign?.onFirstPlacement?.();
             const minCost = Math.min(...Object.values(CONSTANTS.PATTERNS).map(p => p.cost));
             if (this.gameState.budgets[this.gameState.currentPlayer] < minCost) {
                 // Not enough budget for anything, could auto-end turn
