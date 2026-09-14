@@ -22,6 +22,15 @@ const AMBIENT_POOLS = {
     ambient: ['mars-ambient', 'mars-planning-1', 'mars-planning-2', 'mars-simulation-3']
 };
 
+const FAILURE_AUDIO = {
+    'Unser Habitat wurde überwuchert.': 'assets/audio/failure-habitat.mp3',
+    'Das Zeitfenster ist geschlossen.': 'assets/audio/failure-timeout.mp3',
+    'Hellas hat das Wasser zuerst erreicht.': 'assets/audio/failure-race.mp3',
+    'Die Quarantäne wurde durch lebende Flora verletzt.': 'assets/audio/failure-sterile.mp3',
+    'Die Schalter wurden in falscher Reihenfolge berührt.': 'assets/audio/failure-order.mp3',
+    'Fremde Flora hat die geschützte Zone erreicht.': 'assets/audio/failure-protected.mp3'
+};
+
 class GameAudio {
     constructor() {
         this.settings = { ambient: false, ambienceVolume: .35, voiceVolume: .85 };
@@ -318,16 +327,36 @@ class GameAudio {
     }
 
     narrate(key, automatic = false) {
+        if (this.failure?.key === key && this.failure.text && FAILURE_AUDIO[this.failure.text]) {
+            const audioPath = FAILURE_AUDIO[this.failure.text];
+            this.error = '';
+            if (!automatic && this.current === key && !this.voice.paused) { this.voice.pause(); return; }
+            if (this.current !== key) {
+                this.voice.pause();
+                this.current = key;
+                this.voice.src = audioPath;
+            }
+            if (this.voice.ended) this.voice.currentTime = 0;
+            this.voice.play().catch(error => {
+                if (error.name !== 'AbortError') {
+                    if (automatic && error.name === 'NotAllowedError') this.pendingNarration = key;
+                    this.error = error.name === 'NotAllowedError' ? 'Zum automatischen Vorlesen einmal die Seite antippen.' : 'Wiedergabe nicht möglich. Bitte erneut antippen.';
+                    this.sync();
+                }
+            });
+            return;
+        }
         const spokenMission = CAMPAIGN_MISSIONS.find(m => m.narration === 'browser' && (key === `${m.id}_briefing` || key === `${m.id}_debriefing`));
         const spokenText = spokenMission ? spokenMission[key.endsWith('_briefing') ? 'briefing' : 'debriefing'] : null;
         if (this.failure?.key === key || spokenText) {
             this.error = '';
             this.voice.pause();
             if (!window.speechSynthesis) { this.error = 'Vorlesen dieses Berichts wird von diesem Browser nicht unterstützt.'; this.sync(); return; }
-            if (!automatic && this.current === key && this.utterance) {
-                if (this.speaking) { window.speechSynthesis.pause(); this.speaking = false; }
-                else { window.speechSynthesis.resume(); this.speaking = true; }
-                this.sync(); return;
+            if (!automatic && this.current === key && this.utterance && this.speaking) {
+                window.speechSynthesis.pause(); this.speaking = false; this.sync(); return;
+            }
+            if (!automatic && this.current === key && this.utterance && !this.speaking && (typeof window.speechSynthesis.speaking === 'undefined' || window.speechSynthesis.speaking)) {
+                window.speechSynthesis.resume(); this.speaking = true; this.sync(); return;
             }
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(spokenText || this.failure.text);
@@ -342,6 +371,7 @@ class GameAudio {
             utterance.onerror = event => {
                 if (this.utterance !== utterance) return;
                 this.speaking = false;
+                this.utterance = null;
                 if (event.error === 'not-allowed' && automatic) this.pendingNarration = key;
                 this.error = 'Bericht vorlesen: bitte einmal antippen.'; this.sync();
             };

@@ -28,6 +28,16 @@ context.CAMPAIGN_MISSIONS.push({id:'A3_M05',narration:'recorded',audioRevision:'
 audio.stopNarration();audio.enterScene({id:'A3_M05'},'briefing');assert.ok(audio.voice.src.endsWith('A3_M05_briefing.mp3?v=test-current'));assert.equal(audio.voice.paused,false);
 audio.enterScene({id:'A3_M05'},'debriefing');assert.ok(audio.voice.src.endsWith('A3_M05_debriefing.mp3?v=test-current'));
 console.log('PASS: recorded missions use versioned MP3 assets for briefing and report');
+audio.stopNarration();
+audio.failureReport({id:'A4_M04'},'Fremde Flora hat die geschützte Zone erreicht.');
+assert.equal(audio.voice.src,'assets/audio/failure-protected.mp3');
+assert.equal(audio.voice.paused,false);
+assert.equal(audio.ambience.volume,.35*.25);
+audio.narrate('A4_M04_failure');
+assert.equal(audio.voice.paused,true);
+audio.narrate('A4_M04_failure');
+assert.equal(audio.voice.paused,false);
+console.log('PASS: failure report plays studio MP3 voice line, pauses, resumes and ducks ambience');
 
 // Ebene 5a Erweiterung: Crossfade-Engine & Situations-Mixer
 const initialSrc = audio.ambience.src;
