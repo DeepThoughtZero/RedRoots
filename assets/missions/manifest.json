@@ -104,6 +104,41 @@
       "file": "A4_M05.webp",
       "source": "exec-b8da3a48-2490-42bd-a82e-57aa12c5bf45.png",
       "prompt": "Use case: stylized-concept. Create a new 16:9 landscape mission illustration matching these existing game images as STYLE REFERENCES: realistic cinematic science fiction, layered copper-red Mars geology, weathered dark industrial habitats, detailed waxy succulent flora with branching luminous lattice structures, cyan player flora versus yellow Tharsis and green Viridion. Atmospheric scale, dramatic light, sharp readable silhouette at banner size. No labels, no logos, no UI, no watermark, no large planets in sky. Any humans are tiny helmeted explorers. Scene: Epic wide panorama inside the eye of an immense rusty Martian dust storm: three heavily fortified water storage bastions, two yellow and one green, facing multiple cyan living plant offensives, gray-white wild roots approaching an evacuation pad in foreground. Vast scale, shafts of amber light through red swirling dust, grounded science fiction, no guns, no text."
+    },
+    {
+      "id": "A5_M01",
+      "title": "Tausend rote Morgen",
+      "file": "A5_M01.webp",
+      "source": "exec-e8a25c13-0400-49ca-9e52-574f59d79c9f.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use the two input images as STYLE REFERENCES ONLY. Realistic cinematic science fiction, vast layered copper-red Martian geology, weathered dark industrial water infrastructure, tangible waxy succulent flora with branching luminous lattice structures, restrained cyan Marineris versus yellow Tharsis and green Viridion light, atmospheric depth, dramatic natural lighting, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: Arcadia highland at dawn, two far-separated yellow-lit automated relay fortresses beyond immense parallel basalt ridges, a small cyan habitat far left and two distinct cyan living offensives crossing broad valleys. Convey a battle lasting across many seasons and huge scale."
+    },
+    {
+      "id": "A5_M02",
+      "title": "Drei Lichter im Krater",
+      "file": "A5_M02.webp",
+      "source": "exec-bcec3fbc-b2d2-44c5-af8a-3e40d1aaf802.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use the two input images as STYLE REFERENCES ONLY. Realistic cinematic science fiction, vast layered copper-red Martian geology, weathered dark industrial water infrastructure, tangible waxy succulent flora with branching luminous lattice structures, restrained cyan Marineris versus yellow Tharsis and green Viridion light, atmospheric depth, dramatic natural lighting, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: Enormous Amazonis impact crater containing three warm inhabited dome settlements on separate terraces, cyan defensive flora around each, green and yellow living fronts entering through distant opposite crater gates, central reserve route visible. Tense defense under cold morning light."
+    },
+    {
+      "id": "A5_M03",
+      "title": "Die offenen Tore",
+      "file": "A5_M03.webp",
+      "source": "exec-0237c4d0-dd73-4301-bd0b-7544286098c6.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use the two input images as STYLE REFERENCES ONLY. Realistic cinematic science fiction, vast layered copper-red Martian geology, weathered dark industrial water infrastructure, tangible waxy succulent flora with branching luminous lattice structures, restrained cyan Marineris versus yellow Tharsis and green Viridion light, atmospheric depth, dramatic natural lighting, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: A gigantic industrial maintenance labyrinth beneath Olympus, three perfectly barren red-dust biosecurity corridors slicing through intricate terraces, cyan colonies and rival green/yellow flora fighting only on separated safe sides, two remote control stations. Sterile boundaries must look stark and inviolate."
+    },
+    {
+      "id": "A5_M04",
+      "title": "Kein Haus allein",
+      "file": "A5_M04.webp",
+      "source": "exec-a58749d2-7e82-47ae-8667-6cfc0243c943.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use the two input images as STYLE REFERENCES ONLY. Realistic cinematic science fiction, vast layered copper-red Martian geology, weathered dark industrial water infrastructure, tangible waxy succulent flora with branching luminous lattice structures, restrained cyan Marineris versus yellow Tharsis and green Viridion light, atmospheric depth, dramatic natural lighting, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: Epic Olympus plateau with a colossal four-way water distributor, separate north and south civilian stations, cyan root fronts splitting into multiple deliberate routes toward distant green and yellow control bastions. Long campaign scale, dark storm clearing into amber light, cooperation emerging from conflict."
+    },
+    {
+      "id": "A5_M05",
+      "title": "Das Gedächtnis des Bodens",
+      "file": "A5_M05.webp",
+      "source": "exec-efb484a3-6df7-407c-b54f-6a46cdcb2dcb.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use the two input images as STYLE REFERENCES ONLY. Realistic cinematic science fiction, vast layered copper-red Martian geology, weathered dark industrial water infrastructure, tangible waxy succulent flora with branching luminous lattice structures, restrained cyan Marineris versus yellow Tharsis and green Viridion light, atmospheric depth, dramatic natural lighting, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: Finale at the colossal heart of the Olympus network, three separated regional nodes across an immense volcanic caldera, a visibly empty protective corridor around the central infrastructure, cyan, green and yellow plant zones held apart. In the near foreground exactly four small cyan cells form a quiet square-like living cluster beside weathered machinery; solemn hopeful sunrise."
     }
   ]
 }

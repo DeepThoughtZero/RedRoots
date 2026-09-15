@@ -198,5 +198,55 @@
     "id": "A4_M05_debriefing",
     "text": "Die letzte Garnison schweigt. Zum ersten Mal fließt Wasser durch gemeinsam gewartete Leitungen, während die Pflanzenkolonien getrennt bleiben. Der Sturm zieht weiter. Voss fragt nicht mehr, wem der Mars gehört. Sie fragt, wer morgen Verantwortung übernimmt. Die Häuser müssen jetzt eine gemeinsame Ordnung finden.",
     "voice": "uncle_fu"
+  },
+  {
+    "id": "A5_M01_briefing",
+    "text": "Das gerettete Olympus-Netz erreicht Arcadia, doch zwei verlassene Tharsis-Relais speisen weiter unkontrollierte Kolonien. Erobere beide Stationen und halte das westliche Habitat über zweitausend Generationen. Jede Evolutionsphase dauert tausend Generationen; zwischen den Phasen kannst du die gewachsene Landschaft neu beurteilen und verstärken.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A5_M01_debriefing",
+    "text": "Nach zweitausend Generationen fließt die erste Fernleitung stabil. In den Relais finden wir keinen Sabotagebefehl, sondern automatische Notfallpläne: Jede Station sollte allein überleben. Gemeinsam erzeugen sie jedoch eine Front. Viridion meldet drei Habitate, die genau zwischen solchen Plänen liegen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A5_M02_briefing",
+    "text": "Drei Habitate liegen in einer alten Einschlagssenke. Grüne und gelbe Notfallflora dringt durch getrennte Kratertore ein, während die Bewohner ihre lokalen Genome sichern. Halte alle drei Siedlungen dreitausend Generationen frei. Beide Häuser säen nach jeder tausendsten Generation nach; deine Front muss sich über mehrere Runden anpassen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A5_M02_debriefing",
+    "text": "Drei Lichter bleiben an. Viridion öffnet seine Genarchive und erkennt zugleich den Preis völliger Freiheit: Ohne gemeinsame Sperrkorridore hätten die lokalen Varianten einander ausgelöscht. Unter dem Krater verläuft Kesslers älteste Wartungsstraße zum Olympus-Knoten – und ihre biologischen Tore stehen offen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A5_M03_briefing",
+    "text": "Kesslers Wartungsstraße verbindet die Habitate, aber drei breite rote Sperrkorridore trennen ihre Pflanzenzonen. Erobere die beiden alten Steuerlager und halte alle Korridore zweitausend Generationen vollständig steril. Grauer Wildwuchs und beide Garnisonen nutzen jede Lücke. Ein einziger lebender Kontakt verbindet das Netz erneut.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A5_M03_debriefing",
+    "text": "Die Tore schließen sich, Menschen und Wasser passieren weiter. Kesslers vollständiges Protokoll wird lesbar: PALISADE scheiterte nicht an einem aggressiven Genom, sondern an zentralen Notfallplänen, die gleichzeitig dieselben Grenzen öffneten. Tharsis veröffentlicht daraufhin seine geschönten Risikoberichte. Noch fehlt der Hauptverteiler.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A5_M04_briefing",
+    "text": "Der Hauptverteiler versorgt vier Regionen, doch vier automatische Relais arbeiten gegeneinander. Sichere die grünen und gelben Kontrollstationen, während zwei zivile Verteiler dreitausend Generationen frei bleiben. Die Landschaft ist größer als jede bisherige Front. Nur getrennte Kolonien, Reserven und wiederholte Kurskorrekturen überstehen drei volle Zyklen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A5_M04_debriefing",
+    "text": "Nach dreitausend Generationen bleiben vier regionale Netze stabil und getrennt. Die Häuser übertragen ihre Wartungsschlüssel in ein gemeinsames Protokoll – noch ohne politische Einigung. Im Kern des Verteilers wartet Kesslers letzte Aufzeichnung und eine Entscheidung, die keine Simulation für uns treffen kann.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A5_M05_briefing",
+    "text": "Im Kern laufen alle Fehler des alten Netzes zusammen. Sichere drei regionale Knoten, halte die gemeinsame Schutzzone frei und bewahre unser Habitat über viertausend Generationen. Vier lange Evolutionsphasen zeigen, ob die Ordnung wirklich trägt. Danach entscheiden die Siedlungen, wem Wartung, Archive und Genome anvertraut werden.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A5_M05_debriefing",
+    "text": "Viertausend Generationen. Drei getrennte Pflanzenzonen. Im Schutzraum stehen vier cyanfarbene Zellen als stiller Block – dieselbe Form wie bei der Landung. Kesslers Stimme endet: „Das ist genug.“ Der Mars ist nicht gerettet, aber seine Siedlungen besitzen jetzt eine Ordnung, die sie gemeinsam weitertragen können.",
+    "voice": "uncle_fu"
   }
 ]

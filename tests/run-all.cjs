@@ -57,6 +57,11 @@ const suites = [
         desc: 'Belagerungen und Schutz gegen tatsächliche schwere KI'
     },
     {
+        name: 'Ebene 4e: Kampagne Akt V (Missionen 21–25)',
+        file: 'tests/act5.test.cjs',
+        desc: 'Langzeitziele, Großkarten, Sperrkorridore, Codes und finale Entscheidung'
+    },
+    {
         name: 'Ebene 5a: Audio-Steuerung & Sprachausgabe',
         file: 'tests/audio.test.cjs',
         desc: 'GameAudio, Ambience-Ducking, Tab-Pause, Browser-TTS Fallback'
@@ -64,7 +69,7 @@ const suites = [
     {
         name: 'Ebene 5b: Audio-Aufnahmen & Story-Integrität',
         file: 'tests/audio-assets.test.cjs',
-        desc: '40 Qwen3-Aufnahmen gegen Storytexte & SHA-256 Prüfsummen'
+        desc: '50 Qwen3-Aufnahmen gegen Storytexte & SHA-256 Prüfsummen'
     }
 ];
 

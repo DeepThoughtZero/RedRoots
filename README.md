@@ -52,7 +52,7 @@ Das Spiel besteht aus purem HTML, CSS und JavaScript. Es werden keine externen S
 
 ## Kampagne: Das Gedächtnis des roten Bodens
 
-Vier Akte mit zwanzig handgebauten Missionen sind spielbar. Akt I führt Haus Marineris durch Überleben, Expansion, ein Gleiterpass, ein Rennen um Wasser und eine Invasion. Missionsziele werden während der Evolution und nach der Gebietsauswertung geprüft. Gelbe Markierungen zeigen Ziele auf dem Spielfeld; der Funkkanal liefert konkrete taktische Hinweise.
+Fünf Akte mit fünfundzwanzig handgebauten Missionen sind spielbar. Akt I führt Haus Marineris durch Überleben, Expansion, ein Gleiterpass, ein Rennen um Wasser und eine Invasion. Missionsziele werden während der Evolution und nach der Gebietsauswertung geprüft. Gelbe Markierungen zeigen Ziele auf dem Spielfeld; der Funkkanal liefert konkrete taktische Hinweise.
 
 Mission 1 beginnt ausschließlich mit Einzelzellen: Eine Anordnung, die zwölf Generationen überlebt, muss selbst gefunden werden. Die erste Mission läuft bewusst langsam (0,8 Sekunden je Generation) und zeigt den Endzustand kurz vor dem Ergebnis. Der Sieg schaltet die Block-Vorlage frei; nach Mission 2 folgen Gleiter und Blinker. Auch beim Wiederholen bleiben die missionsspezifischen Musterbeschränkungen bestehen.
 
@@ -94,7 +94,7 @@ Das freie Gefecht bleibt mit allen 13 Mustern und den bisherigen Zufallskarten v
 - `js/campaign/ObjectiveSystem.js`: Sieg/Niederlage, Generationen, Materialverbrauch und Bonuswertung.
 - `js/campaign/Story.js`: Funkbriefings, Missionsberichte und freischaltbare Archivfunde.
 - `js/campaign/CampaignManager.js`: Marskarte, Missions-HUD, Ergebnisansicht und versionierter Fortschritt.
-- [Geschichte und weitere Akte](docs/CAMPAIGN_STORY.md): durchgehender Handlungsbogen; Akt V ist geplant, noch nicht spielbar.
+- [Kampagnengeschichte](docs/CAMPAIGN_STORY.md): vollständiger Handlungsbogen der fünf spielbaren Akte.
 
 ### Prüfen und Qualitätssicherung
 
@@ -120,7 +120,7 @@ node tests/audio-assets.test.cjs # Ebene 5: Audio-Aufnahmen & SHA-256 Integritä
 
 Für den Browser: `python3 -m http.server 8765`, dann `http://localhost:8765/index.html`. Es gibt keinen Build-Schritt. Die bestehende Oberfläche lädt Tailwind und Schriften weiterhin über CDNs.
 
-Akt II setzt die Rettung der Hellas-Siedlungen fort: zwei Versorgungswege, gleichzeitige Schleusenkontrolle, Evakuierung unter Wildwuchs, drei Forschungsarchive und ein gemeinsamer Schutzgürtel. Akt III führt diese Geschichte unter Olympus mit sequenziellen Schaltern und Quarantänezonen fort. Akt IV ergänzt fünf schwere Gefechte gegen Tharsis und Viridion. Akt V ist noch nicht spielbar.
+Akt II setzt die Rettung der Hellas-Siedlungen fort: zwei Versorgungswege, gleichzeitige Schleusenkontrolle, Evakuierung unter Wildwuchs, drei Forschungsarchive und ein gemeinsamer Schutzgürtel. Akt III führt diese Geschichte unter Olympus mit sequenziellen Schaltern und Quarantänezonen fort. Akt IV ergänzt fünf schwere Gefechte gegen Tharsis und Viridion. Akt V schließt die Geschichte mit fünf planetaren Langzeitgefechten und einer verantwortbaren Zukunftsentscheidung ab.
 
 ## 🛠️ Architektur
 
@@ -141,7 +141,7 @@ Die fertigen MP3-Dateien unter `assets/audio/` werden mit der Website ausgeliefe
 
 Erzeugung: `python3 scripts/generate_audio.py` und `python3 scripts/generate_failure_audio.py` nutzen die lokalen AiStack-Dienste Qwen3-TTS (deutsche Erzählerstimme `uncle_fu`), Speaches und AudioGen. Der Speaches-Schlüssel wird aus der Umgebung oder der lokalen AiStack-Konfiguration gelesen und niemals in Assets gespeichert. Sprache wird auf −16 LUFS, die in acht Takes erzeugte Atmosphäre auf −23 LUFS normalisiert. `manifest.json` enthält die Texte; `verification.json` enthält die Transkriptprüfung. `node tests/audio.test.cjs` prüft die Audio-Steuerung ohne GPU.
 
-Alle 40 aktuellen Briefings und erfolgreichen Missionsberichte aus Akt I–IV sowie die sechs Niederlagegründe sind als deutsche Qwen3-Aufnahmen enthalten und per Speaches geprüft. Die Browserstimme dient als Fallback für unbekannte Texte. Die Funkkennung lautet „Landefähre“. `verification.json` dokumentiert Transkripte und Prüfsummen; `mastering.json` enthält die Pegelmessungen. `node tests/audio-assets.test.cjs` prüft, dass Aufnahmen und aktuelle Sektortexte zusammenpassen. Versionierte Audio-URLs verhindern, dass alte Aufnahmen aus dem Browsercache abgespielt werden.
+Alle 50 aktuellen Briefings und erfolgreichen Missionsberichte aus Akt I–V sowie die sechs Niederlagegründe sind als deutsche Qwen3-Aufnahmen enthalten und per Speaches geprüft. Die Browserstimme dient als Fallback für unbekannte Texte. Die Funkkennung lautet „Landefähre“. `verification.json` dokumentiert Transkripte und Prüfsummen; `mastering.json` enthält die Pegelmessungen. `node tests/audio-assets.test.cjs` prüft, dass Aufnahmen und aktuelle Sektortexte zusammenpassen. Versionierte Audio-URLs verhindern, dass alte Aufnahmen aus dem Browsercache abgespielt werden.
 
 ### Missionsabhängige Atmosphäre und Abbrechen
 
@@ -190,3 +190,19 @@ Weitere Testpasswörter (nur hier dokumentiert):
 | `PALISADE-FRONTEN` | Mission 18 – Zwischen den Fronten |
 | `PALISADE-GEGENSTOSS` | Mission 19 – Die letzte Gegenoffensive |
 | `PALISADE-STURMAUGE` | Mission 20 – Das Auge des Sturms |
+
+### Akt V – Das geteilte Netz
+
+Fünf großformatige Langzeitgefechte (Sektoren 21–25) führen die PALISADE-Handlung zum Abschluss. Jede Evolutionsphase umfasst **1.000 Generationen**; je nach Mission müssen zwei bis vier volle Phasen bestanden werden, weitere Runden bleiben für Nachsteuerung. Die Karten sind 72×112 bis 96×160 Felder groß und kombinieren Felsrücken, Kraterterrassen, Wartungslabyrinthe, mehrere KI-Häuser, Wildwuchs, Camp-Eroberungen, Habitatverteidigung und sterile Sperrkorridore. Der Temporegler bleibt verfügbar; bei langen Phasen empfiehlt sich die höchste Geschwindigkeit.
+
+Im Finale wird nach dem spielerischen Beweis eines stabilen verteilten Netzes zwischen einem gemeinsamen Mars-Konsortium und freien lokalen Genomen gewählt. Beide Wege sind verantwortbar; die Entscheidung wird zusammen mit dem Kampagnenfortschritt lokal gespeichert. Alle zehn neuen Briefings und Berichte liegen als lokal erzeugte, geprüfte Qwen3-Aufnahmen vor.
+
+Weitere Testpasswörter (nur hier dokumentiert):
+
+| Passwort | Einstieg |
+| --- | --- |
+| `PALISADE-MORGEN` | Mission 21 – Tausend rote Morgen |
+| `PALISADE-LICHTER` | Mission 22 – Drei Lichter im Krater |
+| `PALISADE-TORE` | Mission 23 – Die offenen Tore |
+| `PALISADE-VERTEILER` | Mission 24 – Kein Haus allein |
+| `PALISADE-ERBE` | Mission 25 – Das Gedächtnis des Bodens |

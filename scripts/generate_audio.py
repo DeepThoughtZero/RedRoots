@@ -12,7 +12,8 @@ def post(url, data):
         try:
             with urllib.request.urlopen(req,timeout=1200) as response: return response.read()
         except urllib.error.HTTPError as error:
-            if error.code not in (502, 503) or attempt == 11: raise
+            # Qwen can return a transient 500 while releasing or reloading a long request.
+            if error.code not in (500, 502, 503) or attempt == 11: raise
             print('Audio service is starting; retrying shortly.', flush=True)
             time.sleep(5)
 def ff(args): subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y',*map(str,args)],check=True)
@@ -93,4 +94,13 @@ pending=[item['id'] for item in report if item['status'] != 'pass']
 if pending:
     print('Audio needs review: ' + ', '.join(pending), flush=True)
     raise SystemExit(1)
+# Keep the level report reproducible and synchronized with every verified clip.
+mastering_report=[]
+for item in json.loads((OUT/'manifest.json').read_text()):
+    final=OUT/(item['id']+'.mp3')
+    seconds=float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',str(final)]))
+    measurement=subprocess.run(['ffmpeg','-hide_banner','-nostats','-i',str(final),'-af','loudnorm=I=-16:TP=-2:LRA=11:print_format=json','-f','null','-'],capture_output=True,text=True,check=True).stderr
+    stats=json.JSONDecoder().raw_decode(measurement[measurement.rfind('{'):])[0]
+    mastering_report.append({'id':item['id'],'seconds':round(seconds,2),'integratedLUFS':float(stats['input_i']),'truePeakDBTP':float(stats['input_tp'])})
+(OUT/'mastering.json').write_text(json.dumps(mastering_report,ensure_ascii=False,indent=2)+'\n')
 print('Audio generation and transcript verification complete.',flush=True)

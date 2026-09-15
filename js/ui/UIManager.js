@@ -522,7 +522,7 @@ class UIManager {
             this.updateTerritoryBars();
         } else if (phase === CONSTANTS.PHASE_PLACEMENT) {
             if (this.audio) {
-                const isTense = this.gameState.scenario?.act === 4 || (this.gameState.scenario?.enemies?.length > 1);
+                const isTense = this.gameState.scenario?.act >= 4 || (this.gameState.scenario?.enemies?.length > 1);
                 this.audio.setSituation(isTense ? 'tension' : 'planning');
             }
             this.elGamePhaseDisplay.classList.replace('text-neon-cyan', 'text-mars-300');

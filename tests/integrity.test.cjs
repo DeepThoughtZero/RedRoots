@@ -22,6 +22,7 @@ const jsFiles = [
     'js/campaign/Act2.js',
     'js/campaign/Act3.js',
     'js/campaign/Act4.js',
+    'js/campaign/Act5.js',
     'js/campaign/ObjectiveSystem.js',
     'js/campaign/CampaignManager.js',
     'js/core/GameState.js',
@@ -64,6 +65,7 @@ const expectedScripts = [
     'js/campaign/Act2.js',
     'js/campaign/Act3.js',
     'js/campaign/Act4.js',
+    'js/campaign/Act5.js',
     'js/campaign/ObjectiveSystem.js',
     'js/campaign/CampaignManager.js',
     'js/core/GameState.js',
@@ -88,13 +90,14 @@ for (const file of [
     'js/campaign/Story.js',
     'js/campaign/Act2.js',
     'js/campaign/Act3.js',
-    'js/campaign/Act4.js'
+    'js/campaign/Act4.js',
+    'js/campaign/Act5.js'
 ]) {
     vm.runInContext(fs.readFileSync(file, 'utf8'), ctx);
 }
 const { CAMPAIGN_MISSIONS, CONSTANTS } = vm.runInContext('({CAMPAIGN_MISSIONS, CONSTANTS})', ctx);
 
-assert.ok(CAMPAIGN_MISSIONS.length >= 15, 'Mindestens 15 Kampagnenmissionen müssen deklariert sein');
+assert.equal(CAMPAIGN_MISSIONS.length, 25, 'Fünf Akte mit je fünf Kampagnenmissionen sind deklariert');
 
 const validObjectiveTypes = new Set([
     'survive', 'reachZone', 'race', 'territoryZone', 'territoryZones',
@@ -104,7 +107,7 @@ const validObjectiveTypes = new Set([
 
 CAMPAIGN_MISSIONS.forEach((m, idx) => {
     assert.ok(m.id, `Mission ${idx}: ID vorhanden`);
-    assert.ok([1, 2, 3, 4].includes(m.act), `Mission ${m.id}: Gültiger Akt 1, 2, 3 oder 4`);
+    assert.ok([1, 2, 3, 4, 5].includes(m.act), `Mission ${m.id}: Gültiger Akt 1 bis 5`);
     assert.ok(m.title, `Mission ${m.id}: Titel vorhanden`);
     assert.ok(m.briefing && m.briefing.length > 20, `Mission ${m.id}: Ausführliches Briefing vorhanden`);
     assert.ok(m.debriefing && m.debriefing.length > 20, `Mission ${m.id}: Ausführliches Debriefing vorhanden`);

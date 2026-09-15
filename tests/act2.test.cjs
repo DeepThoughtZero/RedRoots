@@ -1,6 +1,6 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const storage=new Map();const ctx=vm.createContext({console,setTimeout,requestAnimationFrame:()=>1,cancelAnimationFrame:()=>{},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}});
-for(const file of ['js/utils/Constants.js','js/core/AI.js','js/core/Grid.js','js/core/Territory.js','js/campaign/Missions.js','js/campaign/Story.js','js/campaign/Act2.js','js/campaign/Act3.js','js/campaign/Act4.js','js/campaign/ObjectiveSystem.js','js/campaign/CampaignManager.js','js/core/GameState.js'])vm.runInContext(fs.readFileSync(file,'utf8'),ctx);
+for(const file of ['js/utils/Constants.js','js/core/AI.js','js/core/Grid.js','js/core/Territory.js','js/campaign/Missions.js','js/campaign/Story.js','js/campaign/Act2.js','js/campaign/Act3.js','js/campaign/Act4.js','js/campaign/Act5.js','js/campaign/ObjectiveSystem.js','js/campaign/CampaignManager.js','js/core/GameState.js'])vm.runInContext(fs.readFileSync(file,'utf8'),ctx);
 const {GameState,MissionManager,CAMPAIGN_MISSIONS:missions,CONSTANTS:C,CampaignState,AI}=vm.runInContext('({GameState,MissionManager,CAMPAIGN_MISSIONS,CONSTANTS,CampaignState,AI})',ctx);
 function create(i){const s=new GameState(MissionManager.config(missions[i]));s.simSpeedMs=0;s.start();return s;}
 function place(s,key,r,c){assert.ok(s.scenario.patterns.includes(key), `${key} is available in ${s.scenario.id}`); assert.equal(s.placePattern(C.PATTERNS[key].pattern,r,c),true,`mission ${s.scenario.id}: ${key} at ${r},${c}`);}

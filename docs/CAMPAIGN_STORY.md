@@ -2,7 +2,7 @@
 
 ## Spielbarer Umfang
 
-Akt I–IV bestehen aus je fünf implementierten Missionen. Akt V ist ein Entwurf für die spätere Fortsetzung. Das freie Gefecht und die Sandbox bleiben unabhängige Startoptionen mit ihrer bisherigen Genbibliothek und ihren bisherigen Regeln. Die Kampagne folgt zunächst Haus Marineris.
+Akt I–V bestehen aus je fünf implementierten Missionen. Das freie Gefecht und die Sandbox bleiben unabhängige Startoptionen mit ihrer bisherigen Genbibliothek und ihren bisherigen Regeln. Die Kampagne folgt Haus Marineris.
 
 ## Prämisse
 
@@ -60,11 +60,17 @@ Der Sturm öffnet alte Wasserkanäle im Norden. Obwohl die Häuser Hilfe zusagen
 
 Das Ende löst die akute Sturmkrise. Gemeinsam gewartete Wasserleitungen versorgen die Siedlungen, während Pflanzenkolonien getrennt bleiben. Voss stellt die nächste Frage: Wer übernimmt dauerhaft Verantwortung? Es gibt keinen implementierten Entscheidungsbaum oder versteckte Belohnung für frühere politische Entscheidungen.
 
-## Akt V – Olympus (geplant)
+## Akt V – Das geteilte Netz (implementiert)
 
-Das in Akt III gerettete Netz unter Olympus muss nun weitere Regionen versorgen. Das geplante Finale überträgt die örtliche Lösung auf den Mars: Schutz mehrerer Habitate, Verbindungen für Menschen und voneinander getrennte stabile Pflanzenzonen. Der Spieler beweist mit den seit Mission 1 gelernten Mustern, dass ein begrenztes, verteiltes Netz tragfähig ist.
+Das in Akt III gerettete Netz unter Olympus muss nun weitere Regionen versorgen. Jede Mission bildet ein Großgefecht mit tausend Generationen pro Evolutionsphase und mehreren Phasen. Die örtliche Lösung wird auf den Mars übertragen: Habitate bleiben verbunden, Pflanzenzonen getrennt und regionale Reserven handlungsfähig.
 
-Anschließend zwei verantwortbare Entscheidungen: **Ein gemeinsames Mars-Konsortium** bündelt Wartung und Wasserquoten, verlangt aber die Abgabe hausinterner Kontrolle. **Freie lokale Genome** geben den Siedlungen Autonomie und veröffentlichen die Archive, verlangen jedoch langfristige Kooperation zur Erhaltung der Sperrkorridore. Kein Knopf macht den Mars augenblicklich grün. Der Epilog zeigt, wen wir gerettet haben und wem wir Verantwortung übertragen.
+21. **Tausend rote Morgen:** Zwei widersprüchliche Tharsis-Notfallrelais werden in Arcadia gesichert. Erst zweitausend Generationen beweisen, dass die Fernleitung nicht nur einen kurzen Sieg übersteht.
+22. **Drei Lichter im Krater:** Drei Habitate werden dreitausend Generationen gegen grüne und gelbe Fronten verteidigt. Viridion öffnet seine Archive und erkennt, dass lokale Freiheit gemeinsame Grenzen braucht.
+23. **Die offenen Tore:** Kesslers Wartungsstraße bleibt für Menschen offen, während drei biologische Sperrkorridore steril gehalten werden. Das vollständige PALISADE-Protokoll benennt zentrale, gleichzeitig ausgelöste Notfallpläne als Ursache der Katastrophe.
+24. **Kein Haus allein:** Vier regionale Wege werden am Hauptverteiler über drei lange Phasen stabilisiert. Die Häuser teilen ihre Wartungsschlüssel, ohne ihre politische Differenz vorzutäuschen.
+25. **Das Gedächtnis des Bodens:** Drei Netzknoten, ein Habitat und die gemeinsame Schutzzone müssen viertausend Generationen bestehen. Im Kern bleibt derselbe einfache Block erhalten, mit dem die Expedition begann.
+
+Anschließend stehen zwei verantwortbare Entscheidungen: **Ein gemeinsames Mars-Konsortium** bündelt Wartung und Wasserquoten, verlangt aber die Abgabe hausinterner Kontrolle. **Freie lokale Genome** geben den Siedlungen Autonomie und veröffentlichen die Archive, verlangen jedoch langfristige Kooperation zur Erhaltung der Sperrkorridore. Die Wahl wird im Kampagnenstand gespeichert; keine Option macht den Mars augenblicklich grün.
 
 Letzte Aufzeichnung Kesslers: „Die Flora erinnert sich an nichts. Aber jede Generation erbt die Folgen der vorherigen. Das ist genug.“ Letzte Szene: ein Block aus vier Zellen, wie bei der Landung – diesmal in einer gemeinsam erhaltenen Schutzzone.
 

@@ -1,6 +1,6 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const storage=new Map(),ctx=vm.createContext({console:{log(){},warn:console.warn},setTimeout:fn=>{queueMicrotask(fn);return 1},requestAnimationFrame:()=>1,cancelAnimationFrame(){},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}});
-for(const f of ['utils/Constants','core/Grid','core/Territory','core/AI','campaign/Missions','campaign/Story','campaign/Act2','campaign/Act3','campaign/Act4','campaign/ObjectiveSystem','campaign/CampaignManager','core/GameState'])vm.runInContext(fs.readFileSync('js/'+f+'.js','utf8'),ctx);
+for(const f of ['utils/Constants','core/Grid','core/Territory','core/AI','campaign/Missions','campaign/Story','campaign/Act2','campaign/Act3','campaign/Act4','campaign/Act5','campaign/ObjectiveSystem','campaign/CampaignManager','core/GameState'])vm.runInContext(fs.readFileSync('js/'+f+'.js','utf8'),ctx);
 const {GameState,MissionManager,missions,C,CampaignState,AI}=vm.runInContext('({GameState,MissionManager,missions:CAMPAIGN_MISSIONS,C:CONSTANTS,CampaignState,AI})',ctx);
 function create(i,seed=12345){vm.runInContext(`Math.random=(()=>{let x=${seed};return()=>((x=(1664525*x+1013904223)>>>0)/4294967296)})()`,ctx);const s=new GameState(MissionManager.config(missions[i]));s.simSpeedMs=0;s.start();s.nextPlayerTurn=()=>{};return s;}
 function place(s,k,r,c){assert.ok(s.scenario.patterns.includes(k));s.currentPlayer=0;assert.equal(s.placePattern(C.PATTERNS[k].pattern,r,c),true,`${s.scenario.id}: ${k} ${r},${c}`);}
