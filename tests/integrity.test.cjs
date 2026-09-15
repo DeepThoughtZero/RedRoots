@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
 const { execSync } = require('node:child_process');
 
 console.log('--- Ebene 1: Statische Integrität & Hygiene ---');
@@ -148,9 +149,29 @@ CAMPAIGN_MISSIONS.forEach((m, idx) => {
         }
     }
 });
-console.log(`✓ Alle 15 Kampagnenmissionen und Zonen sind syntaktisch und geometrisch valide.`);
+console.log(`✓ Alle ${CAMPAIGN_MISSIONS.length} Kampagnenmissionen und Zonen sind syntaktisch und geometrisch valide.`);
 
-// 4. Audio-Manifest Konsistenz
+// 4. Jede Mission braucht eine eigene registrierte Bilddatei mit eigenem Inhalt.
+const missionImageManifest = JSON.parse(fs.readFileSync('assets/missions/manifest.json', 'utf8'));
+const imageManifestById = new Map(missionImageManifest.images.map(entry => [entry.id, entry]));
+const imageKeys = CAMPAIGN_MISSIONS.map(mission => mission.image || mission.id);
+assert.equal(new Set(imageKeys).size, CAMPAIGN_MISSIONS.length,
+    'Jede Mission muss auf eine andere Bild-ID verweisen');
+
+const imageHashes = [];
+for (const mission of CAMPAIGN_MISSIONS) {
+    const imageKey = mission.image || mission.id;
+    const manifestEntry = imageManifestById.get(imageKey);
+    assert.ok(manifestEntry, `Mission ${mission.id}: Bild ${imageKey} ist im Manifest registriert`);
+    const imagePath = path.join('assets/missions', manifestEntry.file);
+    assert.ok(fs.existsSync(imagePath), `Mission ${mission.id}: Bilddatei ${imagePath} existiert`);
+    imageHashes.push(crypto.createHash('sha256').update(fs.readFileSync(imagePath)).digest('hex'));
+}
+assert.equal(new Set(imageHashes).size, CAMPAIGN_MISSIONS.length,
+    'Jede Mission muss eine Bilddatei mit eindeutigem Inhalt verwenden');
+console.log(`✓ Alle ${CAMPAIGN_MISSIONS.length} Missionsbilder sind zugeordnet, vorhanden und inhaltlich eindeutig.`);
+
+// 5. Audio-Manifest Konsistenz
 if (fs.existsSync('assets/audio/manifest.json')) {
     const audioManifest = JSON.parse(fs.readFileSync('assets/audio/manifest.json', 'utf8'));
     assert.ok(Array.isArray(audioManifest), 'assets/audio/manifest.json ist ein Array');
@@ -162,7 +183,7 @@ if (fs.existsSync('assets/audio/manifest.json')) {
     console.log(`✓ Audio-Manifest geprüft (${audioManifest.length} registrierte Audio-Einträge).`);
 }
 
-// 5. Git-Patch-Hygiene (Whitespace-Check)
+// 6. Git-Patch-Hygiene (Whitespace-Check)
 try {
     execSync('git diff --check', { stdio: 'pipe' });
     console.log('✓ Git-Patch-Hygiene: Keine Whitespace-Fehler oder Konfliktmarker.');

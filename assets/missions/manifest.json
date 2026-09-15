@@ -76,6 +76,41 @@
       "prompt": "Use case: stylized-concept. Asset type: wide landscape mission illustration for RedRoots strategy game. Match the provided existing game artwork as STYLE REFERENCE ONLY: richly detailed cinematic realistic science-fiction concept art, weathered dark industrial habitats, layered rust-red Martian geology, tangible waxy succulent and branching lattice flora with restrained bioluminescence, atmospheric depth, dramatic cyan versus warm copper lighting. Create a NEW unique landscape scene. Wide 16:9 composition, strong readable central subject at small banner size. No text, no letters, no UI, no watermark, no logos, no fantasy creatures. Humans if any are tiny fully helmeted explorers. Epic hopeful Mars panorama of two separate cyan living pump gardens glowing on rocky islands with a barren protective corridor between them; cyan and magenta settlement lights safely shining in the distance, pale wild flora beyond the perimeter, storm clearing at sunrise. No large planets in sky."
     },
     {
+      "id": "A3_M01",
+      "title": "Drei Schlüssel im Staub",
+      "file": "A3_M01.webp",
+      "source": "exec-68c20104-aac5-4425-87d8-791a549c871b.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Realistic cinematic science fiction beneath Olympus with weathered access infrastructure and restrained cyan bioluminescent flora. Scene: three physically distinct buried biological lock chambers recede through the landscape in a clear sequence, approached by separate living tendrils at staggered distances. No text, labels, UI, logos, watermark, guns, fantasy creatures, or large planets."
+    },
+    {
+      "id": "A3_M02",
+      "title": "Die Kunst zu verschwinden",
+      "file": "A3_M02.webp",
+      "source": "exec-9d19c589-44ec-47ae-b3e7-ea7fa22cfbae.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Realistic cinematic science fiction inside a sealed sterile volcanic test chamber. Scene: a fragile sparse cyan colony thins into drifting motes toward a completely empty far end, cold laboratory lighting and impermanence. No readable displays, text, labels, UI, logos, watermark, guns, or fantasy creatures."
+    },
+    {
+      "id": "A3_M03",
+      "title": "Zwei Fronten, kein Rückweg",
+      "file": "A3_M03.webp",
+      "source": "exec-42d52d33-4b64-4d21-86e9-16acce34d338.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Realistic cinematic science fiction in a wide underground Olympus transit cavern. Scene: two parallel evacuation tunnels each end at a separate rescue shuttle and pressure door; two pale wild growth fronts meet cyan defensive colonies. No resemblance to an outdoor single-shuttle landing pad, text, UI, logos, watermark, guns, or fantasy creatures."
+    },
+    {
+      "id": "A3_M04",
+      "title": "Die versiegelte Wahrheit",
+      "file": "A3_M04.webp",
+      "source": "exec-cbce2b26-c31b-4a5f-bcb6-86cb8a6f31af.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Realistic cinematic science fiction at a fortified subterranean archive. Scene: three separate glowing data monoliths guarded by yellow Tharsis flora, with a stark completely barren red quarantine trench and controlled cyan approach routes. No readable symbols, text, UI, logos, watermark, guns, or fantasy creatures."
+    },
+    {
+      "id": "A3_M05",
+      "title": "Das stille Netz",
+      "file": "A3_M05.webp",
+      "source": "exec-4841cbb1-a706-47e8-bc03-349be1fa50da.png",
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Realistic cinematic science fiction in the colossal heart of the Olympus protection system. Scene: three isolated relay towers with stable cyan living islands and a perfectly empty dark-red separation corridor; the central machinery powers down while distant water conduits remain lit. No text, UI, logos, watermark, guns, or fantasy creatures."
+    },
+    {
       "id": "A4_M01",
       "file": "A4_M01.webp",
       "source": "exec-d9918567-a3e2-4cff-8610-4319c5f03574.png",

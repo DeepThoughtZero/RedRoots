@@ -151,7 +151,7 @@ Die Missionen aller drei Akte verwenden unterschiedliche Klangkulissen: Landewin
 
 ### Missionsbilder
 
-Die fünfzehn Missionen von Akt I, II und IV besitzen eigene Illustrationen im Stil der bisherigen Mars- und Häuserbilder. Im Briefing lässt sich das Motiv in voller Größe öffnen. Die WebP-Dateien liegen in `assets/missions/`; `manifest.json` dokumentiert die integrierte Bildgenerierung, Stilreferenzen und vollständigen Prompts. Die Bilder illustrieren die Geschichte, nicht den exakten Aufbau des taktischen Spielfelds.
+Alle 25 Missionen besitzen eigene Illustrationen im Stil der bisherigen Mars- und Häuserbilder. Im Briefing lässt sich das Motiv in voller Größe öffnen. Die WebP-Dateien liegen in `assets/missions/`; `manifest.json` dokumentiert die integrierte Bildgenerierung, Stilreferenzen und vollständigen Prompts. Der Integritätstest prüft eindeutige Zuordnungen und Dateiinhalte. Die Bilder illustrieren die Geschichte, nicht den exakten Aufbau des taktischen Spielfelds.
 
 ### Langsamere Genom-Forschung
 
