@@ -102,7 +102,8 @@ class GameRenderer {
         this.ctx.translate(this.camera.x, this.camera.y);
         this.ctx.scale(this.camera.zoom, this.camera.zoom);
 
-        // 1. Draw Territories (Background colors)
+        // 0. Board slab, 1. Territories (background colours)
+        this.drawBoardBase();
         this.drawTerritories();
 
         // 2. Draw Grid Lines
@@ -277,19 +278,47 @@ class GameRenderer {
         ctx.restore();
     }
 
+    // The board is a distinct slab with a soft drop shadow and corner marks, so its edge stays visible at any zoom.
+    drawBoardBase() {
+        const ctx = this.ctx, w = this.gameState.cols * this.cellSize, h = this.gameState.rows * this.cellSize;
+        const px = this.dpr / this.camera.zoom;
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,.6)';
+        ctx.shadowBlur = 28 * this.dpr;
+        ctx.fillStyle = '#0a1014';
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+        ctx.save();
+        ctx.strokeStyle = 'rgba(214,236,230,.16)';
+        ctx.lineWidth = px;
+        ctx.strokeRect(0, 0, w, h);
+        const arm = 14 * px, gap = 5 * px;
+        ctx.strokeStyle = 'rgba(127,232,208,.55)';
+        ctx.lineWidth = 2 * px;
+        ctx.beginPath();
+        for (const [x, y, dx, dy] of [[-gap, -gap, 1, 1], [w + gap, -gap, -1, 1], [-gap, h + gap, 1, -1], [w + gap, h + gap, -1, -1]]) {
+            ctx.moveTo(x, y + dy * arm); ctx.lineTo(x, y); ctx.lineTo(x + dx * arm, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    // Territory tint, batched into one path per owner (no seams, one fill per colour).
     drawTerritories() {
+        const territory = this.gameState.territory, size = this.cellSize, paths = new Map();
         for (let r = 0; r < this.gameState.rows; r++) {
             for (let c = 0; c < this.gameState.cols; c++) {
-                const owner = this.gameState.territory.getOwnerAt(r, c);
-                if (owner !== null && owner !== CONSTANTS.OWNER_NEUTRAL) {
-                    this.ctx.fillStyle = CONSTANTS.PLAYER_COLORS[owner].bg;
-                    this.ctx.fillRect(c * this.cellSize, r * this.cellSize, this.cellSize, this.cellSize);
-                } else if (owner === CONSTANTS.OWNER_NEUTRAL) {
-                    // Niemandsland
-                    this.ctx.fillStyle = 'rgba(100, 100, 100, 0.1)';
-                    this.ctx.fillRect(c * this.cellSize, r * this.cellSize, this.cellSize, this.cellSize);
-                }
+                const owner = territory.getOwnerAt(r, c);
+                if (owner === null) continue;
+                let path = paths.get(owner);
+                if (!path) paths.set(owner, path = new Path2D());
+                path.rect(c * size, r * size, size, size);
             }
+        }
+        for (const [owner, path] of paths) {
+            // Contested land (Niemandsland) stays a faint grey.
+            this.ctx.fillStyle = owner === CONSTANTS.OWNER_NEUTRAL ? 'rgba(100, 100, 100, 0.1)' : CONSTANTS.PLAYER_COLORS[owner].bg;
+            this.ctx.fill(path);
         }
     }
 
@@ -349,62 +378,53 @@ class GameRenderer {
         }
     }
 
+    // Living cells are batched per owner: one fill (and one glow) per colour instead of one per cell.
     drawCells() {
-        // Performance: Disable expensive shadow blur during simulation phase
+        // Performance: no glow during the simulation phase
         const isSim = this.gameState.phase === CONSTANTS.PHASE_SIMULATION;
         const gridOwners = this.gameState.grid.owners;
         const gridIsOld = this.gameState.grid.isOldFlags;
-        const cols = this.gameState.cols;
+        const cols = this.gameState.cols, size = this.cellSize, ctx = this.ctx;
+        const cellPx = size * this.camera.zoom / this.dpr;
+        const round = cellPx >= 6 && typeof Path2D !== 'undefined' && !!Path2D.prototype.roundRect;
+        const margin = cellPx >= 4 ? 1 : .5, s = size - 2 * margin, radius = s * .24;
+        const paths = new Map(), oldCells = new Path2D(), rockCores = new Path2D();
+        const add = (path, x, y, w) => round ? path.roundRect(x, y, w, w, radius) : path.rect(x, y, w, w);
 
-        for (let r = 0; r < this.gameState.rows; r++) {
-            for (let c = 0; c < this.gameState.cols; c++) {
-                const idx = r * cols + c;
-                const owner = gridOwners[idx];
-                if (owner !== 0) { // OWNER_NONE = 0
-                    let color, shadowColor;
-                    if (owner === CONSTANTS.OWNER_ROCK) {
-                        color = '#6b7280';
-                        shadowColor = 'rgba(0,0,0,0.5)';
-                    } else if (owner === CONSTANTS.OWNER_NEUTRAL) {
-                        color = CONSTANTS.NEUTRAL_COLOR;
-                        shadowColor = 'rgba(255,255,255,0.2)';
-                    } else {
-                        // Player grid owner (1-4) → PLAYER_COLORS index (0-3)
-                        const pIdx = owner - 1;
-                        color = CONSTANTS.PLAYER_COLORS[pIdx].main;
-                        shadowColor = CONSTANTS.PLAYER_COLORS[pIdx].shadow;
-                    }
-                    
-                    this.ctx.fillStyle = color;
-                    if (isSim) {
-                        this.ctx.shadowBlur = 0;
-                    } else {
-                        this.ctx.shadowColor = shadowColor;
-                        this.ctx.shadowBlur = (owner === CONSTANTS.OWNER_ROCK ? 2 : 10) * this.dpr;
-                    }
-                    
-                    const margin = 1;
-                    const x = c * this.cellSize + margin;
-                    const y = r * this.cellSize + margin;
-                    const s = this.cellSize - 2 * margin;
-
-                    this.ctx.fillRect(x, y, s, s);
-
-                    this.ctx.shadowBlur = 0;
-
-                    if (owner === CONSTANTS.OWNER_ROCK) {
-                        this.ctx.fillStyle = '#4b5563';
-                        this.ctx.fillRect(c * this.cellSize + 3, r * this.cellSize + 3, this.cellSize - 6, this.cellSize - 6);
-                    } else if (gridIsOld[idx] && !isSim) {
-                        this.ctx.strokeStyle = '#ffffff';
-                        this.ctx.lineWidth = 2;
-                        this.ctx.strokeRect(x, y, s, s);
-                    }
-                    
-                    this.ctx.shadowBlur = 0;
-                }
-            }
+        for (let idx = 0; idx < gridOwners.length; idx++) {
+            const owner = gridOwners[idx];
+            if (owner === 0) continue; // OWNER_NONE
+            const c = idx % cols, r = (idx - c) / cols;
+            const x = c * size + margin, y = r * size + margin;
+            let path = paths.get(owner);
+            if (!path) paths.set(owner, path = new Path2D());
+            add(path, x, y, s);
+            if (owner === CONSTANTS.OWNER_ROCK) rockCores.rect(c * size + 3, r * size + 3, size - 6, size - 6);
+            else if (gridIsOld[idx] && !isSim) add(oldCells, x, y, s);
         }
+
+        for (const [owner, path] of paths) {
+            let color, shadowColor;
+            if (owner === CONSTANTS.OWNER_ROCK) {
+                color = '#646c78';
+                shadowColor = null;
+            } else if (owner === CONSTANTS.OWNER_NEUTRAL) {
+                color = CONSTANTS.NEUTRAL_COLOR;
+                shadowColor = 'rgba(255,255,255,0.2)';
+            } else {
+                // Player grid owner (1-4) → PLAYER_COLORS index (0-3)
+                color = CONSTANTS.PLAYER_COLORS[owner - 1].main;
+                shadowColor = CONSTANTS.PLAYER_COLORS[owner - 1].shadow;
+            }
+            ctx.save();
+            ctx.fillStyle = color;
+            if (!isSim && shadowColor) { ctx.shadowColor = shadowColor; ctx.shadowBlur = 10 * this.dpr; }
+            ctx.fill(path);
+            ctx.restore();
+        }
+        if (paths.has(CONSTANTS.OWNER_ROCK)) { ctx.fillStyle = '#454d59'; ctx.fill(rockCores); }
+        // Cells from earlier rounds cannot be erased; a white outline marks them while planning.
+        if (!isSim) { ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1.6; ctx.stroke(oldCells); }
     }
 
     drawHoverPreview(inputHandler) {
