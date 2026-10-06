@@ -3,410 +3,297 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>RedRoots - Mars Game of Life</title>
-    <!-- Tailwind CSS for rapid UI development -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        mars: {
-                            900: '#2A0A0A',
-                            800: '#4A1515',
-                            700: '#7A2222',
-                            500: '#B23A3A',
-                            300: '#E86A6A'
-                        },
-                        neon: {
-                            cyan: '#00FFFF',
-                            green: '#39FF14',
-                            pink: '#FF00FF',
-                            yellow: '#FFFF00'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@500&display=swap"
-        rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>RedRoots – Conways Spiel des Lebens auf dem Mars</title>
+    <meta name="description" content="RedRoots ist ein rundenbasiertes Strategiespiel nach Conways Spiel des Lebens auf dem Mars – mit Kampagne, freiem Gefecht und Sandbox.">
+    <meta name="theme-color" content="#091016">
+    <meta name="color-scheme" content="dark">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25' r='75%25'%3E%3Cstop offset='0' stop-color='%23f6a57c'/%3E%3Cstop offset='.55' stop-color='%23c4512f'/%3E%3Cstop offset='1' stop-color='%233a1510'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='15' fill='url(%23g)'/%3E%3Cg fill='%237fe8d0'%3E%3Crect x='14' y='8' width='4' height='4' rx='1'/%3E%3Crect x='19' y='13' width='4' height='4' rx='1'/%3E%3Crect x='9' y='18' width='4' height='4' rx='1'/%3E%3Crect x='14' y='18' width='4' height='4' rx='1'/%3E%3Crect x='19' y='18' width='4' height='4' rx='1'/%3E%3C/g%3E%3C/svg%3E">
+    <link rel="preload" href="assets/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/space-grotesk-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="bg-gray-900 text-gray-100 overflow-hidden font-sans select-none">
+<body>
+    <svg width="0" height="0" class="icon-sprite" aria-hidden="true" focusable="false">
+        <defs>
+            <radialGradient id="brandMarsGradient" cx="35%" cy="30%" r="75%">
+                <stop offset="0" stop-color="#f6a57c" />
+                <stop offset=".55" stop-color="#c4512f" />
+                <stop offset="1" stop-color="#3a1510" />
+            </radialGradient>
+        </defs>
+        <symbol id="i-brand" viewBox="0 0 32 32">
+            <circle cx="16" cy="16" r="15" fill="url(#brandMarsGradient)" />
+            <g fill="#7fe8d0"><rect x="14" y="8" width="4" height="4" rx="1" /><rect x="19" y="13" width="4" height="4" rx="1" /><rect x="9" y="18" width="4" height="4" rx="1" /><rect x="14" y="18" width="4" height="4" rx="1" /><rect x="19" y="18" width="4" height="4" rx="1" /></g>
+        </symbol>
+        <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6" /><path d="M12 17h.01" /></symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
+        <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></symbol>
+        <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 15 4 10l5-5" /><path d="M4 10h10a6 6 0 0 1 0 12h-3" /></symbol>
+        <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7" /><path d="M20 4v5h-5" /></symbol>
+        <symbol id="i-eraser" viewBox="0 0 24 24"><path d="m7 21-4-4a2 2 0 0 1 0-2.8L13.2 4a2 2 0 0 1 2.8 0l4 4a2 2 0 0 1 0 2.8L10 21Z" /><path d="M21 21H7M8 9l7 7" /></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+        <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" /></symbol>
+        <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></symbol>
+        <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></symbol>
+        <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
+        <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6" /></symbol>
+        <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></symbol>
+        <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5Z" /></symbol>
+        <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" /></symbol>
+        <symbol id="i-exit" viewBox="0 0 24 24"><path d="M14 4h5v16h-5" /><path d="M10 16l-4-4 4-4M6 12h10" /></symbol>
+        <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5Z" /><path d="M9 4v13M15 6.5v13" /></symbol>
+    </svg>
 
-    <!-- Background Effect -->
-    <div class="fixed inset-0 z-[-1] mars-bg-gradient"></div>
-    <div class="fixed inset-0 z-[-1] stars-bg opacity-30"></div>
+    <div class="app-backdrop" aria-hidden="true"></div>
 
-    <!-- Main Application Container -->
-    <div id="app" class="relative w-full h-[100dvh] flex flex-col">
+    <!-- Start: exactly three explained modes; house configuration only after choosing the free skirmish. -->
+    <div id="startMenu" class="start-screen">
+        <div class="start-art" aria-hidden="true">
+            <img id="setupHeaderImage" src="assets/ui/mars-overview-01.webp" alt="" width="1408" height="768" decoding="async">
+        </div>
+        <div class="start-shell">
+            <header class="start-top">
+                <span class="brand brand--large"><svg class="brand-mark" aria-hidden="true"><use href="#i-brand" /></svg><span class="brand-word">Red<b>Roots</b></span></span>
+                <button id="btnShowBriefing" class="btn btn-ghost" type="button"><svg class="icon" aria-hidden="true"><use href="#i-help" /></svg><span>Spielregeln</span></button>
+            </header>
 
-        <!-- Top Bar: Game Info -->
-        <header
-            class="h-16 glass-panel border-b border-mars-800 flex items-center justify-between px-6 z-10 flex-shrink-0">
-            <div class="flex items-center gap-4">
-                <h1
-                    class="text-2xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400">
-                    REDROOTS
-                </h1>
-                <span id="gamePhaseDisplay"
-                    class="min-w-[200px] text-center tabular-nums px-3 py-1 bg-mars-800 rounded-full text-xs font-bold uppercase tracking-widest text-mars-300 shadow-inner">
-                    Setup
-                </span>
-                <div class="hidden flex items-center gap-2" id="simSpeedContainer">
-                    <span class="text-xs text-mars-300 uppercase tracking-widest font-bold">Tempo</span>
-                    <input type="range" id="simSpeed" min="1" max="100" value="50" class="w-24">
+            <section id="modeSelection" class="start-section" aria-labelledby="modeTitle">
+                <p class="eyebrow">Conways Spiel des Lebens · Mars 2148</p>
+                <h1 id="modeTitle" class="start-title">Wie möchtest du spielen?</h1>
+                <p class="start-lead">Wähle einen Spielmodus. Für den Einstieg empfehlen wir die Kampagne.</p>
+                <div class="mode-cards">
+                    <button id="btnCampaign" class="mode-card mode-card--featured" type="button">
+                        <span class="mode-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path class="mi-route" d="M8 38c6-2 8-10 15-12s12 2 17-10" /><circle class="mi-node mi-done" cx="8" cy="38" r="4" /><circle class="mi-node mi-done" cx="23" cy="26" r="4" /><circle class="mi-node mi-next" cx="40" cy="16" r="5" /></svg></span>
+                        <small class="mode-eyebrow">Empfohlen zum Einstieg</small>
+                        <strong class="mode-title">Kampagne</strong>
+                        <span class="mode-desc">Entdecke den Mars in fünf Akten. Lerne Schritt für Schritt und folge der Geschichte.</span>
+                        <span id="campaignProgressLine" class="mode-progress" hidden></span>
+                        <b class="mode-cta">Zur Marskarte <span aria-hidden="true">→</span></b>
+                    </button>
+                    <button id="btnChooseSkirmish" class="mode-card" type="button">
+                        <span class="mode-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="6" y="6" width="15" height="15" rx="3" fill="#00ffff" opacity=".85" /><rect x="27" y="6" width="15" height="15" rx="3" fill="#ff00ff" opacity=".85" /><rect x="6" y="27" width="15" height="15" rx="3" fill="#39ff14" opacity=".85" /><rect x="27" y="27" width="15" height="15" rx="3" fill="#ffff00" opacity=".85" /></svg></span>
+                        <small class="mode-eyebrow">Der klassische Modus</small>
+                        <strong class="mode-title">Freies Gefecht</strong>
+                        <span class="mode-desc">Kämpfe gegen Computer oder Freunde am selben Gerät. Alle Muster sind verfügbar.</span>
+                        <b class="mode-cta">Gefecht vorbereiten <span aria-hidden="true">→</span></b>
+                    </button>
+                    <button id="btnStartSandbox" class="mode-card" type="button">
+                        <span class="mode-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><g class="mi-grid"><path d="M6 6h36v36H6zM18 6v36M30 6v36M6 18h36M6 30h36" /></g><g class="mi-cells"><rect x="19" y="7" width="10" height="10" rx="2" /><rect x="31" y="19" width="10" height="10" rx="2" /><rect x="7" y="31" width="10" height="10" rx="2" /><rect x="19" y="31" width="10" height="10" rx="2" /><rect x="31" y="31" width="10" height="10" rx="2" /></g></svg></span>
+                        <small class="mode-eyebrow">Ohne Gegner und Limits</small>
+                        <strong class="mode-title">Sandbox</strong>
+                        <span class="mode-desc">Experimentiere mit lebenden Mustern. Kein Budgetlimit, kein Missionsziel.</span>
+                        <b class="mode-cta">Ausprobieren <span aria-hidden="true">→</span></b>
+                    </button>
                 </div>
+                <p class="rotate-hint">Zum Spielen drehe dein Gerät ins Querformat.</p>
+            </section>
+
+            <section id="skirmishSetup" class="start-section" aria-labelledby="setupTitle" hidden>
+                <button id="btnBackModes" class="btn btn-ghost back-link" type="button"><svg class="icon" aria-hidden="true"><use href="#i-arrow-left" /></svg><span>Spielmodus wählen</span></button>
+                <p class="eyebrow">Der klassische Modus</p>
+                <h1 id="setupTitle" class="start-title setup-title">Freies Gefecht</h1>
+                <p class="start-lead"><strong>Wer spielt welches Haus?</strong> Wähle für jedes Haus „Mensch“ oder „Computer“. Mehrere Menschen spielen abwechselnd an diesem Gerät.</p>
+
+                <div id="humanHousesContainer" class="house-grid">
+                    <!-- Populated dynamically: one card per house with a Mensch / Computer switch -->
+                </div>
+                <p id="houseSummary" class="house-summary" role="status" aria-live="polite"></p>
+
+                <!-- Developer settings (five clicks on the title) -->
+                <div id="devSettings" class="dev-settings hidden">
+                    <h2 class="dev-title">Entwicklermodus</h2>
+                    <div class="dev-grid">
+                        <label class="field"><span>Kartengröße</span>
+                            <select id="cfgMapSize">
+                                <option value="small">Klein (60x40)</option>
+                                <option value="medium">Mittel (100x60)</option>
+                                <option value="large">Groß (140x80)</option>
+                                <option value="xlarge" selected>Extra Groß (180x100)</option>
+                                <option value="xxlarge">Super Groß (240x140)</option>
+                            </select>
+                        </label>
+                        <label class="field"><span>Anzahl Runden</span><input type="number" id="cfgRounds" value="7" min="1" max="50"></label>
+                        <label class="field"><span>Gebiets-Radius (Zellen)</span><input type="number" id="cfgRadius" value="5" min="1" max="15"></label>
+                        <label class="field"><span>Budget-Faktor</span><input type="number" id="cfgBudgetFactor" value="100" min="1" max="500"></label>
+                        <label class="field"><span>Evolutionsschritte</span><input type="number" id="cfgSteps" value="1000" min="100" max="10000" step="100"></label>
+                        <label class="field"><span>Gebirge <output id="valRocks">0</output></span><input type="range" id="cfgRocks" value="0" min="0" max="1000" step="10"></label>
+                        <label class="check"><input type="checkbox" id="cfgDojoMode"><span>Dojo Modus (AI vs AI)</span></label>
+                        <label id="batchModeContainer" class="check hidden"><input type="checkbox" id="cfgBatchMode"><span>Batch-Evolution (Auto-Restart)</span></label>
+                    </div>
+                </div>
+
+                <div class="setup-footer">
+                    <p class="mode-description">Klassischer Modus · Alle Genome · Zufallskarte · Bis zu vier Häuser</p>
+                    <button id="btnStartGame" class="btn btn-mars btn-lg" type="button"><span>Gefecht starten</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right" /></svg></button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Game shell: header, docked mission HUD, board and tool panel never cover each other. -->
+    <div id="app" class="app">
+        <header class="topbar" id="topbar">
+            <a class="brand" href="index.html" aria-label="RedRoots – zur Modusauswahl"><svg class="brand-mark" aria-hidden="true"><use href="#i-brand" /></svg><span class="brand-word">Red<b>Roots</b></span></a>
+            <span id="gamePhaseDisplay" class="phase-chip" data-phase="setup">Setup</span>
+
+            <div id="topStats" class="top-stats" hidden>
+                <div class="stat stat-round"><span class="stat-label">Runde</span><span id="roundDisplay" class="stat-value">1 / 10</span></div>
+                <div class="stat stat-turn"><span class="turn-dot" aria-hidden="true"></span><span id="currentPlayerDisplay">Warten auf Befehl …</span></div>
             </div>
 
-            <!-- Territory Bars -->
-            <div id="territoryBarContainer" class="hidden flex-1 mx-8 flex flex-col justify-center">
-                <div class="text-[10px] text-gray-400 uppercase tracking-widest mb-1 text-center font-bold">
-                    Gebietskontrolle</div>
-                <div id="territoryBars"
-                    class="w-full h-3 bg-black/50 rounded-full overflow-hidden flex shadow-inner border border-white/10">
-                </div>
+            <div id="territoryBarContainer" class="territory" hidden>
+                <span class="territory-label">Gebiet</span>
+                <div id="territoryBars" class="territory-bar" role="img" aria-label="Gebietskontrolle der Häuser"></div>
             </div>
 
-            <div id="topStats" class="hidden flex items-center gap-6">
-                <div class="flex flex-col items-center">
-                    <span class="text-xs text-gray-400 uppercase tracking-wide">Runde</span>
-                    <span id="roundDisplay" class="font-mono text-lg font-bold text-white">1 / 10</span>
-                </div>
-                <div class="w-px h-8 bg-gray-700"></div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs text-gray-400 uppercase tracking-wide">Status:</span>
-                    <span id="currentPlayerDisplay" class="font-bold text-lg drop-shadow-md">Warten auf Befehl...</span>
-                </div>
-            </div>
-
-            <div class="flex gap-4 items-center">
-                <button id="btnHelp" class="text-gray-400 hover:text-white transition-colors" title="Anleitung & Story">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </button>
-                <button id="btnSettings" class="text-gray-400 hover:text-white transition-colors"
-                    title="Spiel abbrechen">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </button>
+            <div class="topbar-actions">
+                <button id="btnHelp" class="btn btn-icon btn-ghost" type="button" title="Spielregeln" aria-label="Spielregeln"><svg class="icon" aria-hidden="true"><use href="#i-help" /></svg></button>
+                <button id="btnSettings" class="btn btn-ghost btn-menu" type="button" title="Menü: Ton, Simulation, Mission abbrechen" aria-label="Menü öffnen" aria-haspopup="dialog" hidden><svg class="icon" aria-hidden="true"><use href="#i-menu" /></svg><span class="btn-menu-label">Menü</span></button>
             </div>
         </header>
 
-        <!-- Main Content Area -->
-        <main class="flex-1 relative flex overflow-hidden">
-
-            <!-- Start Menu Overlay (visible initially) -->
-            <div id="startMenu"
-                class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
-                <div
-                    class="glass-panel w-full max-w-2xl p-0 rounded-2xl shadow-2xl border border-white/10 max-h-[90dvh] overflow-y-auto flex flex-col">
-                    
-                    <!-- Header Image -->
-                    <div class="relative h-32 w-full overflow-hidden rounded-t-2xl border-b border-white/10">
-                        <img id="setupHeaderImage" src="assets/Mars_Overview01.png" alt="Mars Overview" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
-                        <button id="btnShowBriefing" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-mars-800/80 hover:bg-mars-700 flex items-center justify-center text-white text-xl font-bold border border-white/20 shadow-lg transition-transform hover:scale-110" title="Kommando-Briefing">
-                            ?
-                        </button>
-                    </div>
-
-                    <div class="p-6 sm:p-8">
-                        <section id="modeSelection">
-                            <h2>Wie möchtest du spielen?</h2><p>Wähle einen Spielmodus. Für den Einstieg empfehlen wir die Kampagne.</p>
-                            <div class="mode-cards">
-                                <button id="btnCampaign" class="mode-card"><small>EMPFOHLEN ZUM EINSTIEG</small><strong>Kampagne</strong><span>Entdecke den Mars in fünf Akten. Lerne Schritt für Schritt und folge der Geschichte.</span><b>Zur Marskarte →</b></button>
-                                <button id="btnChooseSkirmish" class="mode-card"><small>DER KLASSISCHE MODUS</small><strong>Freies Gefecht</strong><span>Kämpfe gegen Computer oder Freunde am selben Gerät. Alle Muster sind verfügbar.</span><b>Gefecht vorbereiten →</b></button>
-                                <button id="btnStartSandbox" class="mode-card"><small>OHNE GEGNER UND LIMITS</small><strong>Sandbox</strong><span>Experimentiere mit lebenden Mustern. Kein Budgetlimit, kein Missionsziel.</span><b>Ausprobieren →</b></button>
-                            </div>
-                        </section>
-                        <section id="skirmishSetup" hidden><button id="btnBackModes" class="quiet-button">← Spielmodus wählen</button>
-                        <h2 id="setupTitle" class="text-3xl font-bold mb-6 text-center text-white cursor-pointer select-none hover:text-mars-300 transition-colors">
-                            Freies Gefecht
-                        </h2>
-
-                        <div class="flex flex-col items-center">
-                            <!-- Main Settings (Always visible) -->
-                            <div class="w-full space-y-6 text-center">
-                                <div>
-                                    <h3 class="text-xl font-bold text-mars-300 border-b border-mars-800 pb-2 mb-4">Wer spielt welches Haus?</h3>
-                                    <label class="block text-base text-gray-300 mb-2">Wähle für jedes Haus „Mensch“ oder „Computer“. Mehrere Menschen spielen abwechselnd an diesem Gerät.</label>
-
-                                </div>
-                                
-                                <!-- Dynamic House Selection -->
-                                <div id="humanHousesContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl bg-black/40 border border-white/5 w-full">
-                                    <!-- Populated dynamically with toggleable houses -->
-                                </div>
-                            </div>
-
-                            <!-- Developer Settings (Hidden by default) -->
-                            <div id="devSettings" class="hidden w-full mt-8 p-6 rounded-xl bg-orange-950/10 border border-orange-500/20 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <h3 class="text-lg font-semibold text-orange-400 border-b border-orange-900/50 pb-2 mb-4">Entwicklermodus</h3>
-                                
-                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-left">
-                                    <div>
-                                        <label class="block text-sm text-gray-400 mb-1">Kartengröße</label>
-                                        <select id="cfgMapSize"
-                                            class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white">
-                                            <option value="small">Klein (60x40)</option>
-                                            <option value="medium">Mittel (100x60)</option>
-                                            <option value="large">Groß (140x80)</option>
-                                            <option value="xlarge" selected>Extra Groß (180x100)</option>
-                                            <option value="xxlarge">Super Groß (240x140)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm text-gray-400 mb-1">Anzahl Runden</label>
-                                        <input type="number" id="cfgRounds" value="7" min="1" max="50"
-                                            class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm text-gray-400 mb-1">Gebiets-Radius (Zellen)</label>
-                                        <input type="number" id="cfgRadius" value="5" min="1" max="15"
-                                            class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm text-gray-400 mb-1">Budget-Faktor</label>
-                                        <input type="number" id="cfgBudgetFactor" value="100" min="1" max="500"
-                                            class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm text-gray-400 mb-1">Evolutionsschritte</label>
-                                        <input type="number" id="cfgSteps" value="1000" min="100" max="10000" step="100"
-                                            class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm text-gray-400 mb-1">Gebirge</label>
-                                        <div class="flex items-center gap-2">
-                                            <input type="range" id="cfgRocks" value="0" min="0" max="1000" step="10"
-                                                class="flex-1 accent-orange-500">
-                                            <span class="text-xs text-orange-400 w-12 text-right font-mono" id="valRocks">0</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3 pt-4 sm:col-span-2 md:col-span-1">
-                                        <input type="checkbox" id="cfgDojoMode" class="w-5 h-5 accent-orange-500 rounded bg-gray-800 border-gray-700">
-                                        <label for="cfgDojoMode" class="text-sm font-bold text-orange-400 cursor-pointer">Dojo Modus (AI vs AI)</label>
-                                    </div>
-                                    <div id="batchModeContainer" class="hidden flex items-center gap-3 pt-4 sm:col-span-2 md:col-span-1">
-                                        <input type="checkbox" id="cfgBatchMode" class="w-5 h-5 accent-orange-500 rounded bg-gray-800 border-gray-700">
-                                        <label for="cfgBatchMode" class="text-sm font-bold text-orange-400 cursor-pointer">Batch-Evolution (Auto-Restart)</label>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="mode-description">Klassischer Modus · Alle Genome · Zufallskarte · Bis zu vier Häuser</p>
-                        <div class="mt-10 flex justify-center">
-                            <button id="btnStartGame"
-                                class="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-orange-500 text-white font-extrabold py-4 px-16 rounded-full shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all transform hover:scale-105 active:scale-95 uppercase tracking-widest">
-                                Gefecht starten
-                            </button>
-                        </div>
-                        </section>
-                    </div>
-                </div>
+        <main class="game-main">
+            <!-- The campaign mission HUD is inserted here by CampaignManager. -->
+            <div id="canvasContainer" class="board">
+                <canvas id="gameCanvas" aria-label="Spielfeld"></canvas>
             </div>
 
-            <!-- Game Board (Canvas) -->
-            <div id="canvasContainer"
-                class="flex-1 relative cursor-crosshair overflow-hidden touch-none flex items-center justify-center p-4">
-                <canvas id="gameCanvas" class="shadow-2xl rounded border border-white/5 bg-[#0a0a0a]"></canvas>
-            </div>
-
-            <!-- Right Panel: Placement Tools & Budget -->
-            <aside id="rightPanel"
-                class="w-72 glass-panel border-l border-mars-800 flex flex-col transition-transform duration-300 translate-x-full absolute right-0 top-0 bottom-0 z-20">
-                <!-- Toggle Button (Tab) -->
-                <button id="btnTogglePanel"
-                    class="absolute -left-10 top-1/2 -translate-y-1/2 w-10 h-24 glass-panel border-l border-t border-b border-mars-800 rounded-l-lg flex items-center justify-center text-gray-400 hover:text-white group">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 transform transition-transform group-hover:scale-110" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" id="panelIcon">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-
-                <!-- Panel Content -->
-                <div class="flex-1 flex flex-col p-4 h-full overflow-y-auto">
-
-                    <!-- Player Status Header -->
-                    <div id="panelPlayerHeader"
-                        class="mb-6 p-4 rounded-xl border border-white/10 bg-black/40 text-center">
-                        <h3 class="text-lg font-bold" id="panelPlayerName">Warte auf Start</h3>
-                        <div class="mt-2 text-sm text-gray-400">Budget</div>
-                        <div class="text-3xl font-mono font-bold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                            id="budgetDisplay">--</div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex gap-2 mb-6">
-                        <button id="btnFinishTurn"
-                            class="flex-1 bg-green-600/80 hover:bg-green-500 text-white font-bold py-2 px-4 rounded transition shadow-[0_0_10px_rgba(34,197,94,0.3)] leading-tight text-center">
-                            Fertig
-                        </button>
-                    </div>
-
-                    <!-- Tools Section -->
-                    <h4 class="text-sm font-semibold text-mars-300 uppercase tracking-wider mb-3">Werkzeuge & Figuren
-                    </h4>
-
-                    <div class="flex items-center justify-between mb-2 gap-2">
-                        <span class="input-help text-gray-400 flex-1"><span class="desktop-help">R: Drehen · Strg+Z: Zurück</span><span class="touch-help">Tippen: setzen · Zwei Finger: Zoom / Verschieben</span></span>
-                        <div class="flex gap-1">
-                            <button id="btnUndo"
-                                class="p-1.5 flex items-center justify-center bg-gray-800 hover:bg-gray-700 rounded text-gray-300 transition"
-                                title="Rückgängig (Strg+Z)">
-                                ↩️
-                            </button>
-                            <button id="btnEraser"
-                                class="pattern-btn p-1.5 flex items-center justify-center bg-gray-800 hover:bg-gray-700 rounded text-gray-300 transition"
-                                title="Radierer">
-                                🗑️
-                            </button>
-                            <button id="btnRotate"
-                                class="p-1.5 bg-gray-800 hover:bg-gray-700 rounded text-gray-300 transition"
-                                title="Rotieren">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            </button>
-                            <button id="btnResetSandbox"
-                                class="hidden p-1.5 bg-red-900/40 hover:bg-red-800/60 rounded text-red-200 transition"
-                                title="Spielfeld leeren (Reset)">
-                                🔄
-                            </button>
+            <aside id="rightPanel" class="tool-panel" aria-label="Werkzeuge und Muster" hidden>
+                <div class="panel-scroll" id="panelContent">
+                    <section id="panelPlayerHeader" class="player-card" aria-live="polite">
+                        <img id="panelPlayerEmblem" class="player-emblem" src="assets/ui/house-marineris.webp" alt="" width="64" height="64">
+                        <div class="player-meta">
+                            <span id="panelPlayerRole" class="player-role">Am Zug</span>
+                            <h2 class="player-name" id="panelPlayerName">Warte auf Start</h2>
                         </div>
+                        <div class="budget">
+                            <span class="budget-label">Genmaterial</span>
+                            <strong class="budget-value" id="budgetDisplay">--</strong>
+                        </div>
+                    </section>
+
+                    <div class="panel-actions">
+                        <button id="btnFinishTurn" class="btn btn-primary btn-lg btn-block btn-finish" type="button">Zug beenden</button>
                     </div>
 
-                    <div id="patternList" class="space-y-2 flex-1">
-                        <!-- Populated dynamically via JS -->
-                    </div>
+                    <section id="evolutionStatus" class="evolution-status" hidden>
+                        <div class="evo-head"><span class="evo-label">Evolution</span><span id="evoCount" class="evo-count">0 / 0</span></div>
+                        <div class="evo-track"><div id="evoBar" class="evo-bar"></div></div>
+                        <div id="simSpeedContainer" class="sim-speed" hidden>
+                            <label for="simSpeed">Tempo</label>
+                            <input type="range" id="simSpeed" min="1" max="100" value="50">
+                        </div>
+                    </section>
+
+                    <section class="tool-section" aria-labelledby="toolsTitle">
+                        <div class="section-head">
+                            <h3 id="toolsTitle" class="section-title">Muster setzen</h3>
+                            <span class="input-help"><span class="desktop-help"><kbd>R</kbd> drehen · <kbd>Strg</kbd>+<kbd>Z</kbd> zurück</span><span class="touch-help">Tippen: setzen · Zwei Finger: Zoom</span></span>
+                        </div>
+                        <div class="tool-row" role="toolbar" aria-label="Werkzeuge">
+                            <button id="btnUndo" class="tool-btn" type="button" title="Rückgängig (Strg+Z)"><svg class="icon" aria-hidden="true"><use href="#i-undo" /></svg><span>Zurück</span></button>
+                            <button id="btnRotate" class="tool-btn" type="button" title="Muster drehen (R oder Rechtsklick)"><svg class="icon" aria-hidden="true"><use href="#i-rotate" /></svg><span>Drehen</span></button>
+                            <button id="btnEraser" class="tool-btn" type="button" title="Radierer: eigene, neu gesetzte Zellen entfernen" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-eraser" /></svg><span>Radierer</span></button>
+                            <button id="btnResetSandbox" class="tool-btn tool-btn--danger hidden" type="button" title="Spielfeld leeren"><svg class="icon" aria-hidden="true"><use href="#i-trash" /></svg><span>Leeren</span></button>
+                        </div>
+                        <div id="patternList" class="pattern-grid" role="group" aria-label="Muster">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </section>
+
+                    <div id="panelExtras" class="panel-extras"></div>
                 </div>
             </aside>
-
         </main>
 
-        <!-- Bottom Banner / Event Log (Optional) -->
-        <footer id="eventLog"
-            class="h-8 glass-panel border-t border-mars-800 flex items-center justify-center text-xs text-gray-400 tracking-widest uppercase z-10 flex-shrink-0">
-            System bereit.
-        </footer>
+        <div id="eventLog" class="sr-only" role="status" aria-live="polite">System bereit.</div>
     </div>
 
-    <!-- Alert Overlay -->
-    <div id="alertOverlay"
-        class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
-        <div class="bg-black/80 backdrop-blur-md border-t-4 border-b-4 border-red-500 py-6 px-12 transform scale-95 transition-transform duration-300 flex flex-col items-center"
-            id="alertBox">
-            <h2 id="alertTitle"
-                class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 text-center uppercase tracking-widest drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]">
-                ALERT</h2>
-            <div class="my-4 relative group">
-                <img id="alertImage" src="" alt="House Emblem" class="max-h-64 rounded-lg shadow-2xl border border-white/20 transition-transform duration-500 group-hover:scale-105">
-                <div class="absolute inset-0 rounded-lg shadow-[inset_0_0_40px_rgba(0,0,0,0.5)] pointer-events-none"></div>
-            </div>
-            <p id="alertMessage" class="text-xl text-gray-300 mt-2 mb-6 text-center">Message goes here</p>
-            <button id="btnRestartGame"
-                class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded border border-gray-600 transition shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                Neues Spiel starten
-            </button>
-        </div>
-    </div>
-
-    <!-- Settings/Quit Confirmation Overlay -->
-    <div id="settingsOverlay"
-        class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 hidden">
-        <div class="bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-8 max-w-lg w-full mx-4 transform scale-95 transition-transform duration-300 flex flex-col items-center shadow-[0_0_50px_rgba(0,0,0,0.5)]"
-            id="settingsBox">
-            <h2 class="text-2xl font-bold text-white mb-4 uppercase tracking-widest">Mission abbrechen?</h2>
-            
-            <div class="relative w-full mb-6 group overflow-hidden rounded-xl border border-white/5">
-                <img id="cancelHeaderImage" src="assets/Mars_Terraforming01.png" alt="Mars Terraforming" class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
-            </div>
-
-            <p class="text-gray-400 text-center mb-8">Bist du sicher, dass du das aktuelle Kommando beenden und zum Hauptquartier zurückkehren möchtest? Alle Fortschritte dieser Mission gehen verloren.</p>
-            
-            <div class="flex gap-4 w-full">
-                <button id="btnSettingsCancel"
-                    class="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 rounded-xl border border-white/10 transition-all active:scale-95">
-                    Bleiben
-                </button>
-                <button id="btnSettingsConfirm"
-                    class="flex-1 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold py-3 rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all active:scale-95">
-                    Abbrechen
-                </button>
+    <!-- Skirmish result -->
+    <div id="alertOverlay" class="dialog-backdrop hidden">
+        <div class="dialog dialog--result" id="alertBox" role="dialog" aria-modal="true" aria-labelledby="alertTitle">
+            <p class="eyebrow">Freies Gefecht · Ergebnis</p>
+            <h2 id="alertTitle" class="dialog-title">Gefecht beendet</h2>
+            <img id="alertImage" class="alert-emblem" src="" alt="">
+            <p id="alertMessage" class="alert-message">Message goes here</p>
+            <div class="dialog-actions">
+                <button id="btnViewBoard" class="btn" type="button">Spielfeld ansehen</button>
+                <button id="btnRestartGame" class="btn btn-primary" type="button">Neues Spiel starten</button>
             </div>
         </div>
     </div>
-    <!-- Help / Story Overlay -->
-    <div id="helpOverlay"
-        class="fixed inset-0 z-[110] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 hidden">
-        <div class="bg-gray-900/95 backdrop-blur-md border border-mars-800 rounded-2xl p-8 max-w-3xl w-full mx-4 transform scale-95 transition-transform duration-300 pointer-events-auto overflow-y-auto max-h-[90vh] shadow-[0_0_50px_rgba(239,68,68,0.2)]"
-            id="helpBox">
-            <h2
-                class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-6 border-b border-mars-800 pb-2">
-                Kommando-Briefing: Projekt RedRoots</h2>
 
-            <div class="space-y-4 text-gray-300 leading-relaxed">
-                <p><strong>Commander, willkommen auf dem Mars!</strong></p>
-                <p>Wir haben es geschafft. Die ersten Kuppeln stehen, doch der Kampf um die Ressourcen hat begonnen. 
-                   Die großen Häuser des Mars — <strong>Marineris, Hellas, Viridion und Tharsis</strong> — haben zeitgleich in diesem Sektor gelandet. 
-                   Unsere einzige Waffe in diesem kargen Ödland? <strong>Die rote Mars-Flora.</strong></p>
+    <!-- In-game menu: sound, simulation options, rules and leaving the mission -->
+    <div id="settingsOverlay" class="dialog-backdrop hidden">
+        <div class="dialog dialog--menu" id="settingsBox" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+            <div class="dialog-head">
+                <h2 id="settingsTitle" class="dialog-title">Menü</h2>
+                <button class="btn btn-icon btn-ghost" type="button" data-dialog-close aria-label="Menü schließen"><svg class="icon" aria-hidden="true"><use href="#i-close" /></svg></button>
+            </div>
+            <div id="settingsExtras" class="menu-extras"></div>
+            <dl class="shortcut-list">
+                <div><dt><kbd>R</kbd> / Rechtsklick</dt><dd>Muster drehen</dd></div>
+                <div><dt><kbd>Strg</kbd>+<kbd>Z</kbd></dt><dd>Rückgängig</dd></div>
+                <div><dt>Mausrad</dt><dd>Zoom</dd></div>
+                <div><dt>Mittlere Maustaste</dt><dd>Spielfeld verschieben</dd></div>
+                <div><dt><kbd>P</kbd> · <kbd>.</kbd></dt><dd>Pause · eine Generation weiter (Kampagne)</dd></div>
+            </dl>
+            <section class="menu-danger">
+                <h3 class="menu-danger-title">Mission abbrechen?</h3>
+                <p>Du kehrst zur Marskarte bzw. zur Modusauswahl zurück. Der Fortschritt dieser laufenden Mission geht verloren; gespeicherte Sterne bleiben erhalten.</p>
+                <div class="dialog-actions">
+                    <button id="btnSettingsCancel" class="btn btn-primary" type="button">Weiterspielen</button>
+                    <button id="btnSettingsConfirm" class="btn btn-danger" type="button"><svg class="icon" aria-hidden="true"><use href="#i-exit" /></svg><span>Mission abbrechen</span></button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Help / Story -->
+    <div id="helpOverlay" class="dialog-backdrop hidden">
+        <div class="dialog dialog--help" id="helpBox" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+            <div class="dialog-head">
+                <div>
+                    <p class="eyebrow">Spielregeln</p>
+                    <h2 id="helpTitle" class="dialog-title">Kommando-Briefing: Projekt RedRoots</h2>
+                </div>
+                <button class="btn btn-icon btn-ghost" type="button" data-dialog-close aria-label="Spielregeln schließen"><svg class="icon" aria-hidden="true"><use href="#i-close" /></svg></button>
+            </div>
+
+            <div class="help-body">
+                <p class="help-lead"><strong>Commander, willkommen auf dem Mars!</strong></p>
+                <p>Wir haben es geschafft. Die ersten Kuppeln stehen, doch der Kampf um die Ressourcen hat begonnen.
+                    Die großen Häuser des Mars — <strong>Marineris, Hellas, Viridion und Tharsis</strong> — haben zeitgleich in diesem Sektor gelandet.
+                    Unsere einzige Waffe in diesem kargen Ödland? <strong>Die rote Mars-Flora.</strong></p>
                 <p>Ihre Aufgabe ist es, unsere genetisch modifizierten Pflanzen-Zellen strategisch zu züchten und das
-                   feindliche Gebiet zu überwuchern. Wer zuerst das gegnerische Hauptlager (schraffierte Ecken/Ränder)
-                   erreicht, gewinnt den Sektor für sein Haus!</p>
+                    feindliche Gebiet zu überwuchern. Wer zuerst das gegnerische Hauptlager (schraffierte Ecken/Ränder)
+                    erreicht, gewinnt den Sektor für sein Haus!</p>
 
-                <h3 class="text-xl font-bold text-mars-300 mt-6 border-b border-gray-700 pb-1">🌱 Biologische
-                    Kriegsführung (Die Regeln)</h3>
-                <p>Die Pflanzen wachsen nicht zufällig. Sie folgen den strikten Naturgesetzen von <em>Conway's Game of
-                        Life</em>:</p>
-                <ul class="list-disc pl-6 space-y-2">
-                    <li><strong>Einsamkeit:</strong> Eine Pflanze mit weniger als 2 Nachbarn stirbt (vertrocknet).</li>
-                    <li><strong>Überleben:</strong> Eine Pflanze mit 2 oder 3 Nachbarn überlebt in die nächste
-                        Generation.</li>
-                    <li><strong>Überbevölkerung:</strong> Eine Pflanze mit mehr als 3 Nachbarn erstickt und stirbt.</li>
-                    <li><strong>Wachstum (Geburt):</strong> Auf einem leeren Feld, das von <em>genau 3 Pflanzen</em>
-                        umgeben ist, sprießt ein neuer Setzling! Bei Konflikten gewinnt die Fraktion mit den meisten
-                        Nachbarn.</li>
+                <h3 class="help-heading">🌱 Biologische Kriegsführung (Die Regeln)</h3>
+                <p>Die Pflanzen wachsen nicht zufällig. Sie folgen den strikten Naturgesetzen von <em>Conway's Game of Life</em>:</p>
+                <ul class="rule-cards">
+                    <li class="rule-card"><svg class="rule-grid" viewBox="0 0 30 30" aria-hidden="true"><path class="rg-lines" d="M0 10h30M0 20h30M10 0v30M20 0v30" /><rect class="rg-cell rg-dies" x="11" y="11" width="8" height="8" rx="1.5" /><rect class="rg-cell" x="1" y="1" width="8" height="8" rx="1.5" /></svg><div><strong>Einsamkeit:</strong> Eine Pflanze mit weniger als 2 Nachbarn stirbt (vertrocknet).</div></li>
+                    <li class="rule-card"><svg class="rule-grid" viewBox="0 0 30 30" aria-hidden="true"><path class="rg-lines" d="M0 10h30M0 20h30M10 0v30M20 0v30" /><rect class="rg-cell rg-lives" x="11" y="11" width="8" height="8" rx="1.5" /><rect class="rg-cell" x="1" y="1" width="8" height="8" rx="1.5" /><rect class="rg-cell" x="21" y="21" width="8" height="8" rx="1.5" /></svg><div><strong>Überleben:</strong> Eine Pflanze mit 2 oder 3 Nachbarn überlebt in die nächste Generation.</div></li>
+                    <li class="rule-card"><svg class="rule-grid" viewBox="0 0 30 30" aria-hidden="true"><path class="rg-lines" d="M0 10h30M0 20h30M10 0v30M20 0v30" /><rect class="rg-cell rg-dies" x="11" y="11" width="8" height="8" rx="1.5" /><rect class="rg-cell" x="1" y="1" width="8" height="8" rx="1.5" /><rect class="rg-cell" x="11" y="1" width="8" height="8" rx="1.5" /><rect class="rg-cell" x="21" y="1" width="8" height="8" rx="1.5" /><rect class="rg-cell" x="1" y="21" width="8" height="8" rx="1.5" /></svg><div><strong>Überbevölkerung:</strong> Eine Pflanze mit mehr als 3 Nachbarn erstickt und stirbt.</div></li>
+                    <li class="rule-card"><svg class="rule-grid" viewBox="0 0 30 30" aria-hidden="true"><path class="rg-lines" d="M0 10h30M0 20h30M10 0v30M20 0v30" /><rect class="rg-cell rg-born" x="11" y="11" width="8" height="8" rx="1.5" /><rect class="rg-cell" x="1" y="1" width="8" height="8" rx="1.5" /><rect class="rg-cell" x="21" y="1" width="8" height="8" rx="1.5" /><rect class="rg-cell" x="11" y="21" width="8" height="8" rx="1.5" /></svg><div><strong>Wachstum (Geburt):</strong> Auf einem leeren Feld, das von <em>genau 3 Pflanzen</em> umgeben ist, sprießt ein neuer Setzling! Bei Konflikten gewinnt die Fraktion mit den meisten Nachbarn.</div></li>
                 </ul>
 
-                <h3 class="text-xl font-bold text-mars-300 mt-6 border-b border-gray-700 pb-1">⚔️ Gebietskontrolle &
-                    Budget</h3>
+                <h3 class="help-heading">⚔️ Gebietskontrolle &amp; Budget</h3>
                 <p>Je mehr Marsboden Deine Pflanzen nach einer Wachstumsphase beherrschen, desto mehr Ressourcen
                     <strong>(Budget)</strong> erhalten Sie für die nächste Runde. Mit diesem Budget können Sie in Ihrem
                     eigenen Gebiet (Ihre Farbe) neue Setzlinge und komplexe Strukturen platzieren – von einfachen
                     Blöcken bis hin zu verheerenden "Gleiter-Kanonen".
                 </p>
 
-                <p class="mt-6 italic text-orange-400 font-bold text-lg text-center">Das Kommando verlässt sich auf Sie.
-                    Lassen Sie es wuchern, Commander!</p>
+                <p class="help-closing">Das Kommando verlässt sich auf Sie. Lassen Sie es wuchern, Commander!</p>
             </div>
 
-            <div class="mt-8 flex justify-center">
-                <button id="btnHelpClose"
-                    class="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-orange-500 text-white font-bold py-3 px-12 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)] transition-all transform hover:scale-105">
-                    Verstanden
-                </button>
+            <div class="dialog-actions dialog-actions--center">
+                <button id="btnHelpVoice" class="btn" type="button" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-pause" /></svg><span>Vorlesen anhalten</span></button>
+                <button id="btnHelpClose" class="btn btn-primary" type="button">Verstanden</button>
             </div>
         </div>
     </div>

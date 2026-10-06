@@ -74,6 +74,7 @@ class InputHandler {
         // Normalize so the top-leftmost cell of bounding box is near 0,0, but we want anchor to stay at 0,0
         // Wait, rotating around 0,0 is fine.
         this.currentPattern = rotated;
+        this.uiManager.onPatternRotated?.();
         this.uiManager.render();
     }
 
@@ -100,7 +101,6 @@ class InputHandler {
     onWheel(e) {
         e.preventDefault();
         const renderer = this.uiManager.renderer;
-        const cam = renderer.camera;
         
         const rect = this.canvas.getBoundingClientRect();
         const scaleX = this.canvas.width / rect.width;
@@ -108,17 +108,9 @@ class InputHandler {
         const rawX = (e.clientX - rect.left) * scaleX;
         const rawY = (e.clientY - rect.top) * scaleY;
         
-        const zoomDelta = e.deltaY < 0 ? 1.1 : 0.9;
-        const newZoom = Math.max(0.2, Math.min(5, cam.zoom * zoomDelta));
-        
-        // Adjust camera position to zoom towards cursor
-        const logicalX = (rawX - cam.x) / cam.zoom;
-        const logicalY = (rawY - cam.y) / cam.zoom;
-        
-        cam.zoom = newZoom;
-        cam.x = rawX - logicalX * cam.zoom;
-        cam.y = rawY - logicalY * cam.zoom;
-        
+        // Zoom towards the cursor
+        renderer.zoomAt(rawX, rawY, e.deltaY < 0 ? 1.1 : 0.9);
+
         this.uiManager.render();
     }
 
@@ -138,6 +130,7 @@ class InputHandler {
             
             cam.x += dx * scaleX;
             cam.y += dy * scaleY;
+            renderer.userCamera = true;
             
             this.uiManager.render();
             return;
@@ -188,7 +181,6 @@ class InputHandler {
 
         const success = this.gameState.placePattern(this.currentPattern, r, c);
         if (success) {
-            this.uiManager?.campaign?.onFirstPlacement?.();
             const minCost = Math.min(...Object.values(CONSTANTS.PATTERNS).map(p => p.cost));
             if (this.gameState.budgets[this.gameState.currentPlayer] < minCost) {
                 // Not enough budget for anything, could auto-end turn
@@ -255,7 +247,7 @@ class InputHandler {
             // Handle Zoom
             if (this.initialPinchDist > 0) {
                 const zoomFactor = currentDist / this.initialPinchDist;
-                const newZoom = Math.max(0.2, Math.min(5, this.initialZoom * zoomFactor));
+                const newZoom = renderer.clampZoom(this.initialZoom * zoomFactor);
                 
                 const rect = this.canvas.getBoundingClientRect();
                 const scaleX = this.canvas.width / rect.width;
@@ -283,6 +275,7 @@ class InputHandler {
                 cam.x += dx * scaleX;
                 cam.y += dy * scaleY;
             }
+            renderer.userCamera = true;
             
             this.lastTouchCenter = currentCenter;
             this.uiManager.render();

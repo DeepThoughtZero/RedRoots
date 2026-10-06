@@ -1,5 +1,18 @@
 // js/ui/UIManager.js
 
+// Inline icon from the sprite in index.html.
+const uiIcon = (name, extra = '') => `<svg class="icon${extra ? ` ${extra}` : ''}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+
+// Small SVG silhouette of a pattern, normalized to its bounding box.
+function patternPreviewSvg(cells) {
+    const rs = cells.map(([r]) => r), cs = cells.map(([, c]) => c);
+    const r0 = Math.min(...rs), c0 = Math.min(...cs), h = Math.max(...rs) - r0 + 1, w = Math.max(...cs) - c0 + 1;
+    const pad = .35;
+    return `<svg viewBox="${-pad} ${-pad} ${w + 2 * pad} ${h + 2 * pad}" aria-hidden="true">${cells.map(([r, c]) => `<rect x="${c - c0 + .08}" y="${r - r0 + .08}" width=".84" height=".84" rx=".18"/>`).join('')}</svg>`;
+}
+
+const PHASE_LABELS = { SETUP: ['setup', 'Setup'], PLATZIERUNG: ['placement', 'Planung'], EVOLUTION: ['simulation', 'Evolution'], BEENDET: ['gameover', 'Beendet'] };
+
 class UIManager {
     constructor(canvas, config) {
         this.canvas = canvas;
@@ -15,25 +28,27 @@ class UIManager {
         this.elGamePhaseDisplay = document.getElementById('gamePhaseDisplay');
         this.elRoundDisplay = document.getElementById('roundDisplay');
         this.elCurrentPlayerDisplay = document.getElementById('currentPlayerDisplay');
-        
+
         this.elRightPanel = document.getElementById('rightPanel');
-        this.elBtnTogglePanel = document.getElementById('btnTogglePanel');
-        this.elPanelIcon = document.getElementById('panelIcon');
-        
+        this.elPanelContent = document.getElementById('panelContent');
+        this.elPanelExtras = document.getElementById('panelExtras');
         this.elPanelPlayerHeader = document.getElementById('panelPlayerHeader');
         this.elPanelPlayerName = document.getElementById('panelPlayerName');
+        this.elPanelPlayerRole = document.getElementById('panelPlayerRole');
+        this.elPanelPlayerEmblem = document.getElementById('panelPlayerEmblem');
         this.elBudgetDisplay = document.getElementById('budgetDisplay');
-        
+
         this.elBtnFinishTurn = document.getElementById('btnFinishTurn');
         this.elBtnRotate = document.getElementById('btnRotate');
         this.elBtnEraser = document.getElementById('btnEraser');
         this.elBtnUndo = document.getElementById('btnUndo');
         this.elPatternList = document.getElementById('patternList');
-        
+
         this.elBtnSettings = document.getElementById('btnSettings');
-        
+        this.elSettingsExtras = document.getElementById('settingsExtras');
+
         this.elEventLog = document.getElementById('eventLog');
-        
+
         // Alert Box
         this.elAlertOverlay = document.getElementById('alertOverlay');
         this.elAlertBox = document.getElementById('alertBox');
@@ -42,6 +57,9 @@ class UIManager {
         this.elAlertMessage = document.getElementById('alertMessage');
         this.elBtnRestartGame = document.getElementById('btnRestartGame');
 
+        this.elEvolutionStatus = document.getElementById('evolutionStatus');
+        this.elEvoBar = document.getElementById('evoBar');
+        this.elEvoCount = document.getElementById('evoCount');
         this.elSimSpeedContainer = document.getElementById('simSpeedContainer');
         this.elSimSpeed = document.getElementById('simSpeed');
         this.elTerritoryBarContainer = document.getElementById('territoryBarContainer');
@@ -55,12 +73,37 @@ class UIManager {
 
         // Randomize Setup Header Image
         const setupHeaderImage = document.getElementById('setupHeaderImage');
-        if (setupHeaderImage) {
-            setupHeaderImage.src = Math.random() > 0.5 ? 'assets/Mars_Overview01.png' : 'assets/Mars_Overview02.png';
-        }
+        if (setupHeaderImage && Math.random() > 0.5) setupHeaderImage.src = 'assets/ui/mars-overview-02.webp';
 
+        this.openDialogs = [];
+        this.lastBudget = null;
         this.initStartMenu();
         this.initPanelControls();
+    }
+
+    // Dialogs: focus moves into the dialog and returns afterwards; Escape and the backdrop close it.
+    openDialog(overlay, focusTarget = null) {
+        if (!overlay || this.openDialogs.includes(overlay)) return;
+        overlay.returnFocus = document.activeElement;
+        overlay.classList.remove('hidden');
+        this.openDialogs.push(overlay);
+        requestAnimationFrame(() => {
+            overlay.classList.add('is-open');
+            (focusTarget || overlay.querySelector('.btn-primary') || overlay.querySelector('button'))?.focus({ preventScroll: true });
+        });
+    }
+
+    closeDialog(overlay) {
+        if (!overlay || !this.openDialogs.includes(overlay)) return;
+        this.openDialogs = this.openDialogs.filter(o => o !== overlay);
+        overlay.classList.remove('is-open');
+        if (overlay === this.helpOverlay) this.stopHelpVoice();
+        setTimeout(() => {
+            if (!this.openDialogs.includes(overlay)) overlay.classList.add('hidden');
+            if (this.audio) this.audio.updateAmbience?.();
+        }, 220);
+        const back = overlay.returnFocus;
+        if (back && document.contains(back)) back.focus();
     }
 
     initStartMenu() {
@@ -75,11 +118,10 @@ class UIManager {
                 if (c.budgetFactor) document.getElementById('cfgBudgetFactor').value = c.budgetFactor;
                 if (c.steps) document.getElementById('cfgSteps').value = c.steps;
                 if (c.radius) document.getElementById('cfgRadius').value = c.radius;
-                if (c.humanFlags) this.humanFlags = c.humanFlags;
-            } catch(e) { console.error('Failed to parse saved config', e); }
-        } else {
-            this.humanFlags = [true, false, false, false]; // Default: P1 human
+                if (Array.isArray(c.humanFlags) && c.humanFlags.length === 4) this.humanFlags = c.humanFlags.map(Boolean);
+            } catch (e) { console.error('Failed to parse saved config', e); }
         }
+        if (!this.humanFlags) this.humanFlags = [true, false, false, false]; // Default: P1 human
 
         // Randomize Rocks (Mountains) for each mission
         const cfgRocks = document.getElementById('cfgRocks');
@@ -88,37 +130,40 @@ class UIManager {
             const randomRocks = Math.floor(Math.random() * 1001);
             cfgRocks.value = randomRocks;
             valRocks.textContent = randomRocks;
-            
-            cfgRocks.addEventListener('input', () => {
-                valRocks.textContent = cfgRocks.value;
-            });
+            cfgRocks.addEventListener('input', () => { valRocks.textContent = cfgRocks.value; });
         }
 
-        // Interactive House Selection
+        // House selection: every house is explicitly "Mensch" or "Computer" (hot seat on one device).
         const humanHousesContainer = document.getElementById('humanHousesContainer');
-        if (!this.humanFlags) this.humanFlags = [true, false, false, false]; // Fallback if not loaded
-
+        const houseSummary = document.getElementById('houseSummary');
+        const updateSummary = () => {
+            if (!houseSummary) return;
+            const humans = this.humanFlags.filter(Boolean).length, ai = 4 - humans;
+            houseSummary.textContent = humans === 0
+                ? 'Nur Computer: Du schaust den vier Häusern zu.'
+                : `${humans} ${humans === 1 ? 'Mensch' : 'Menschen'} · ${ai} Computer${humans > 1 ? ' · Die Menschen wechseln sich an diesem Gerät ab.' : ''}`;
+        };
         if (humanHousesContainer) {
-            const updateHouseUI = () => {
-                humanHousesContainer.innerHTML = '';
-                CONSTANTS.PLAYER_COLORS.forEach((player, i) => {
-                    const isSelected = this.humanFlags[i];
-                    
-                    const wrapper = document.createElement('label');
-                    wrapper.className = 'house-controller';
-                    wrapper.innerHTML = `<img src="${player.asset}" alt=""><strong>${player.name}</strong><select aria-label="Steuerung für ${player.name}"><option value="human">Mensch</option><option value="ai">Computer</option></select>`;
-                    const select = wrapper.querySelector('select');
-                    select.value = isSelected ? 'human' : 'ai';
-                    select.addEventListener('change', () => { this.humanFlags[i] = select.value === 'human'; });
-                    humanHousesContainer.appendChild(wrapper);
-                });
-            };
-            updateHouseUI();
+            humanHousesContainer.innerHTML = '';
+            CONSTANTS.PLAYER_COLORS.forEach((player, i) => {
+                const card = document.createElement('div');
+                card.className = `house-card${this.humanFlags[i] ? ' is-human' : ''}`;
+                card.style.setProperty('--house', player.main);
+                card.innerHTML = `<img src="${player.asset}" alt="" width="704" height="384" loading="lazy" decoding="async"><strong>${player.name}</strong><div class="segmented" role="radiogroup" aria-label="Steuerung für ${player.name}"><label><input type="radio" name="houseControl${i}" value="human"${this.humanFlags[i] ? ' checked' : ''}><span>Mensch</span></label><label><input type="radio" name="houseControl${i}" value="ai"${this.humanFlags[i] ? '' : ' checked'}><span>Computer</span></label></div>`;
+                card.querySelectorAll('input').forEach(input => input.addEventListener('change', () => {
+                    this.humanFlags[i] = input.value === 'human';
+                    card.classList.toggle('is-human', this.humanFlags[i]);
+                    updateSummary();
+                }));
+                humanHousesContainer.appendChild(card);
+            });
+            updateSummary();
         }
 
         document.getElementById('btnChooseSkirmish').onclick = () => {
             document.getElementById('modeSelection').hidden = true;
             document.getElementById('skirmishSetup').hidden = false;
+            this.elStartMenu.scrollTop = 0;
             document.getElementById('btnBackModes').focus();
         };
         document.getElementById('btnBackModes').onclick = () => {
@@ -136,17 +181,10 @@ class UIManager {
                 setupClickCount++;
                 if (setupClickCount >= 5) {
                     const isHidden = devSettings.classList.contains('hidden');
-                    if (isHidden) {
-                        devSettings.classList.remove('hidden');
-                        setupTitle.classList.add('text-orange-500');
-                        setupTitle.textContent = "Developer Setup";
-                        this.logEvent("Entwicklermodus aktiviert.");
-                    } else {
-                        devSettings.classList.add('hidden');
-                        setupTitle.classList.remove('text-orange-500');
-                        setupTitle.textContent = "Freies Gefecht";
-                        this.logEvent("Entwicklermodus deaktiviert.");
-                    }
+                    devSettings.classList.toggle('hidden', !isHidden);
+                    setupTitle.classList.toggle('is-dev', isHidden);
+                    setupTitle.textContent = isHidden ? 'Developer Setup' : 'Freies Gefecht';
+                    this.logEvent(isHidden ? 'Entwicklermodus aktiviert.' : 'Entwicklermodus deaktiviert.');
                     setupClickCount = 0;
                 }
             });
@@ -157,18 +195,12 @@ class UIManager {
         if (cfgDojoMode && batchModeContainer) {
             const cfgSteps = document.getElementById('cfgSteps');
             cfgDojoMode.addEventListener('change', () => {
-                if (cfgDojoMode.checked) {
-                    batchModeContainer.classList.remove('hidden');
-                    if (cfgSteps) cfgSteps.value = 150;
-                } else {
-                    batchModeContainer.classList.add('hidden');
-                    if (cfgSteps) cfgSteps.value = 2000;
-                }
+                batchModeContainer.classList.toggle('hidden', !cfgDojoMode.checked);
+                if (cfgSteps) cfgSteps.value = cfgDojoMode.checked ? 150 : 2000;
             });
         }
 
         document.getElementById('btnStartGame').addEventListener('click', () => {
-            const devSettings = document.getElementById('devSettings');
             const isDevMode = devSettings && !devSettings.classList.contains('hidden');
 
             let mapSize, rounds, budgetFactor, steps, radius, rocks, isDojoMode, isBatchMode;
@@ -219,7 +251,7 @@ class UIManager {
 
             if (config.isDojoMode) {
                 config.humanFlags = [false, false, false, false];
-                config.steps = 150; 
+                config.steps = 150;
                 config.rounds = 7;
             }
 
@@ -227,83 +259,50 @@ class UIManager {
             this.startGame(config);
         });
 
-        // Help Modal Events
-        const btnHelp = document.getElementById('btnHelp');
-        const btnShowBriefing = document.getElementById('btnShowBriefing'); // Question mark in setup
-        const btnHelpClose = document.getElementById('btnHelpClose');
-        const helpOverlay = document.getElementById('helpOverlay');
-        const helpBox = document.getElementById('helpBox');
-
-        // Audio for Briefing
+        // Help dialog with the recorded rules briefing.
+        this.helpOverlay = document.getElementById('helpOverlay');
+        const btnHelpVoice = document.getElementById('btnHelpVoice');
         this.audioBriefing = new Audio('assets/Intro_Rules.mp3');
         this.audioBriefing.loop = false;
-
+        this.audioBriefing.preload = 'none';
+        const syncHelpVoice = () => {
+            if (!btnHelpVoice) return;
+            const playing = !this.audioBriefing.paused;
+            btnHelpVoice.setAttribute('aria-pressed', String(playing));
+            btnHelpVoice.innerHTML = `${uiIcon(playing ? 'pause' : 'play')}<span>${playing ? 'Vorlesen anhalten' : 'Vorlesen'}</span>`;
+        };
+        for (const event of ['play', 'pause', 'ended']) this.audioBriefing.addEventListener(event, syncHelpVoice);
+        this.stopHelpVoice = () => { this.audioBriefing.pause(); this.audioBriefing.currentTime = 0; };
+        if (btnHelpVoice) btnHelpVoice.onclick = () => {
+            if (this.audioBriefing.paused) this.audioBriefing.play().catch(e => console.warn('Audio playback failed:', e));
+            else this.audioBriefing.pause();
+        };
         const showHelp = () => {
             if (this.audio) { this.audio.stopNarration(); this.audio.ambience.pause(); }
-            helpOverlay.classList.remove('hidden');
-            this.audioBriefing.play().catch(e => console.warn("Audio playback failed:", e));
-            
-            setTimeout(() => {
-                helpOverlay.classList.remove('opacity-0', 'pointer-events-none');
-                helpBox.classList.remove('scale-95');
-            }, 10);
+            this.openDialog(this.helpOverlay, document.getElementById('btnHelpClose'));
+            this.audioBriefing.play().catch(e => console.warn('Audio playback failed:', e));
+            syncHelpVoice();
         };
+        document.getElementById('btnHelp')?.addEventListener('click', showHelp);
+        document.getElementById('btnShowBriefing')?.addEventListener('click', showHelp);
+        document.getElementById('btnHelpClose')?.addEventListener('click', () => this.closeDialog(this.helpOverlay));
 
-        if (btnHelp) btnHelp.addEventListener('click', showHelp);
-        if (btnShowBriefing) btnShowBriefing.addEventListener('click', showHelp);
-
-        if (btnHelpClose && helpOverlay && helpBox) {
-            btnHelpClose.addEventListener('click', () => {
-                helpOverlay.classList.add('opacity-0', 'pointer-events-none');
-                helpBox.classList.add('scale-95');
-                
-                // Stop audio
-                this.audioBriefing.pause();
-                this.audioBriefing.currentTime = 0;
-
-                setTimeout(() => {
-                    helpOverlay.classList.add('hidden');
-
-                    // If first time, show start menu now
-                    if (!localStorage.getItem('redroots_briefing_shown')) {
-                        localStorage.setItem('redroots_briefing_shown', 'true');
-                        this.elStartMenu.classList.remove('hidden', 'opacity-0');
-                    }
-                }, 300);
+        // Generic close affordances: [data-dialog-close], backdrop click and Escape.
+        for (const overlay of [this.helpOverlay, this.elSettingsOverlay]) {
+            if (!overlay) continue;
+            overlay.addEventListener('click', event => {
+                if (event.target === overlay || event.target.closest('[data-dialog-close]')) this.closeDialog(overlay);
             });
         }
+        window.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && this.openDialogs.length) this.closeDialog(this.openDialogs.at(-1));
+        });
 
-        if (this.elBtnRestartGame) {
-            this.elBtnRestartGame.addEventListener('click', () => {
-                location.reload();
-            });
-        }
-        if (this.elBtnSettings) {
-            this.elBtnSettings.addEventListener('click', () => {
-                // Randomize Cancel Header Image
-                const cancelHeaderImage = document.getElementById('cancelHeaderImage');
-                if (cancelHeaderImage) {
-                    cancelHeaderImage.src = Math.random() > 0.5 ? 'assets/Mars_Terraforming01.png' : 'assets/Mars_Terraforming02.png';
-                }
+        if (this.elBtnRestartGame) this.elBtnRestartGame.addEventListener('click', () => location.reload());
+        document.getElementById('btnViewBoard')?.addEventListener('click', () => this.closeDialog(this.elAlertOverlay));
 
-                this.elSettingsOverlay.classList.remove('hidden');
-                setTimeout(() => {
-                    this.elSettingsOverlay.classList.remove('opacity-0', 'pointer-events-none');
-                    this.elSettingsBox.classList.remove('scale-95');
-                }, 10);
-            });
-        }
-
-        if (this.elBtnSettingsCancel) {
-            this.elBtnSettingsCancel.addEventListener('click', () => {
-                this.elSettingsOverlay.classList.add('opacity-0', 'pointer-events-none');
-                this.elSettingsBox.classList.add('scale-95');
-                setTimeout(() => {
-                    this.elSettingsOverlay.classList.add('hidden');
-                }, 300);
-            });
-        }
-
+        if (this.elBtnSettings) this.elBtnSettings.addEventListener('click', () => this.openDialog(this.elSettingsOverlay, this.elBtnSettingsCancel));
+        if (this.elBtnSettingsCancel) this.elBtnSettingsCancel.addEventListener('click', () => this.closeDialog(this.elSettingsOverlay));
         if (this.elBtnSettingsConfirm) {
             this.elBtnSettingsConfirm.addEventListener('click', () => {
                 if (this.audio) this.audio.stopNarration();
@@ -333,18 +332,6 @@ class UIManager {
     }
 
     initPanelControls() {
-        let isPanelOpen = false;
-        this.elBtnTogglePanel.addEventListener('click', () => {
-            isPanelOpen = !isPanelOpen;
-            if (isPanelOpen) {
-                this.elRightPanel.classList.remove('translate-x-full');
-                this.elPanelIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />`;
-            } else {
-                this.elRightPanel.classList.add('translate-x-full');
-                this.elPanelIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />`;
-            }
-        });
-
         this.elBtnFinishTurn.addEventListener('click', () => {
             if (this.gameState && this.gameState.isSandbox) {
                 if (this.gameState.phase === CONSTANTS.PHASE_PLACEMENT) {
@@ -362,52 +349,47 @@ class UIManager {
         const btnResetSandbox = document.getElementById('btnResetSandbox');
         if (btnResetSandbox) {
             btnResetSandbox.addEventListener('click', () => {
-                if (this.gameState && this.gameState.isSandbox) {
-                    if (confirm("Spielfeld wirklich komplett leeren?")) {
-                        this.gameState.resetSandbox();
-                    }
-                }
+                if (this.gameState && this.gameState.isSandbox && confirm('Spielfeld wirklich komplett leeren?')) this.gameState.resetSandbox();
             });
         }
 
-        this.elBtnRotate.addEventListener('click', () => {
-            if (this.inputHandler) {
-                this.inputHandler.rotatePattern();
-            }
-        });
+        this.elBtnRotate.addEventListener('click', () => this.inputHandler?.rotatePattern());
 
+        // The eraser toggles: a second press returns to the last pattern.
         this.elBtnEraser.addEventListener('click', () => {
-            this.elPatternList.querySelectorAll('.pattern-btn').forEach(b => b.classList.remove('active'));
+            if (this.inputHandler?.isEraserMode) { this.elPatternList.querySelector(`[data-pattern="${this.inputHandler.activePatternKey}"]`)?.click(); return; }
+            this.elPatternList.querySelectorAll('.pattern-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
             this.elBtnEraser.classList.add('active');
-            if (this.inputHandler) {
-                this.inputHandler.setEraserMode(true);
-            }
+            this.elBtnEraser.setAttribute('aria-pressed', 'true');
+            this.inputHandler?.setEraserMode(true);
         });
 
         if (this.elBtnUndo) {
             this.elBtnUndo.addEventListener('click', () => {
-                if (this.gameState && this.gameState.undoLastAction()) {
-                    this.render();
-                }
+                if (this.gameState && this.gameState.undoLastAction()) this.render();
             });
         }
-        
-        // Populate patterns
+
+        // Pattern cards with a silhouette, name and material cost.
         this.elPatternList.innerHTML = '';
         const sortedPatterns = Object.entries(CONSTANTS.PATTERNS).sort((a, b) => a[1].cost - b[1].cost);
         for (const [key, pData] of sortedPatterns) {
             const btn = document.createElement('button');
+            btn.type = 'button';
             btn.dataset.pattern = key;
             btn.className = `pattern-btn ${key === 'cell' ? 'active' : ''}`;
-            btn.innerHTML = `
-                <span>${pData.name}</span>
-                <span class="pattern-cost">${pData.cost}</span>
-            `;
+            btn.setAttribute('aria-pressed', String(key === 'cell'));
+            btn.setAttribute('aria-label', `${pData.name}, ${pData.cost} Genmaterial`);
+            btn.innerHTML = `<span class="pattern-preview">${patternPreviewSvg(pData.pattern)}</span><span class="pattern-row"><span class="pattern-name">${pData.name}</span><span class="pattern-cost">${pData.cost}</span></span>`;
             btn.addEventListener('click', () => {
-                // Remove active class from all
-                this.elPatternList.querySelectorAll('.pattern-btn').forEach(b => b.classList.remove('active'));
+                this.elPatternList.querySelectorAll('.pattern-btn').forEach(b => {
+                    b.classList.remove('active'); b.setAttribute('aria-pressed', 'false');
+                    b.querySelector('.pattern-preview').innerHTML = patternPreviewSvg(CONSTANTS.PATTERNS[b.dataset.pattern].pattern);
+                });
                 this.elBtnEraser.classList.remove('active');
+                this.elBtnEraser.setAttribute('aria-pressed', 'false');
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
                 if (this.inputHandler) {
                     this.inputHandler.setEraserMode(false);
                     this.inputHandler.setPattern(key);
@@ -417,16 +399,35 @@ class UIManager {
         }
     }
 
+    // Keeps the active card's silhouette in the orientation that will be placed.
+    onPatternRotated() {
+        const key = this.inputHandler?.activePatternKey;
+        const preview = key && this.elPatternList.querySelector(`[data-pattern="${key}"] .pattern-preview`);
+        if (preview) preview.innerHTML = patternPreviewSvg(this.inputHandler.currentPattern);
+    }
+
+    setPhaseLabel(text, phase) {
+        this.elGamePhaseDisplay.textContent = text;
+        if (phase) this.elGamePhaseDisplay.dataset.phase = phase;
+    }
+
     startGame(config) {
         if (this.audio) {
             this.audio.stopNarration();
-            this.elRightPanel.querySelector('div').insertAdjacentHTML('beforeend', (config.scenario ? this.audio.narrationButton(config.scenario, 'briefing') : '') + this.audio.controls());
+            if (config.scenario) this.elPanelExtras.insertAdjacentHTML('beforeend', this.audio.narrationButton(config.scenario, 'briefing'));
+            this.elSettingsExtras.insertAdjacentHTML('beforeend', this.audio.controls());
+            this.elSettingsExtras.querySelector('.audio-settings')?.setAttribute('open', '');
             this.audio.startGameAmbience(config.scenario);
         }
-        // Hide start menu
-        this.elStartMenu.classList.add('opacity-0', 'pointer-events-none');
-        this.elTopStats.classList.remove('hidden');
-        
+        // Hide start menu, reveal the game shell
+        this.elStartMenu.classList.add('is-closed');
+        this.elStartMenu.setAttribute('aria-hidden', 'true');
+        this.elStartMenu.inert = true;
+        this.elTopStats.hidden = false;
+        this.elRightPanel.hidden = false;
+        this.elBtnSettings.hidden = false;
+        document.body.classList.add('in-game');
+
         // Initialize Core Systems
         this.gameState = new GameState(config);
         this.elPatternList.querySelectorAll('[data-pattern]').forEach(btn => {
@@ -437,25 +438,20 @@ class UIManager {
         if (!zoomControls) {
             zoomControls = document.createElement('div');
             zoomControls.id = 'boardZoomControls';
+            zoomControls.setAttribute('role', 'toolbar');
             zoomControls.setAttribute('aria-label', 'Spielfeld-Zoom');
-            zoomControls.innerHTML = '<button type="button" data-zoom="0.8" aria-label="Spielfeld verkleinern">−</button><button type="button" data-zoom="fit" aria-label="Ganzes Spielfeld anzeigen">Einpassen</button><button type="button" data-zoom="1.25" aria-label="Spielfeld vergrößern">+</button>';
+            zoomControls.innerHTML = `<button type="button" data-zoom="1.25" aria-label="Spielfeld vergrößern" title="Vergrößern">${uiIcon('plus')}</button><button type="button" data-zoom="0.8" aria-label="Spielfeld verkleinern" title="Verkleinern">${uiIcon('minus')}</button><button type="button" data-zoom="fit" aria-label="Ganzes Spielfeld anzeigen" title="Einpassen">${uiIcon('fit')}</button>`;
             this.canvas.parentElement.append(zoomControls);
             zoomControls.addEventListener('click', event => {
-                const factor = event.target.dataset.zoom;
+                const factor = event.target.closest('[data-zoom]')?.dataset.zoom;
                 if (!factor) return;
-                if (factor === 'fit') { this.renderer.resize(); return; }
-                const cam = this.renderer.camera;
-                const centerX = (this.canvas.width - (window.innerWidth > 1024 ? 288 : 0)) / 2;
-                const centerY = this.canvas.height / 2;
-                const nextZoom = Math.max(.1, Math.min(8, cam.zoom * Number(factor)));
-                cam.x = centerX - (centerX - cam.x) * nextZoom / cam.zoom;
-                cam.y = centerY - (centerY - cam.y) * nextZoom / cam.zoom;
-                cam.zoom = nextZoom;
+                if (factor === 'fit') { this.renderer.fit(); return; }
+                this.renderer.zoomAt(this.canvas.width / 2, this.canvas.height / 2, Number(factor));
                 this.render();
             });
         }
         this.inputHandler = new InputHandler(this.canvas, this.gameState, this);
-        
+
         this.evolver = config.isDojoMode ? new AIEvolver(this.gameState) : null;
         this.ai = new AI(this.gameState); // Single instance, will swap genomes
 
@@ -482,26 +478,23 @@ class UIManager {
             // Cubic curve: 1→500ms, 50→~70ms, 100→16ms (~60fps, still visible to human eye)
             const x = speedVal / 100;
             const delay = Math.max(16, Math.round(500 * Math.pow(1 - x, 3)));
-            
+
             this.gameState.simSpeedMs = config.scenario?.evolutionDelayMs ?? delay;
         };
         this.elSimSpeed.addEventListener('input', updateSimSpeed);
         updateSimSpeed(); // Initial read
         if (config.scenario) this.setupMissionControls(config.scenario);
 
-        this.logEvent("Mission gestartet. Initialisiere Landezonen...");
-        
-        // Open right panel automatically
-        this.elBtnTogglePanel.click();
+        this.logEvent('Mission gestartet. Initialisiere Landezonen …');
 
         // Start Game State Machine
         this.gameState.start();
-        
+
         // Render initial state
         this.render();
     }
 
-    // Campaign-only controls: simulation bar on the board, simulation options and the forecast in the panel.
+    // Campaign-only controls: simulation bar on the board, simulation options in the menu, forecast in the panel.
     setupMissionControls(mission) {
         const state = this.gameState;
         let options = { slowMotion: true, pauseOnAlarm: false };
@@ -512,11 +505,12 @@ class UIManager {
         if (!bar) {
             bar = document.createElement('div');
             bar.id = 'simControls';
+            bar.setAttribute('role', 'toolbar');
             bar.setAttribute('aria-label', 'Evolution steuern');
             this.canvas.parentElement.append(bar);
         }
         bar.hidden = true;
-        bar.innerHTML = `<button type="button" data-sim="pause" aria-pressed="false">❚❚ Pause</button><button type="button" data-sim="step" disabled aria-label="Eine Generation weiter">+1</button>${fixedTempo ? '' : '<button type="button" data-sim="tempo" aria-label="Tempo wechseln">◷ Normal</button><button type="button" data-sim="turbo" aria-pressed="false">» Turbo</button>'}`;
+        bar.innerHTML = `<button type="button" data-sim="pause" aria-pressed="false">${uiIcon('pause')}<span>Pause</span></button><button type="button" data-sim="step" disabled aria-label="Eine Generation weiter" title="Eine Generation weiter (.)">+1</button>${fixedTempo ? '' : '<button type="button" data-sim="tempo" aria-label="Tempo wechseln">◷ Normal</button><button type="button" data-sim="turbo" aria-pressed="false">» Turbo</button>'}`;
         const tempos = [['Langsam', 20], ['Normal', 50], ['Schnell', 85]];
         bar.onclick = event => {
             const action = event.target.closest('[data-sim]')?.dataset.sim;
@@ -536,7 +530,6 @@ class UIManager {
             if (event.key === 'p' || event.key === 'P') state.setPaused(!state.paused);
             if (event.key === '.') state.stepOnce();
         });
-        const panel = this.elRightPanel.querySelector('div');
         if (mission.forecast) {
             this.elBtnFinishTurn.parentElement.insertAdjacentHTML('afterend', '<div class="forecast-tools"><button type="button" id="btnForecast" class="forecast-button"></button><p id="forecastSummary" class="forecast-summary" role="status" aria-live="polite"></p></div>');
             document.getElementById('btnForecast').onclick = () => {
@@ -547,8 +540,8 @@ class UIManager {
                 this.syncSimControls(); this.render();
             };
         }
-        panel.insertAdjacentHTML('beforeend', `<details class="sim-options"><summary>Simulation</summary><label><input type="checkbox" data-sim-option="slowMotion" ${state.slowMotion ? 'checked' : ''}> Zeitlupe in entscheidenden Momenten</label><label><input type="checkbox" data-sim-option="pauseOnAlarm" ${state.pauseOnAlarm ? 'checked' : ''}> Bei Alarm automatisch anhalten</label><p>Tasten: P pausiert, Punkt rückt eine Generation weiter.</p></details>`);
-        panel.querySelectorAll('[data-sim-option]').forEach(input => input.onchange = () => {
+        this.elSettingsExtras.insertAdjacentHTML('beforeend', `<details class="sim-options" open><summary>Simulation</summary><label><input type="checkbox" data-sim-option="slowMotion" ${state.slowMotion ? 'checked' : ''}> Zeitlupe in entscheidenden Momenten</label><label><input type="checkbox" data-sim-option="pauseOnAlarm" ${state.pauseOnAlarm ? 'checked' : ''}> Bei Alarm automatisch anhalten</label><p>Tasten: P pausiert, Punkt rückt eine Generation weiter.</p></details>`);
+        this.elSettingsExtras.querySelectorAll('[data-sim-option]').forEach(input => input.onchange = () => {
             state[input.dataset.simOption] = input.checked;
             try { localStorage.setItem('redroots_simulation_v1', JSON.stringify({ slowMotion: state.slowMotion, pauseOnAlarm: state.pauseOnAlarm })); } catch { /* optional */ }
         });
@@ -561,14 +554,15 @@ class UIManager {
         const simulating = state.phase === CONSTANTS.PHASE_SIMULATION;
         bar.hidden = !simulating;
         const pause = bar.querySelector('[data-sim="pause"]');
-        pause.textContent = state.paused ? '▶ Weiter' : '❚❚ Pause';
+        pause.innerHTML = `${uiIcon(state.paused ? 'play' : 'pause')}<span>${state.paused ? 'Weiter' : 'Pause'}</span>`;
         pause.setAttribute('aria-pressed', String(state.paused));
         bar.querySelector('[data-sim="step"]').disabled = !state.paused;
         const turbo = bar.querySelector('[data-sim="turbo"]');
         if (turbo) turbo.setAttribute('aria-pressed', String(state.turbo));
         const tempo = bar.querySelector('[data-sim="tempo"]');
         if (tempo) { const v = Number(this.elSimSpeed.value); tempo.textContent = `◷ ${v <= 20 ? 'Langsam' : v <= 50 ? 'Normal' : 'Schnell'}`; }
-        if (simulating && state.paused) this.elGamePhaseDisplay.textContent = `EVOLUTION · PAUSE`;
+        if (simulating) this.elGamePhaseDisplay.dataset.phase = state.paused ? 'paused' : 'simulation';
+        if (simulating && state.paused) this.elGamePhaseDisplay.textContent = 'Evolution · Pause';
         const forecast = document.getElementById('btnForecast');
         if (forecast) {
             forecast.textContent = `Prognose · ${state.forecastCharges} übrig`;
@@ -578,109 +572,134 @@ class UIManager {
         }
     }
 
+    // Primary action reflects the phase: end the turn, start the evolution, or (sandbox) stop it.
+    updateFinishButton() {
+        const s = this.gameState, btn = this.elBtnFinishTurn;
+        if (!s) return;
+        btn.classList.remove('btn-stop');
+        if (s.isSandbox) {
+            const running = s.phase === CONSTANTS.PHASE_SIMULATION;
+            btn.innerHTML = running ? 'Simulation stoppen' : 'Simulation starten';
+            btn.classList.toggle('btn-stop', running);
+            btn.disabled = false;
+            return;
+        }
+        if (s.phase === CONSTANTS.PHASE_SIMULATION) { btn.innerHTML = 'Evolution läuft …'; btn.disabled = true; return; }
+        if (s.phase === CONSTANTS.PHASE_GAMEOVER) { btn.innerHTML = 'Spiel beendet'; btn.disabled = true; return; }
+        if (s.objectiveSystem) btn.innerHTML = `Evolution starten<br><span class="btn-sub">${s.stepsPerRound} Generationen →</span>`;
+        else btn.innerHTML = s.humanFlags?.filter(Boolean).length > 1 ? 'Zug beenden<br><span class="btn-sub">Nächstes Haus ist dran →</span>' : 'Zug beenden';
+        btn.disabled = !s.isCurrentPlayerHuman();
+    }
+
     handlePhaseChange(phase) {
-        this.elGamePhaseDisplay.textContent = phase;
+        const [key, label] = PHASE_LABELS[phase] || ['setup', phase];
+        this.setPhaseLabel(label, key);
+        document.body.dataset.phase = key;
         if (this.gameState.objectiveSystem) { this.campaign?.onPhaseChange(phase); this.syncSimControls(); }
-        
+
         if (phase === CONSTANTS.PHASE_SIMULATION) {
             if (this.audio) this.audio.setSituation('simulation');
-            this.elGamePhaseDisplay.classList.replace('text-mars-300', 'text-neon-cyan');
-            this.logEvent("Evolutionsphase läuft...");
-            
-            if (this.gameState.isSandbox) {
-                this.elBtnFinishTurn.innerHTML = `<span>Simulation stoppen</span> <span class="ml-1 text-sm">⏹️</span>`;
-                this.elBtnFinishTurn.className = 'flex-1 text-white font-bold py-2 px-4 rounded transition btn-sandbox-stop';
-            } else {
-                this.elRightPanel.classList.add('translate-x-full');
-            }
-            
-            this.elSimSpeedContainer.classList.toggle('hidden', !!this.gameState.scenario?.evolutionDelayMs);
-            this.elTerritoryBarContainer.classList.remove('hidden');
-            this.elCurrentPlayerDisplay.textContent = 'Evolution läuft...';
-            this.elCurrentPlayerDisplay.style.color = '#fff';
+            this.logEvent('Evolutionsphase läuft …');
+            this.elEvolutionStatus.hidden = false;
+            this.elEvoBar.style.width = '0%';
+            this.elEvoCount.textContent = `0 / ${this.gameState.stepsPerRound}`;
+            this.elSimSpeedContainer.hidden = !!this.gameState.scenario?.evolutionDelayMs;
+            this.elTerritoryBarContainer.hidden = false;
+            this.elCurrentPlayerDisplay.textContent = 'Evolution läuft …';
+            document.body.dataset.turn = 'none';
+            // During the evolution nobody is on turn: the panel shows the (first) human house.
+            const shown = Math.max(0, this.gameState.humanFlags.indexOf(true));
+            this.setHouseAccent(shown);
+            this.showPlayerCard(shown, 'Evolution läuft');
             this.updateTerritoryBars();
         } else if (phase === CONSTANTS.PHASE_PLACEMENT) {
             if (this.audio) {
                 const isTense = this.gameState.scenario?.act >= 4 || (this.gameState.scenario?.enemies?.length > 1);
                 this.audio.setSituation(isTense ? 'tension' : 'planning');
             }
-            this.elGamePhaseDisplay.classList.replace('text-neon-cyan', 'text-mars-300');
             this.elRoundDisplay.textContent = `${this.gameState.currentRound} / ${this.gameState.maxRounds}`;
-            this.elRightPanel.classList.remove('translate-x-full');
-            
-            if (this.gameState.isSandbox) {
-                this.elBtnFinishTurn.innerHTML = `<span>Simulation starten</span> <span class="ml-1 text-sm">▶️</span>`;
-                this.elBtnFinishTurn.className = 'flex-1 text-white font-bold py-2 px-4 rounded transition btn-sandbox-start';
-                document.getElementById('btnResetSandbox').classList.remove('hidden');
-            } else if (this.gameState.objectiveSystem) {
-                this.elBtnFinishTurn.innerHTML = `Evolution starten<br><span class="text-xs font-normal opacity-90">(${this.gameState.stepsPerRound} Schritte) →</span>`;
-            }
-            
-            this.elSimSpeedContainer.classList.add('hidden');
-            this.elTerritoryBarContainer.classList.remove('hidden');
+            this.elEvolutionStatus.hidden = true;
+            if (this.gameState.isSandbox) document.getElementById('btnResetSandbox').classList.remove('hidden');
+            this.elSimSpeedContainer.hidden = true;
+            this.elTerritoryBarContainer.hidden = false;
             this.logEvent(`Runde ${this.gameState.currentRound} beginnt.`);
             this.updateTerritoryBars();
+        } else if (phase === CONSTANTS.PHASE_GAMEOVER) {
+            this.elEvolutionStatus.hidden = true;
         }
+        this.updateFinishButton();
 
         if (this.gameState.isSandbox) {
-            this.elBudgetDisplay.textContent = "∞";
-            this.elRoundDisplay.closest('#topStats > div')?.classList.add('hidden');
-            this.elTerritoryBarContainer.classList.add('hidden');
+            this.elBudgetDisplay.textContent = '∞';
+            this.elRoundDisplay.closest('.stat')?.classList.add('hidden');
+            this.elTerritoryBarContainer.hidden = true;
         } else {
-            this.elRoundDisplay.closest('#topStats > div')?.classList.remove('hidden');
+            this.elRoundDisplay.closest('.stat')?.classList.remove('hidden');
         }
     }
 
     handleCycleUpdate(step, maxSteps) {
-        this.elGamePhaseDisplay.textContent = `EVOLUTION (${step}/${maxSteps})`;
+        if (!this.gameState.paused) this.setPhaseLabel(`Evolution · ${step}/${maxSteps}`, 'simulation');
+        this.elEvoCount.textContent = `${step} / ${maxSteps}`;
+        this.elEvoBar.style.width = `${Math.min(100, step / maxSteps * 100)}%`;
+    }
+
+    setHouseAccent(pId) {
+        const color = pId === null || pId < 0 ? null : CONSTANTS.PLAYER_COLORS[pId].main;
+        for (const el of [this.elRightPanel, this.elTopStats]) {
+            if (!el) continue;
+            if (color) el.style.setProperty('--house', color); else el.style.removeProperty('--house');
+        }
+    }
+
+    // Player card in the tool panel: emblem, house name, role and budget of the shown house.
+    showPlayerCard(pId, role) {
+        const player = CONSTANTS.PLAYER_COLORS[pId];
+        this.elPanelPlayerName.textContent = player.name;
+        this.elPanelPlayerRole.textContent = role;
+        if (this.elPanelPlayerEmblem.getAttribute('src') !== player.asset) this.elPanelPlayerEmblem.src = player.asset;
+        if (this.gameState.isSandbox) { this.elBudgetDisplay.textContent = '∞'; return; }
+        this.lastBudget = null;
+        this.updateBudgetDisplay(pId);
     }
 
     handlePlayerChange(pId) {
         if (pId < 0) return;
-        
-        // Show camp indicator
-        this.showCampIndicator(pId);
-        
+
         const isHuman = this.gameState.isCurrentPlayerHuman();
-        const pName = CONSTANTS.PLAYER_COLORS[pId].name;
-        const pColor = CONSTANTS.PLAYER_COLORS[pId].main;
-        
-        if (this.gameState.isSandbox) {
-            this.elCurrentPlayerDisplay.textContent = "Sandbox Modus - Platziere nach Belieben";
-            this.elCurrentPlayerDisplay.style.color = "#fff";
-        } else {
-            this.elCurrentPlayerDisplay.textContent = isHuman ? `${pName} ist am Zug...` : `${pName} (KI) berechnet...`;
-            this.elCurrentPlayerDisplay.style.color = pColor;
+        const scenario = this.gameState.scenario;
+        // Houses without a role in this mission pass silently, without flashing their name in the panel.
+        if (!isHuman && this.gameState.phase === CONSTANTS.PHASE_PLACEMENT && scenario && (this.gameState.defeatedPlayers?.has(pId) || (scenario.enemies ? !scenario.enemies.some(e => e.house === pId) : !scenario.enemy))) {
+            this.gameState.nextPlayerTurn();
+            return;
         }
 
-        this.elPanelPlayerName.textContent = pName;
-        this.elPanelPlayerHeader.style.borderColor = pColor;
-        this.elPanelPlayerHeader.style.boxShadow = `0 0 15px ${CONSTANTS.PLAYER_COLORS[pId].bg}`;
-        
+        // Show camp indicator
+        this.showCampIndicator(pId);
+
+        const player = CONSTANTS.PLAYER_COLORS[pId];
+        this.setHouseAccent(pId);
+        document.body.dataset.turn = isHuman ? 'human' : 'ai';
+
         if (this.gameState.isSandbox) {
-            this.elBudgetDisplay.textContent = "∞";
+            this.elCurrentPlayerDisplay.textContent = 'Sandbox · Platziere nach Belieben';
         } else {
-            this.updateBudgetDisplay();
+            this.elCurrentPlayerDisplay.textContent = isHuman ? `${player.name} ist am Zug` : `${player.name} (Computer) plant …`;
         }
-        
+        this.showPlayerCard(pId, this.gameState.isSandbox ? 'Sandbox' : isHuman ? 'Am Zug · Mensch' : 'Computer plant …');
+
         if (!isHuman && this.gameState.phase === CONSTANTS.PHASE_PLACEMENT) {
             this.elBtnFinishTurn.disabled = true;
-            this.elBtnFinishTurn.classList.add('opacity-50');
-            
+
             // Swap genome if in Dojo/Evolution mode
             if (this.aiGenomes) {
                 this.ai.genome = this.aiGenomes[pId].params;
             }
-            
-            if (this.gameState.scenario && (this.gameState.defeatedPlayers?.has(pId) || (this.gameState.scenario.enemies ? !this.gameState.scenario.enemies.some(e => e.house === pId) : !this.gameState.scenario.enemy))) {
-                this.gameState.nextPlayerTurn();
-            } else {
-                if (this.gameState.scenario) this.ai.genome = this.ai.getDefaultGenome(this.gameState.playerStrengths[pId], this.gameState.aiProfiles?.[pId]?.doctrine);
-                this.ai.takeTurn();
-            }
+
+            if (scenario) this.ai.genome = this.ai.getDefaultGenome(this.gameState.playerStrengths[pId], this.gameState.aiProfiles?.[pId]?.doctrine);
+            this.ai.takeTurn();
         } else {
-            this.elBtnFinishTurn.disabled = false;
-            this.elBtnFinishTurn.classList.remove('opacity-50');
+            this.updateFinishButton();
         }
     }
 
@@ -695,37 +714,36 @@ class UIManager {
     }
 
     handleGameOver(winnerId) {
+        document.body.dataset.phase = 'gameover';
+        this.updateFinishButton();
         if (this.gameState.objectiveSystem) { this.campaign.showResult(); return; }
-        this.elRightPanel.classList.add('translate-x-full');
-        let title = "MISSION BEENDET";
-        let msg = "";
-        let color = "white";
-        let asset = "";
+        let title = 'Gefecht beendet';
+        let msg = '';
+        let color = '';
 
         if (winnerId === -1) {
-            msg = "Es ist ein Unentschieden. Keine Überlebenden.";
+            title = 'Unentschieden';
+            msg = 'Es ist ein Unentschieden. Keine Überlebenden.';
             this.elAlertImage.classList.add('hidden');
         } else {
             const winner = CONSTANTS.PLAYER_COLORS[winnerId];
+            title = `${winner.name} siegt`;
             msg = `${winner.name} hat die Vorherrschaft errungen!`;
             color = winner.main;
             this.elAlertImage.src = winner.asset;
+            this.elAlertImage.alt = winner.name;
             this.elAlertImage.classList.remove('hidden');
             this.elAlertImage.style.borderColor = color;
-            this.elAlertImage.style.boxShadow = `0 0 30px ${winner.shadow}`;
+            this.elAlertImage.style.boxShadow = `0 0 40px ${winner.shadow}`;
         }
 
         this.elAlertTitle.textContent = title;
         this.elAlertMessage.textContent = msg;
         this.elAlertMessage.style.color = color;
 
-        if (!this.gameState.isBatchMode) {
-            this.elAlertOverlay.classList.remove('opacity-0', 'pointer-events-none');
-            this.elAlertBox.classList.remove('scale-95');
-            this.elAlertBox.classList.add('scale-100');
-        }
-        
-        this.logEvent("Evolution beendet.");
+        if (!this.gameState.isBatchMode) this.openDialog(this.elAlertOverlay, this.elBtnRestartGame);
+
+        this.logEvent('Evolution beendet.');
 
         // Evolution Mode Result Recording
         if (this.gameState.isDojoMode && this.aiGenomes) {
@@ -741,7 +759,7 @@ class UIManager {
             this.evolver.recordResult(stats);
 
             if (this.gameState.isBatchMode) {
-                this.logEvent("Nächster Evolutions-Lauf in 1s...");
+                this.logEvent('Nächster Evolutions-Lauf in 1s …');
                 setTimeout(() => {
                     location.reload();
                 }, 1000);
@@ -762,7 +780,7 @@ class UIManager {
     getMinDistanceToEnemyCamp(pId) {
         let minDist = 1000;
         const enemyCamps = this.gameState.territory.camps.filter(c => c.id !== pId);
-        
+
         for (let r = 0; r < this.gameState.rows; r++) {
             for (let c = 0; c < this.gameState.cols; c++) {
                 if (this.gameState.grid.getOwner(r, c) === pId + 1) {
@@ -778,18 +796,36 @@ class UIManager {
         return minDist;
     }
 
-    updateBudgetDisplay() {
-        if (!this.gameState || this.gameState.currentPlayer < 0) return;
-        const budget = this.gameState.budgets[this.gameState.currentPlayer];
-        this.elBudgetDisplay.textContent = budget;
+    updateBudgetDisplay(pId = null) {
+        if (!this.gameState) return;
+        if (pId === null) pId = this.gameState.currentPlayer >= 0 ? this.gameState.currentPlayer : this.shownPlayer;
+        if (pId === undefined || pId < 0) return;
+        this.shownPlayer = pId;
+        if (this.gameState.isSandbox) { this.elBudgetDisplay.textContent = '∞'; return; }
+        const budget = this.gameState.budgets[pId];
+        if (String(budget) !== this.elBudgetDisplay.textContent) {
+            this.elBudgetDisplay.textContent = budget;
+            // A visible pulse when material is added (new round, supply cache), not when it is spent.
+            if (this.lastBudget !== null && budget > this.lastBudget) {
+                this.elBudgetDisplay.classList.remove('is-bump');
+                void this.elBudgetDisplay.offsetWidth;
+                this.elBudgetDisplay.classList.add('is-bump');
+            }
+        }
+        this.lastBudget = budget;
+        this.elPatternList.querySelectorAll('[data-pattern]').forEach(btn => {
+            const tooExpensive = CONSTANTS.PATTERNS[btn.dataset.pattern].cost > budget;
+            btn.classList.toggle('is-unaffordable', tooExpensive);
+            btn.title = tooExpensive ? 'Zu wenig Genmaterial' : '';
+        });
     }
 
     updateTerritoryBars() {
         if (!this.gameState || !this.elTerritoryBars) return;
-        
+
         const counts = Array(this.gameState.playerCount).fill(0);
         let totalOwned = 0;
-        
+
         for (let r = 0; r < this.gameState.rows; r++) {
             for (let c = 0; c < this.gameState.cols; c++) {
                 const owner = this.gameState.territory.getOwnerAt(r, c);
@@ -803,21 +839,25 @@ class UIManager {
         this.elTerritoryBars.innerHTML = '';
         if (totalOwned === 0) return;
 
+        const summary = [];
         for (let i = 0; i < this.gameState.playerCount; i++) {
             if (counts[i] > 0) {
                 const pct = (counts[i] / totalOwned) * 100;
                 const bar = document.createElement('div');
                 bar.style.width = `${pct}%`;
                 bar.style.backgroundColor = CONSTANTS.PLAYER_COLORS[i].main;
-                bar.className = 'h-full flex items-center justify-center text-[10px] text-black font-bold truncate transition-all duration-300';
-                if (pct > 5) bar.textContent = counts[i];
+                bar.className = 'territory-seg';
+                bar.title = `${CONSTANTS.PLAYER_COLORS[i].name}: ${counts[i]} Felder (${Math.round(pct)} %)`;
+                if (pct > 9) bar.textContent = counts[i];
                 this.elTerritoryBars.appendChild(bar);
+                summary.push(`${CONSTANTS.PLAYER_COLORS[i].name} ${Math.round(pct)} %`);
             }
         }
+        this.elTerritoryBars.setAttribute('aria-label', `Gebietskontrolle: ${summary.join(', ')}`);
     }
 
     logEvent(msg) {
-        this.elEventLog.textContent = `> ${msg}`;
+        this.elEventLog.textContent = msg;
     }
 
     showCampIndicator(pId) {
@@ -830,7 +870,7 @@ class UIManager {
             startTime: Date.now(),
             opacity: 1
         };
-        
+
         const animate = () => {
             const elapsed = Date.now() - this.campIndicator.startTime;
             if (elapsed < 3000) {

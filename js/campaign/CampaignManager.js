@@ -173,21 +173,21 @@ class CampaignManager {
         this.hudToggle.setAttribute('aria-label', 'Missions-Info ein- oder ausfahren');
         this.hudToggle.setAttribute('aria-expanded', 'true');
         this.hudToggle.title = 'Missions-Info ein- oder ausfahren';
-        this.hudToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="hud-toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>`;
+        this.hudToggle.innerHTML = CampaignManager.toggleIcon(true);
         this.hudToggle.onclick = () => this.toggleHUD();
         this.hud.append(this.hudToggle);
         this.hudCollapsed = false;
-        this.hasAutoCollapsed = false;
         document.querySelector('#app > main').prepend(this.hud);
-        // Event toasts sit above the board; they repeat nothing that the HUD does not also show.
+        // Event toasts sit on the board; they repeat nothing that the HUD does not also show.
         this.toast = document.createElement('div');
         this.toast.className = 'mission-toast';
         this.toast.setAttribute('role', 'status');
         this.toast.setAttribute('aria-live', 'polite');
         this.toast.hidden = true;
-        document.querySelector('#app > main').append(this.toast);
+        (document.getElementById('canvasContainer') || document.querySelector('#app > main')).append(this.toast);
         this.toastQueue = [];
         document.getElementById('btnCampaign').onclick = () => this.showMap();
+        this.showStartProgress();
         // A page transition disposes all simulation timers, canvas listeners and AI work.
         const params = new URLSearchParams(location.search);
         const selected = CAMPAIGN_MISSIONS.findIndex(m => m.id === params.get('sector'));
@@ -209,6 +209,19 @@ class CampaignManager {
             if (selected >= 0) this.overlay.querySelector('.expedition-layout').scrollIntoView({block:'start'});
         }
     }
+    static toggleIcon(expanded) {
+        return `<svg class="icon hud-toggle-icon" aria-hidden="true"><use href="#i-chevron-${expanded ? 'left' : 'right'}"/></svg>`;
+    }
+    // The campaign card on the start screen shows the saved progress and offers to continue.
+    showStartProgress() {
+        const line = document.getElementById('campaignProgressLine'), cta = document.querySelector('#btnCampaign .mode-cta');
+        const done = Object.keys(this.progress.completed).length;
+        if (!line || !done) return;
+        const stars = Object.values(this.progress.completed).reduce((sum, v) => sum + v.stars, 0);
+        line.hidden = false;
+        line.textContent = `${done} / ${CAMPAIGN_MISSIONS.length} Sektoren gesichert · ★ ${stars} / ${CAMPAIGN_MISSIONS.length * 3}`;
+        if (cta && done < CAMPAIGN_MISSIONS.length) cta.innerHTML = 'Expedition fortsetzen <span aria-hidden="true">→</span>';
+    }
     navigateToMap(index) { location.href = `${location.pathname}?campaign&sector=${CAMPAIGN_MISSIONS[index].id}`; }
     navigate(index, attempt = 1, expert = false) { location.href = `${location.pathname}?mission=${CAMPAIGN_MISSIONS[index].id}${attempt > 1 ? `&attempt=${attempt}` : ''}${expert ? '&expert=1' : ''}`; }
     hintStages(m) { return m.hints || [m.hint]; }
@@ -223,7 +236,7 @@ class CampaignManager {
         const stars = Object.values(this.progress.completed).reduce((s, v) => s + v.stars, 0);
         this.overlay.hidden = false;
         this.overlay.innerHTML = `
-            <header class="expedition-header"><a class="expedition-brand" href="${location.pathname}">RED<span>ROOTS</span><small>EXPEDITION COMMAND</small></a><span class="mission-eyebrow">KAMPAGNE / AKT ${chapter}</span><button class="quiet-button" id="campaignClose">Zurück zum Gefecht ↗</button>${this.ui.audio.controls()}</header>
+            <header class="expedition-header"><a class="expedition-brand" href="${location.pathname}">RED<span>ROOTS</span><small>EXPEDITION COMMAND</small></a><span class="mission-eyebrow">KAMPAGNE / AKT ${chapter}</span><button class="quiet-button" id="campaignClose">← Spielmodi</button>${this.ui.audio.controls()}</header>
             <div class="expedition-intro"><div><div class="mission-eyebrow">PROJECT REDROOTS · ${act.name.toUpperCase()}</div><h1>${act.headline}<br><em>${act.subtitle}</em></h1><p>Das Gedächtnis des roten Bodens · Fünf Akte · fünfundzwanzig Missionen.</p></div><div class="expedition-progress"><strong>${String(completed).padStart(2,'0')}<span> / ${CAMPAIGN_MISSIONS.length}</span></strong><small>SEKTOREN GESICHERT</small><div>★ <span>${stars} / ${CAMPAIGN_MISSIONS.length * 3}</span></div></div></div>
             <nav class="act-tabs" aria-label="Akt auswählen">${CAMPAIGN_ACTS.map(a => { const first = CAMPAIGN_MISSIONS.findIndex(n => n.act === a.id); return `<button data-act="${a.id}" aria-pressed="${m.act === a.id}" ${this.progress.available(first) ? '' : 'disabled'}>Akt ${a.roman} · ${a.name}${this.progress.available(first) ? '' : ' · Gesperrt'}</button>`; }).join('')}</nav>
             ${actComplete ? `<section class="campaign-completion"><h2>Akt ${chapter} abgeschlossen</h2><p>${nextAct ? `Die Reise geht weiter: Akt ${nextAct.roman} · ${nextAct.name} ist jetzt spielbar.` : this.progress.finalChoice === 'consortium' ? 'Das Mars-Konsortium beginnt seine gemeinsame Wache über Wasserwege und Sperrkorridore.' : this.progress.finalChoice === 'open_genomes' ? 'Die PALISADE-Archive sind frei; ein gemeinsamer Vertrag schützt die Grenzen der lokalen Genome.' : 'Alle fünfundzwanzig Sektoren sind gesichert. Im letzten Missionsbericht wartet noch die Entscheidung über die gemeinsame Zukunft.'}</p>${nextAct ? `<button class="launch-button" data-act="${nextAct.id}">Weiter zu Akt ${nextAct.roman} →</button>` : ''}</section>` : ''}<div class="expedition-layout"><div class="mars-chart"><div class="chart-caption">MARS / EXPEDITIONSROUTE </div>
@@ -298,17 +311,16 @@ class CampaignManager {
         this.hintLevel = Math.min(this.attempt, this.hintStages(mission).length);
         this.ui.startGame(MissionManager.config(mission));
         this.hud.hidden = false;
-        this.hasAutoCollapsed = false;
         this.expandHUD();
-        this.ui.elBtnFinishTurn.innerHTML = `Evolution starten<br><span class="text-xs font-normal opacity-90">(${this.ui.gameState.stepsPerRound} Schritte) →</span>`;
+        this.ui.elBtnFinishTurn.innerHTML = `Evolution starten<br><span class="btn-sub">${this.ui.gameState.stepsPerRound} Generationen →</span>`;
         this.updateHUD();
         this.ui.elPatternList.querySelector('[data-pattern="cell"]').click();
         this.ui.audio.enterScene(CAMPAIGN_MISSIONS[index], 'briefing');
     }
     hintDetails(m) {
-        if (!this.hintStages(m).length) return `<details><summary>Ziel · Expertenprotokoll</summary><p><strong>${m.objective.label}</strong></p><p>Expertenprotokoll: weniger Material, stärkere Gegner, keine Hinweise und keine Prognose.</p></details>`;
+        if (!this.hintStages(m).length) return `<details class="hud-hints"><summary>Ziel · Expertenprotokoll</summary><div class="hud-hints-body"><p><strong>${m.objective.label}</strong></p><p>Expertenprotokoll: weniger Material, stärkere Gegner, keine Hinweise und keine Prognose.</p></div></details>`;
         const stages = this.hintStages(m), level = Math.max(1, Math.min(this.hintLevel || 1, stages.length));
-        return `<details><summary>Ziel & Hinweis · Stufe ${level}/${stages.length}</summary><p><strong>${m.objective.label}</strong></p>${stages.slice(0, level).map((text, i) => `<p class="${i === level - 1 ? 'hint-current' : 'hint-earlier'}">${text}</p>`).join('')}${level < stages.length ? '<button type="button" class="quiet-button" data-more-hint>Mehr Hilfe</button>' : ''}</details>`;
+        return `<details class="hud-hints"><summary>Ziel &amp; Hinweis · Stufe ${level}/${stages.length}</summary><div class="hud-hints-body"><p><strong>${m.objective.label}</strong></p>${stages.slice(0, level).map((text, i) => `<p class="${i === level - 1 ? 'hint-current' : 'hint-earlier'}">${text}</p>`).join('')}${level < stages.length ? '<button type="button" class="quiet-button" data-more-hint>Mehr Hilfe</button>' : ''}</div></details>`;
     }
     // Rewinds to the start of a round in place; the page and its listeners stay, so clean up explicitly.
     rewind(round) {
@@ -328,7 +340,7 @@ class CampaignManager {
         this.hud.classList.add('collapsed');
         if (this.hudToggle) {
             this.hudToggle.setAttribute('aria-expanded', 'false');
-            this.hudToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="hud-toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>`;
+            this.hudToggle.innerHTML = CampaignManager.toggleIcon(false);
         }
     }
     expandHUD() {
@@ -336,18 +348,12 @@ class CampaignManager {
         this.hud.classList.remove('collapsed');
         if (this.hudToggle) {
             this.hudToggle.setAttribute('aria-expanded', 'true');
-            this.hudToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="hud-toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>`;
+            this.hudToggle.innerHTML = CampaignManager.toggleIcon(true);
         }
     }
     toggleHUD() {
         if (this.hudCollapsed) this.expandHUD();
         else this.collapseHUD();
-    }
-    onFirstPlacement() {
-        if (!this.hasAutoCollapsed) {
-            this.hasAutoCollapsed = true;
-            this.collapseHUD();
-        }
     }
     updateHUD() {
         const s = this.ui.gameState;
@@ -360,12 +366,10 @@ class CampaignManager {
         const progress = [o.progressText, countdown ? `<span class="objective-countdown${countdown.remaining <= 10 ? ' urgent' : ''}">⏱ ${countdown.label} ${countdown.remaining} Gen.</span>` : ''].filter(Boolean).join(' · ');
         const upcoming = s.upcomingEvents?.()[0];
         const warning = upcoming ? `<p class="objective-progress objective-alert objective-event">⚡ Vorwarnung (${upcoming.when}): ${upcoming.text}</p>` : '';
-        target.innerHTML = `<div class="mission-eyebrow">AKT ${CAMPAIGN_ACTS.find(a => a.id === m.act).roman} / SEKTOR ${String(this.selected+1).padStart(2,'0')}${m.expertMode ? ' · ✦ EXPERTE' : ''}<a href="${location.pathname}?campaign">Marskarte ↗</a></div><h2>${m.title}</h2><p>${m.objective.label}</p>${threat ? `<p class="objective-progress objective-alert ${threat.level}">⚠ ${threat.label}: ${threatText}</p>` : ''}${warning}${progress ? `<p class="objective-progress">${progress}</p>` : ''}<div class="hud-telemetry"><span>GEN ${String(o.generations).padStart(3,'0')}</span><span>${o.spent} MATERIAL EINGESETZT</span></div>${this.hintDetails(m)}`;
+        const status = `${threat ? `<p class="objective-progress objective-alert ${threat.level}">⚠ ${threat.label}: ${threatText}</p>` : ''}${warning}${progress ? `<p class="objective-progress">${progress}</p>` : ''}`;
+        target.innerHTML = `<div class="hud-head"><span class="hud-sector">Akt ${CAMPAIGN_ACTS.find(a => a.id === m.act).roman} · Sektor ${String(this.selected+1).padStart(2,'0')}${m.expertMode ? ' · <em>✦ Experte</em>' : ''}<b> · ${m.title}</b></span><a class="hud-map-link" href="${location.pathname}?campaign"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg><span>Marskarte</span></a></div><h2 class="hud-title">${m.title}</h2><p class="hud-objective">${m.objective.label}</p><div class="hud-status">${status}</div><div class="hud-telemetry"><span>Gen ${String(o.generations).padStart(3,'0')}</span><span>${o.spent} Material eingesetzt</span></div>${this.hintDetails(m)}`;
         // Preserve an opened hint across frequent simulation renders.
         if (this.hintOpen) target.querySelector('details').open = true;
-        if (!this.hasAutoCollapsed && s.undoStack?.some(d => d.type === 'placement')) {
-            this.onFirstPlacement();
-        }
         this.processEvents();
     }
     // Turns objective events into toasts and signals and drives the simulation's tension music.

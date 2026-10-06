@@ -10,14 +10,18 @@ class GameRenderer {
         this.playerImages = [];
         this.loadPlayerImages();
 
-        // Calculate cell size to fit window nicely
-        this.cellSize = 10; 
+        // World units: one cell is cellSize wide; the camera maps them to device pixels.
+        this.cellSize = 10;
         this.camera = { x: 0, y: 0, zoom: 1 };
+        this.dpr = 1;
+        this.fitZoom = 1;
+        // Until the player pans or zooms, a resize re-fits the whole board.
+        this.userCamera = false;
         this.reducedMotion = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
         // Spaceships among predefined foreign flora get a direction arrow in the first planning phase.
         this.seedArrows = (gameState.scenario?.map.seeds || []).filter(seed => seed.owner !== 1).map(seed => ({ seed, cells: MissionManager.seedCells(seed), motion: MissionManager.seedMotion(seed) })).filter(a => a.motion);
         this.resize();
-        // The board also changes size when mobile controls or mission hints expand.
+        // The board also changes size when the mission HUD collapses or the device rotates.
         this.resizeObserver = new ResizeObserver(() => this.resize());
         this.resizeObserver.observe(this.canvas.parentElement);
     }
@@ -26,28 +30,59 @@ class GameRenderer {
         return this.reducedMotion ? 1 : .55 + .45 * Math.sin(performance.now() / 160);
     }
 
+    clampZoom(zoom) {
+        return Math.max(Math.min(.2 * this.dpr, this.fitZoom * .8), Math.min(6 * this.dpr, zoom));
+    }
+
+    // Zooms around a point given in canvas (device) pixels.
+    zoomAt(px, py, factor) {
+        const cam = this.camera, next = this.clampZoom(cam.zoom * factor);
+        cam.x = px - (px - cam.x) * next / cam.zoom;
+        cam.y = py - (py - cam.y) * next / cam.zoom;
+        cam.zoom = next;
+        this.userCamera = true;
+    }
+
     // Centers the camera on a cell and zooms in far enough to see individual cells.
     focusCell(r, c, minZoom = 1.4) {
-        const panelWidth = window.innerWidth > 1024 ? 288 : 0;
-        this.camera.zoom = Math.max(this.camera.zoom, minZoom);
-        this.camera.x = (this.canvas.width - panelWidth) / 2 - (c + .5) * this.cellSize * this.camera.zoom;
+        this.camera.zoom = this.clampZoom(Math.max(this.camera.zoom, minZoom * this.dpr));
+        this.camera.x = this.canvas.width / 2 - (c + .5) * this.cellSize * this.camera.zoom;
         this.camera.y = this.canvas.height / 2 - (r + .5) * this.cellSize * this.camera.zoom;
+        this.userCamera = true;
+        this.render();
+    }
+
+    // Shows the whole board inside the measured container (header, HUD and panel are outside it).
+    fit() {
+        const w = this.canvas.width, h = this.canvas.height, pad = 12 * this.dpr;
+        const boardW = this.gameState.cols * this.cellSize, boardH = this.gameState.rows * this.cellSize;
+        this.fitZoom = Math.max(.01, Math.min((w - 2 * pad) / boardW, (h - 2 * pad) / boardH));
+        this.camera.zoom = this.fitZoom;
+        this.camera.x = (w - boardW * this.camera.zoom) / 2;
+        this.camera.y = (h - boardH * this.camera.zoom) / 2;
+        this.userCamera = false;
         this.render();
     }
 
     resize() {
         const rect = this.canvas.parentElement.getBoundingClientRect();
         if (!rect.width || !rect.height) return;
-        this.canvas.width = rect.width;
-        this.canvas.height = rect.height;
-        const panelWidth = window.innerWidth > 1024 ? 288 : 0;
-        const availableWidth = Math.max(1, rect.width - panelWidth - 24);
-        const topInset = window.innerWidth <= 1024 && window.innerWidth > window.innerHeight && this.gameState.scenario ? 85 : 0;
-        const availableHeight = Math.max(1, rect.height - 24 - topInset);
-        this.cellSize = 10;
-        this.camera.zoom = Math.min(availableWidth / (this.gameState.cols * this.cellSize), availableHeight / (this.gameState.rows * this.cellSize));
-        this.camera.x = (rect.width - panelWidth - this.gameState.cols * this.cellSize * this.camera.zoom) / 2;
-        this.camera.y = topInset + (rect.height - topInset - this.gameState.rows * this.cellSize * this.camera.zoom) / 2;
+        const dpr = Math.min(2, (typeof window !== 'undefined' && window.devicePixelRatio) || 1);
+        const cam = this.camera, prevW = this.canvas.width, prevH = this.canvas.height, prevDpr = this.dpr;
+        const w = Math.round(rect.width * dpr), h = Math.round(rect.height * dpr);
+        if (w === prevW && h === prevH && dpr === prevDpr && this.fitted) return;
+        // Keep the point in the middle of the view where it is when the player has moved the camera.
+        const center = this.userCamera && prevW ? { x: (prevW / 2 - cam.x) / cam.zoom, y: (prevH / 2 - cam.y) / cam.zoom } : null;
+        this.dpr = dpr;
+        this.canvas.width = w;
+        this.canvas.height = h;
+        this.fitted = true;
+        if (!center) { this.fit(); return; }
+        const boardW = this.gameState.cols * this.cellSize, boardH = this.gameState.rows * this.cellSize, pad = 12 * dpr;
+        this.fitZoom = Math.max(.01, Math.min((w - 2 * pad) / boardW, (h - 2 * pad) / boardH));
+        cam.zoom = this.clampZoom(cam.zoom * dpr / prevDpr);
+        cam.x = w / 2 - center.x * cam.zoom;
+        cam.y = h / 2 - center.y * cam.zoom;
         this.render();
     }
 
@@ -98,12 +133,19 @@ class GameRenderer {
         this.ctx.restore();
     }
 
+    // Labels keep a readable on-screen size (10–13 px) at every zoom level.
+    labelFont() {
+        const screenPx = Math.max(10, Math.min(13, 11 * this.camera.zoom / this.dpr));
+        const size = screenPx * this.dpr / this.camera.zoom;
+        return { size, font: `600 ${size}px "Fira Code", ui-monospace, monospace` };
+    }
+
     label(text, x, y, color) {
-        const ctx = this.ctx;
-        ctx.font = 'bold 11px monospace';
-        const w = ctx.measureText(text).width;
-        ctx.fillStyle = 'rgba(8,16,22,.78)';
-        ctx.fillRect(x - 2, y - 11, w + 4, 14);
+        const ctx = this.ctx, { size, font } = this.labelFont();
+        ctx.font = font;
+        const w = ctx.measureText(text).width, pad = size * .35;
+        ctx.fillStyle = 'rgba(6,12,17,.82)';
+        ctx.fillRect(x - pad, y - size * 1.05, w + 2 * pad, size * 1.4);
         ctx.fillStyle = color;
         ctx.fillText(text, x, y);
     }
@@ -191,7 +233,7 @@ class GameRenderer {
             ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x1 - 9 * Math.cos(a - .45), y1 - 9 * Math.sin(a - .45)); ctx.lineTo(x1 - 9 * Math.cos(a + .45), y1 - 9 * Math.sin(a + .45)); ctx.closePath(); ctx.fill();
             const speed = Math.max(Math.abs(motion.dr), Math.abs(motion.dc));
             const text = `zieht nach ${names[`${Math.sign(motion.dr)},${Math.sign(motion.dc)}`]} · ${speed} Feld${speed > 1 ? 'er' : ''} je ${motion.period} Gen.`;
-            ctx.font = 'bold 11px monospace';
+            ctx.font = this.labelFont().font;
             const width = ctx.measureText(text).width;
             // The label sits beside the seed itself, on the side away from the arrow.
             const lx = Math.min(Math.max(4, x0 - width / 2), state.cols * size - width - 4);
@@ -251,20 +293,26 @@ class GameRenderer {
         }
     }
 
+    // Grid lines are one device pixel wide and fade out when cells get too small to tell apart.
     drawGrid() {
-        this.ctx.strokeStyle = CONSTANTS.GRID_LINE_COLOR;
-        this.ctx.lineWidth = 1;
-
-        this.ctx.beginPath();
+        const cellPx = this.cellSize * this.camera.zoom / this.dpr;
+        if (cellPx < 3) return;
+        const ctx = this.ctx, w = this.gameState.cols * this.cellSize, h = this.gameState.rows * this.cellSize;
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, (cellPx - 3) / 6);
+        ctx.strokeStyle = CONSTANTS.GRID_LINE_COLOR;
+        ctx.lineWidth = 1 / this.camera.zoom;
+        ctx.beginPath();
         for (let r = 0; r <= this.gameState.rows; r++) {
-            this.ctx.moveTo(0, r * this.cellSize);
-            this.ctx.lineTo(this.canvas.width, r * this.cellSize);
+            ctx.moveTo(0, r * this.cellSize);
+            ctx.lineTo(w, r * this.cellSize);
         }
         for (let c = 0; c <= this.gameState.cols; c++) {
-            this.ctx.moveTo(c * this.cellSize, 0);
-            this.ctx.lineTo(c * this.cellSize, this.canvas.height);
+            ctx.moveTo(c * this.cellSize, 0);
+            ctx.lineTo(c * this.cellSize, h);
         }
-        this.ctx.stroke();
+        ctx.stroke();
+        ctx.restore();
     }
 
     drawCamps() {
@@ -332,7 +380,7 @@ class GameRenderer {
                         this.ctx.shadowBlur = 0;
                     } else {
                         this.ctx.shadowColor = shadowColor;
-                        this.ctx.shadowBlur = owner === CONSTANTS.OWNER_ROCK ? 2 : 10;
+                        this.ctx.shadowBlur = (owner === CONSTANTS.OWNER_ROCK ? 2 : 10) * this.dpr;
                     }
                     
                     const margin = 1;

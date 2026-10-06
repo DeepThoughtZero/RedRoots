@@ -57,14 +57,12 @@ async function evolve(s) { s.currentPlayer=-1; s.phase=C.PHASE_SIMULATION; await
     cm.hud = { classList: { c: new Set(), add(k){this.c.add(k)}, remove(k){this.c.delete(k)}, contains(k){return this.c.has(k)} } };
     cm.hudToggle = { setAttribute(k,v){this[k]=v}, innerHTML: '' };
     cm.hudBody = { innerHTML: '', querySelector: () => null };
-    cm.hudCollapsed = false; cm.hasAutoCollapsed = false;
+    cm.hudCollapsed = false;
     cm.collapseHUD(); assert.equal(cm.hudCollapsed, true); assert.ok(cm.hud.classList.contains('collapsed')); assert.equal(cm.hudToggle['aria-expanded'], 'false');
     cm.expandHUD(); assert.equal(cm.hudCollapsed, false); assert.ok(!cm.hud.classList.contains('collapsed')); assert.equal(cm.hudToggle['aria-expanded'], 'true');
     cm.toggleHUD(); assert.equal(cm.hudCollapsed, true);
-    cm.expandHUD(); cm.hasAutoCollapsed = false; cm.onFirstPlacement();
-    assert.equal(cm.hasAutoCollapsed, true); assert.equal(cm.hudCollapsed, true);
-    cm.expandHUD(); cm.onFirstPlacement(); assert.equal(cm.hudCollapsed, false);
-    cm.start(0); assert.ok(mockBtn.innerHTML.includes('Evolution starten<br>'));
+    // The docked HUD never covers the board, so it only collapses on request; a mission start expands it.
+    cm.start(0); assert.equal(cm.hudCollapsed, false); assert.ok(mockBtn.innerHTML.includes('Evolution starten<br>'));
 
     console.log('PASS: five mission solutions, extinction, race defeat, camp defeat, material undo, persistence validation, skirmish compatibility, collapsible hud, button newline');
 })().catch(e=>{console.error(e);process.exitCode=1});

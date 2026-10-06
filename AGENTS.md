@@ -15,7 +15,7 @@ RedRoots ist ein deutschsprachiges Strategiespiel auf Grundlage von Conways Game
 
 ## Start und Projektstruktur
 
-Das aktive Spiel startet über **`index.html`**. Kein Build-Schritt, kein Framework und kein npm-Projekt erforderlich. Die Seite verwendet klassische Scripts mit gemeinsamen globalen Klassen; ihre Ladereihenfolge ist relevant. Tailwind und Webfonts kommen bisher von CDNs, daher keine vollständige Offline-Fähigkeit behaupten.
+Das aktive Spiel startet über **`index.html`**. Kein Build-Schritt, kein Framework und kein npm-Projekt erforderlich. Die Seite verwendet klassische Scripts mit gemeinsamen globalen Klassen; ihre Ladereihenfolge ist relevant. Es gibt keine CDN-Abhängigkeit mehr: `css/style.css` ist ein eigenes Designsystem (Tokens in `:root`, keine Utility-Klassen), Schriften liegen unter `assets/fonts/` (SIL OFL, Lizenztexte daneben), Oberflächenbilder als WebP unter `assets/ui/`. Keine externen Skripte, Stylesheets oder Fonts einführen. Trotzdem keine Offline-App behaupten (kein Service Worker).
 
 ```bash
 python3 -m http.server 8765 --bind 127.0.0.1
@@ -29,7 +29,7 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 | Datei / Verzeichnis | Verantwortung |
 | --- | --- |
 | `index.html` | Aktuelle Oberfläche, Modusauswahl, Panels und Script-Ladereihenfolge |
-| `css/style.css` | Darstellung, responsive Regeln und Touch-Layouts |
+| `css/style.css` | Designsystem (Tokens, Komponenten), Spiel-Layout als Grid (HUD-Spalte/-Streifen, Spielfeld, Werkzeugleiste), responsive Regeln und Touch-Layouts |
 | `js/main.js` | Initialisierung von UIManager, GameAudio und CampaignManager |
 | `js/utils/Constants.js` | Häuserfarben, Phasen, Eigentümerwerte, Muster und Kosten |
 | `js/core/Grid.js` | Conway-Berechnung mit flachen Typed Arrays und Double Buffering |
@@ -73,7 +73,7 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 - Platzieren, Radieren und Undo müssen den Materialverbrauch für Bonusziele konsistent ändern. Neutrale Flora darf nicht als Spieler oder Camp-Eroberer behandelt werden.
 - Mission abbrechen führt zur Marskarte (Kampagne) bzw. zur Modusauswahl (Gefecht/Sandbox), nicht zum Neuladen derselben Missions-URL.
 - Ein Missionswechsel erfolgt derzeit per Seitenwechsel. Dies entsorgt alte Listener, Animationen, KI-Züge und Audiowiedergabe. Bei Umstellung auf Navigation ohne Neuladen explizites Cleanup implementieren.
-- Canvas-Größe und Kameraposition hängen von tatsächlichem verfügbarem Raum und Panelposition ab. Breakpoints in CSS und Renderer gemeinsam ändern; Touch-Koordinaten müssen nach Zoom und Formatwechsel stimmen.
+- HUD, Spielfeld und Werkzeugleiste sind angedockte Grid-Bereiche und überdecken sich nicht; nur kurze Einblendungen (Toasts, Hinweis-Popover, Zoom-/Simulationsleiste) liegen auf dem Spielfeld. Der Renderer misst ausschließlich den Spielfeld-Container (`#canvasContainer`), rendert mit `devicePixelRatio` (max. 2) und kennt keine Panel-Offsets; Breakpoints daher nur in CSS ändern. Hat der Spieler Kamera/Zoom verändert, bleibt der Bildmittelpunkt bei Größenänderungen erhalten, sonst wird eingepasst. Touch-Koordinaten müssen nach Zoom und Formatwechsel stimmen.
 
 ## Kampagne und Geschichte
 
