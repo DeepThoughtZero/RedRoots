@@ -132,6 +132,7 @@ Briefings auf dem taktischen Spielfeld und erfolgreiche Missionsberichte automat
 ## Verifikation und Übergabe
 
 - Git-Commit-Nachrichten immer auf Englisch verfassen. Dies gilt für Betreff und optionalen Beschreibungstext.
+- **Nach jeder merklichen Änderung direkt auf `main` committen und pushen** (`git add`, `git commit`, `git push origin main`), ohne Feature-Branch oder Pull Request; ausdrücklicher Wunsch des Projektinhabers. Vorher `node tests/run-all.cjs` ausführen und nur mit grüner Testsuite pushen. Kleinste Tippfehler- oder Zwischenstände dürfen gesammelt werden; fertige Funktionen, Fehlerbehebungen und Dokumentationsänderungen nicht liegen lassen. Bei abgelehntem Push (Remote neuer) zuerst `git pull --rebase origin main`, Konflikte lösen, Tests erneut ausführen. Niemals force-pushen.
 - Gesamte Testsuite: `node tests/run-all.cjs` (wird automatisch über den Git-Hook `.git/hooks/pre-push` erzwungen; Aktivierung via `./scripts/install-hooks.sh`).
 - Engine- & Core-Unit-Tests: `node tests/core.test.cjs`.
 - KI-Disziplin & Grenzfälle: `node tests/ai.test.cjs`.
