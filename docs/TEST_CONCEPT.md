@@ -138,6 +138,12 @@ Validiert alle Missionslösungen und Spielstandsmechaniken:
   - Runden-Checkpoints stellen Feld, Budget und Zielzustand wieder her und spielen die Rundenplanung erneut ein; mit festem `aiSeed` verläuft eine unveränderte Runde identisch.
   - Prognose verbraucht Ladungen, verändert keinen Spielzustand und erkennt erreichte Ziele; die Rennuhr trifft die tatsächliche Ankunft.
 
+- **Szenarioereignisse & neue Zieltypen (`tests/scenario.test.cjs`):**
+  - Runden- und Generationsereignisse: Ankündigung vorher, Anwendung genau einmal (auch nach Rückspulen), Fels- und Budgetaktionen addieren.
+  - Vorratskapseln zahlen einmal zur nächsten Runde aus, ohne den Materialverbrauch zu ändern.
+  - Doktrinen: Zielrechteck ersetzt das nächste Camp; Missionen ohne Doktrin liefern bitgenau dieselben gesetzten KI-Züge wie zuvor (Fingerabdruck).
+  - `clearZones`, `oscillate`, `exactCount` und `escort` mit echten Conway-Lösungen und Gegenbeispielen; der Sturmstoß von A4_M05 erreicht ohne Eingriff tatsächlich den Rettungsplatz.
+
 ### Ebene 5: Audio & Systemtests (`tests/audio.test.cjs`)
 Verifikation des Klang- und Narrationssystems:
 - **Standardzustand:** Standardmäßig stummgeschaltet, kein Autoplay-Verstoß.
@@ -156,7 +162,7 @@ Verifikation des Klang- und Narrationssystems:
 ```bash
 node tests/run-all.cjs
 ```
-Führt alle Testsuiten (derzeit zwölf) nacheinander aus, misst die Laufzeiten und gibt einen übersichtlichen Erfolgs- oder Fehlerbericht aus.
+Führt alle Testsuiten (derzeit dreizehn) nacheinander aus, misst die Laufzeiten und gibt einen übersichtlichen Erfolgs- oder Fehlerbericht aus.
 
 ### Einzelne Suiten ausführen
 ```bash

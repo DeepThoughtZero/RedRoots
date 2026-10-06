@@ -359,6 +359,26 @@ Abnahme:
 - Alle betroffenen Lösungswege bestehen gegen die echte KI (`act*.test.cjs`).
 - Missionen ohne neue Felder verhalten sich unverändert (Seed-Vergleichstest).
 
+**Status: umgesetzt (Oktober 2026).**
+- C1:
+  - `events` mit Aktionen `seed`, `clearRocks`, `addRocks` und `budget`; mehrere Aktionen pro Ereignis sind möglich.
+  - Rundenereignisse wirken zu Beginn der Planungsphase, Generationsereignisse unmittelbar vor ihrer Generation.
+  - Vorwarnung im HUD, gestrichelte Umrisse und Meldungen. Rückspulen wendet nichts doppelt an.
+- C2: Zonen mit `cache` zahlen über `pendingMaterial` nach `calculateBudgets` aus.
+- C3: `doctrine`/`target` je Gegner.
+  - Raids starten fair: Spots näher als zwölf Felder am Ziel erhalten Gewicht × 0,05.
+  - Ohne Doktrin sind die gesetzten KI-Züge aller Missionen bitgenau unverändert (Fingerabdrucktest).
+- C4: `clearZones`, `oscillate`, `escort` und `exactCount` mit Fortschritt, Countdown, Niederlagengrund, Beinahe-Wert und Integritätsprüfung.
+  - Getestet sind sie mit Testszenarien und echten Conway-Lösungen.
+  - Noch nutzt sie keine Kampagnenmission. Neue Missionen brauchen nach `AGENTS.md` Bild und Vertonung.
+- Nachrüstungen:
+  - Flutung in A4_M02 (zwei Acorns, Runde 5).
+  - Sturmstoß in A4_M05 (zwei Gleiter, Runde 6).
+  - Raids in A4_M03 (Viridion → Ost, Tharsis → West).
+  - Kapseln in A1_M02 (+6), A2_M01 (+8) und A5_M01 (+20).
+- Abweichung bei A4_M04: Ein Tharsis-Raid auf die direkt angrenzende Zivilstation war nicht abwehrbar (Durchbruch in Generation 11). Den Angriff führt deshalb Viridion aus der Ferne. Der neue `aiSeed` 831068837 hält die Referenzlösung bei drei Sternen; Nichtstun verliert in Generation 97.
+- Die vertonten Briefings bleiben unverändert. Die Gefahren werden über Hinweisstufe 1, die Vorwarnung und die README angekündigt.
+
 ### Phase 4 – „Meisterschaft“
 Umfang: D1–D5 (Bonusvielfalt, Bestwerte, Expertenprotokolle, Funksprüche, Ergebnis-Zeitleiste).
 Abnahme:

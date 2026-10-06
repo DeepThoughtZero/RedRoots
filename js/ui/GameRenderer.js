@@ -112,7 +112,7 @@ class GameRenderer {
         const state = this.gameState, os = state.objectiveSystem;
         if (!state.scenario || !os) return;
         const ctx = this.ctx, size = this.cellSize, pulse = this.pulse();
-        const palette = { done: ['#8bf5c7', 'rgba(92,255,174,.2)'], sterile: ['#ff6578', 'rgba(255,70,95,.18)'], locked: ['#8a9aa8', 'rgba(120,140,160,.08)'], next: ['#ffe08a', 'rgba(255,214,110,.24)'], active: ['#9ff3ff', 'rgba(120,240,255,.18)'], protect: ['#ffd48a', 'rgba(255,196,110,.12)'], open: ['#ffd48a', 'rgba(255,196,110,.12)'] };
+        const palette = { done: ['#8bf5c7', 'rgba(92,255,174,.2)'], sterile: ['#ff6578', 'rgba(255,70,95,.18)'], locked: ['#8a9aa8', 'rgba(120,140,160,.08)'], next: ['#ffe08a', 'rgba(255,214,110,.24)'], active: ['#9ff3ff', 'rgba(120,240,255,.18)'], protect: ['#ffd48a', 'rgba(255,196,110,.12)'], open: ['#ffd48a', 'rgba(255,196,110,.12)'], cache: ['#7fe3ff', 'rgba(110,220,255,.14)'] };
         for (const z of state.scenario.map.zones) {
             const st = os.zoneStatus(z.id);
             let [stroke, fill] = palette[st.state];
@@ -128,10 +128,18 @@ class GameRenderer {
                 ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(x + 2, y + h - 8, w - 4, 6);
                 ctx.fillStyle = st.progress >= .75 ? '#8bf5c7' : '#ffd48a'; ctx.fillRect(x + 2, y + h - 8, (w - 4) * st.progress, 6);
             }
-            const prefix = st.state === 'done' ? '✓ ' : st.state === 'next' ? '▶ ' : st.state === 'protect' ? '⛨ ' : '';
-            const suffix = st.state === 'locked' ? ' · WARTET' : st.progressLabel && st.progress > 0 ? ` · ${st.progressLabel}` : '';
+            const prefix = st.state === 'done' ? '✓ ' : st.state === 'next' ? '▶ ' : st.state === 'protect' ? '⛨ ' : st.state === 'cache' ? '◆ ' : '';
+            const suffix = st.state === 'locked' ? ' · WARTET' : st.state === 'cache' ? ` · +${z.cache} MATERIAL` : st.progressLabel && st.progress > 0 ? ` · ${st.progressLabel}` : '';
             const threat = st.threat !== 'calm' ? ` · ⚠ ${st.distance} F.` : '';
             this.label(prefix + z.label + suffix + threat, x, y - 4, st.threat === 'alarm' || st.state === 'sterile' ? '#ff9fab' : st.threat === 'warning' ? '#ffc98a' : st.state === 'done' ? '#b8ffe0' : st.state === 'locked' ? '#b6c2cc' : '#ffe0ab');
+            ctx.restore();
+        }
+        // Announced scenario events: dashed outline of the affected area with the time of arrival.
+        for (const e of state.upcomingEvents?.() || []) for (const area of e.areas) {
+            const x = (area.cMin - 1) * size, y = (area.rMin - 1) * size, w = (area.cMax - area.cMin + 3) * size, h = (area.rMax - area.rMin + 3) * size;
+            ctx.save();
+            ctx.strokeStyle = '#ff9f43'; ctx.lineWidth = 2.5; ctx.setLineDash([3, 3]); ctx.strokeRect(x, y, w, h); ctx.setLineDash([]);
+            this.label(`⚡ ${e.when}`, x, y - 4, '#ffc98a');
             ctx.restore();
         }
         // The own habitat is drawn as a camp; its threat gets the same border language.

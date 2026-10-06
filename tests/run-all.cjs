@@ -72,6 +72,11 @@ const suites = [
         desc: 'Pause, Einzelschritt, Turbo, Zeitlupe, Runden-Checkpoints, Prognose, Rennuhr'
     },
     {
+        name: 'Ebene 4h: Szenarioereignisse & neue Zieltypen',
+        file: 'tests/scenario.test.cjs',
+        desc: 'Angekündigte Ereignisse, Vorratskapseln, Doktrinen, Eindämmung, Leuchtfeuer, Kalibrierung, Geleitschutz'
+    },
+    {
         name: 'Ebene 5a: Audio-Steuerung & Sprachausgabe',
         file: 'tests/audio.test.cjs',
         desc: 'GameAudio, Ambience-Ducking, Tab-Pause, Browser-TTS Fallback'

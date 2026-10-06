@@ -11,7 +11,7 @@ CAMPAIGN_MISSIONS.push(
         patterns:ACT2_PATTERNS, reward:'r_pentomino', rounds:5,steps:24,budget:18,radius:3,budgetFactor:35,
         objective:{type:'territoryZones',zones:['east','south'],label:'Beide Wasseranschlüsse gleichzeitig mit Einflussgebiet versorgen'},
         bonuses:[{type:'rounds',value:3,label:'Innerhalb von 3 Runden verbinden'},{type:'spent',value:24,label:'Höchstens 24 Genmaterial einsetzen'}],
-        map:{territory:[[0,5,5,14,14]],rocks:[[0,20,6,21],[19,0,20,6],[18,20,23,25]],zones:[{id:'east',label:'OSTPUMPE',rMin:10,rMax:13,cMin:23,cMax:25},{id:'south',label:'SÜDPUMPE',rMin:23,rMax:25,cMin:10,cMax:13}]}
+        map:{territory:[[0,5,5,14,14]],rocks:[[0,20,6,21],[19,0,20,6],[18,20,23,25]],zones:[{id:'east',label:'OSTPUMPE',rMin:10,rMax:13,cMin:23,cMax:25},{id:'south',label:'SÜDPUMPE',rMin:23,rMax:25,cMin:10,cMax:13},{id:'depot',label:'VORRAT',cache:8,rMin:17,rMax:19,cMin:16,cMax:18}]}
     },
     {
         id:'A2_M02',act:2,title:'Die geteilte Schlucht',region:'Hellas · Zwei Zugänge zur Wasserader',kind:'Synchronisation',point:[66,43],ambience:'canyon',

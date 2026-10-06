@@ -74,7 +74,7 @@ class GameState {
         // Simulation controls. Every generation is still evaluated; only the waiting time changes.
         this.paused = false; this.turbo = false; this.slowMotion = false; this.pauseOnAlarm = false;
         this._pauseResolve = null; this._stepPending = false; this._slowUntil = -1; this._wasCritical = false;
-        this.boardVersion = 0; this.checkpoints = {};
+        this.boardVersion = 0; this.checkpoints = {}; this.appliedEvents = new Set(); this.announcedEvents = new Set();
         if (config.scenario) MissionManager.apply(this, config.scenario);
     }
 
@@ -95,6 +95,7 @@ class GameState {
         // Placements of the current round, so the board can highlight fresh enemy colonies.
         if (newPhase === CONSTANTS.PHASE_PLACEMENT) this.roundPlacements = Array.from({ length: this.playerCount }, () => []);
         this.boardVersion++;
+        if (newPhase === CONSTANTS.PHASE_PLACEMENT) this.applyScenarioEvents('round');
         // Round checkpoints live in memory only; they allow re-planning a round after a defeat.
         if (newPhase === CONSTANTS.PHASE_PLACEMENT && this.objectiveSystem) {
             this.checkpoints[this.currentRound] = this.snapshot();
@@ -270,6 +271,7 @@ class GameState {
         for (let step = 0; step < this.stepsPerRound; step++) {
             if (this.paused) await this._waitWhilePaused();
             if (this.stopSimulation) break;
+            if (this.scenario?.events) this.applyScenarioEvents('generation');
             
             this.grid.calculateNextGeneration();
             this._simDirty = true; // Mark for next RAF render
@@ -337,6 +339,8 @@ class GameState {
 
         // Reset budgets dynamically
         this.calculateBudgets();
+        // Supply caches reached during the evolution pay out between rounds, on top of the regular income.
+        if (this.objectiveSystem?.pendingMaterial) { this.budgets[0] += this.objectiveSystem.pendingMaterial; this.objectiveSystem.pendingMaterial = 0; }
 
         this.currentRound++;
         if (this.isSandbox) {
@@ -356,6 +360,32 @@ class GameState {
             this.notifyPlayerChange();
             this.notifyStateUpdate();
         }
+    }
+
+    // Applies due scenario events once: round events at the start of a planning phase, generation events
+    // right before that generation is computed. Announcements are queued for the HUD.
+    applyScenarioEvents(kind) {
+        const events = this.scenario?.events;
+        if (!events || !this.objectiveSystem) return;
+        for (const e of events) {
+            if (kind === 'round' && !this.announcedEvents.has(e.id) && this.currentRound >= e.announceRound && !this.appliedEvents.has(e.id)) {
+                this.announcedEvents.add(e.id);
+                this.objectiveSystem.events.push({ type: 'announce', eventId: e.id, text: e.text });
+            }
+            if (this.appliedEvents.has(e.id)) continue;
+            const due = kind === 'round' ? e.round !== undefined && this.currentRound >= e.round : e.generation !== undefined && this.objectiveSystem.generations >= e.generation - 1;
+            if (!due) continue;
+            this.appliedEvents.add(e.id);
+            MissionManager.applyAction(this, e.action);
+            this.objectiveSystem.events.push({ type: 'scenario', eventId: e.id, text: e.text });
+            this.boardVersion++;
+        }
+    }
+
+    // Announced events that have not happened yet, with the time left.
+    upcomingEvents() {
+        return (this.scenario?.events || []).filter(e => !this.appliedEvents.has(e.id) && this.currentRound >= e.announceRound)
+            .map(e => ({ ...e, areas: MissionManager.eventAreas(e), when: e.round !== undefined ? `Runde ${e.round}` : `Generation ${e.generation}` }));
     }
 
     setPaused(paused) {
@@ -380,7 +410,7 @@ class GameState {
     }
 
     snapshot() {
-        return { round: this.currentRound, owners: this.grid.owners.slice(), isOld: this.grid.isOldFlags.slice(), territory: this.territory.territoryMap.map(row => row.slice()), budgets: this.budgets.slice(), defeated: [...(this.defeatedPlayers || [])], aiRandomSeed: this.aiRandomSeed, objective: this.objectiveSystem.snapshot(), plan: [] };
+        return { round: this.currentRound, owners: this.grid.owners.slice(), isOld: this.grid.isOldFlags.slice(), territory: this.territory.territoryMap.map(row => row.slice()), budgets: this.budgets.slice(), defeated: [...(this.defeatedPlayers || [])], aiRandomSeed: this.aiRandomSeed, objective: this.objectiveSystem.snapshot(), applied: [...this.appliedEvents], announced: [...this.announcedEvents], plan: [] };
     }
 
     // Rewinds a finished mission to the start of a round and replays the plan placed there.
@@ -395,6 +425,7 @@ class GameState {
         this.defeatedPlayers = new Set(checkpoint.defeated);
         this.aiRandomSeed = checkpoint.aiRandomSeed;
         this.objectiveSystem.restore(checkpoint.objective);
+        this.appliedEvents = new Set(checkpoint.applied); this.announcedEvents = new Set(checkpoint.announced);
         for (const key of Object.keys(this.checkpoints)) if (Number(key) > round) delete this.checkpoints[key];
         this.currentRound = round; this.winner = undefined; this.undoStack = []; this.currentPlayer = 0;
         this.changePhase(CONSTANTS.PHASE_PLACEMENT);

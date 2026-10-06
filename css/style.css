@@ -396,3 +396,4 @@ canvas {
 .rewind-options button { min-height:44px;padding:0 14px; }
 @media(max-width:1024px) and (orientation:landscape) { #simControls { bottom:8px;left:8px; } #simControls button { min-width:44px;padding:0 8px;font-size:14px; } }
 @media(max-width:1024px) { .forecast-tools { grid-column:1/-1;margin:0; } .sim-options { grid-column:1/-1; } }
+.objective-event { border-left-color:#ff9f43!important; }

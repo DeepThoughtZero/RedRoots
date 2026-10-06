@@ -106,7 +106,7 @@ assert.equal(CAMPAIGN_MISSIONS.length, 25, 'Fünf Akte mit je fünf Kampagnenmis
 const validObjectiveTypes = new Set([
     'survive', 'reachZone', 'race', 'territoryZone', 'territoryZones',
     'orderedZones', 'pulse', 'allZones', 'collectZones', 'holdZones', 'evacuate',
-    'captureCamps'
+    'captureCamps', 'clearZones', 'oscillate', 'escort', 'exactCount'
 ]);
 
 CAMPAIGN_MISSIONS.forEach((m, idx) => {
@@ -118,6 +118,31 @@ CAMPAIGN_MISSIONS.forEach((m, idx) => {
     assert.ok(m.hint, `Mission ${m.id}: Taktischer Hinweis vorhanden`);
     assert.ok(Array.isArray(m.hints) && m.hints.length >= 2 && m.hints.includes(m.hint) && m.hints.every(h => typeof h === 'string' && h.length > 20), `Mission ${m.id}: Gestufte Hinweise mit dem taktischen Hinweis`);
     if (m.id !== 'A1_M01') assert.ok(!/Zeile|Spalte/.test(m.hints[0]), `Mission ${m.id}: Erste Hinweisstufe verrät keine Koordinaten`);
+    const zoneIds = new Set(m.map.zones.map(z => z.id));
+    const inBounds = ([r1, c1, r2, c2]) => r1 >= 0 && c1 >= 0 && r1 <= r2 && c1 <= c2 && r2 < (m.map.rows || 30) && c2 < (m.map.cols || 48);
+    m.map.zones.filter(z => z.cache !== undefined).forEach(z => assert.ok(Number.isInteger(z.cache) && z.cache > 0, `Mission ${m.id}: Vorrat ${z.id} mit positiver Menge`));
+    const eventIds = new Set();
+    for (const e of m.events || []) {
+        assert.ok(e.id && !eventIds.has(e.id), `Mission ${m.id}: Ereignis-ID eindeutig`); eventIds.add(e.id);
+        assert.ok(typeof e.text === 'string' && e.text.length > 20, `Mission ${m.id}: Ereignis ${e.id} hat einen Ankündigungstext`);
+        const eventRound = e.round ?? Math.floor((e.generation - 1) / m.steps) + 1;
+        assert.ok(Number.isInteger(eventRound) && eventRound <= m.rounds, `Mission ${m.id}: Ereignis ${e.id} liegt innerhalb der Mission`);
+        assert.ok(Number.isInteger(e.announceRound) && e.announceRound < eventRound, `Mission ${m.id}: Ereignis ${e.id} wird mindestens eine Runde vorher angekündigt`);
+        for (const a of [].concat(e.action)) {
+            assert.ok(['seed', 'clearRocks', 'addRocks', 'budget'].includes(a.type), `Mission ${m.id}: Ereignisaktion ${a.type} bekannt`);
+            if (a.type === 'seed') {
+                assert.ok(CONSTANTS.PATTERNS[a.pattern], `Mission ${m.id}: Ereignismuster ${a.pattern} existiert`);
+                CONSTANTS.PATTERNS[a.pattern].pattern.forEach(([r, c]) => assert.ok(inBounds([a.r + r, a.c + (a.mirror ? -c : c), a.r + r, a.c + (a.mirror ? -c : c)]), `Mission ${m.id}: Ereignissaat ${e.id} liegt im Feld`));
+            }
+            if (a.rect) assert.ok(inBounds(a.rect), `Mission ${m.id}: Ereignisbereich ${e.id} liegt im Feld`);
+        }
+    }
+    for (const e of m.enemies || []) {
+        if (e.doctrine) assert.ok(['raid', 'siege', 'defend', 'expand'].includes(e.doctrine), `Mission ${m.id}: Doktrin ${e.doctrine} bekannt`);
+        if (e.target) assert.ok(zoneIds.has(e.target), `Mission ${m.id}: Angriffsziel ${e.target} ist eine Zone`);
+    }
+    if (m.objective.type === 'escort') assert.ok([2, 3, 4].includes(m.objective.owner) && (m.map.seeds || []).some(s => s.owner === m.objective.owner), `Mission ${m.id}: Geleitzug ist vorgegeben`);
+    if (m.objective.type === 'exactCount') assert.ok(Number.isInteger(m.objective.at) && m.objective.at <= m.rounds * m.steps, `Mission ${m.id}: Messzeitpunkt erreichbar`);
     assert.ok(m.forecast === null || (Number.isInteger(m.forecast.charges) && m.forecast.charges > 0 && m.forecast.horizon > 0), `Mission ${m.id}: Prognose deaktiviert oder gültig konfiguriert`);
     assert.ok(Array.isArray(m.patterns), `Mission ${m.id}: Muster-Array vorhanden`);
     for (const pat of m.patterns) {

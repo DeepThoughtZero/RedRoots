@@ -3,8 +3,20 @@
 class AI {
     constructor(gameState, genome = null) {
         this.gameState = gameState;
-        this.genome = genome || this.getDefaultGenome(gameState.playerStrengths[gameState.currentPlayer] || 'medium');
+        this.genome = genome || this.getDefaultGenome(gameState.playerStrengths[gameState.currentPlayer] || 'medium', gameState.aiProfiles?.[gameState.currentPlayer]?.doctrine);
     }
+
+    // Campaign doctrines shift pattern weights; without a doctrine the genome stays unchanged.
+    static applyDoctrine(genome, doctrine) {
+        const g = { ...genome };
+        if (doctrine === 'raid') Object.assign(g, { glider_weight: 1.2, lwss_weight: 1.0, block_weight: 0.05, expansion_weight: 0.2 });
+        if (doctrine === 'siege') Object.assign(g, { acorn_weight: 1.4, r_pentomino_weight: 1.2, b_heptomino_weight: 1.2, glider_weight: 0.05 });
+        if (doctrine === 'defend') Object.assign(g, { block_weight: 1.0, glider_weight: 0.3, expansion_weight: 0.1 });
+        if (doctrine === 'expand') Object.assign(g, { expansion_weight: 1.0, r_pentomino_weight: 1.2 });
+        return g;
+    }
+
+    profile(pId) { return this.gameState.aiProfiles?.[pId] || null; }
 
     random() {
         const state = this.gameState;
@@ -13,7 +25,11 @@ class AI {
         return state.aiRandomSeed / 4294967296;
     }
 
-    getDefaultGenome(strength) {
+    getDefaultGenome(strength, doctrine = null) {
+        return doctrine ? AI.applyDoctrine(this.baseGenome(strength), doctrine) : this.baseGenome(strength);
+    }
+
+    baseGenome(strength) {
         if (strength === 'easy') {
             return {
                 r_pentomino_weight: 0.6,
@@ -84,6 +100,9 @@ class AI {
     }
 
     getNearestEnemyCamp(r, c, pId) {
+        // A declared mission target replaces the nearest enemy camp as aiming point.
+        const target = this.profile(pId)?.target;
+        if (target) return target;
         let nearestCamp = null;
         let minDist = Infinity;
 
@@ -327,6 +346,8 @@ class AI {
                             }
                         }
                         
+                        const profile = this.profile(pId);
+                        if (profile?.doctrine && weight > 0) weight *= this.doctrineSpotFactor(profile, r, c, chosenKey, pId);
                         if (weight > 0) {
                             validSpots.push({r, c, pattern: currentPattern, weight});
                         }
@@ -346,6 +367,20 @@ class AI {
             return validSpots[0];
         }
         return null;
+    }
+
+    // Raids launch mobile patterns at their target from a fair distance (no seeding next to it);
+    // defenders stay near their own camp.
+    doctrineSpotFactor(profile, r, c, key, pId) {
+        const mobile = ['glider', 'lwss', 'glider_gun'].includes(key);
+        if (profile.doctrine === 'raid' && profile.target) {
+            const t = profile.target;
+            const distance = Math.max(t.rMin - r, r - t.rMax, t.cMin - c, c - t.cMax, 0);
+            if (distance < 12) return .05;
+            return mobile ? 3 * (1 + 20 / distance) : 1;
+        }
+        if (profile.doctrine === 'defend') return 1 + 40 / (10 + this.getDistanceToCamp(r, c, pId));
+        return 1;
     }
 
     getLoSScore(r, c, rotations, pId) {

@@ -543,7 +543,7 @@ class UIManager {
                 const result = state.forecast();
                 if (!result) return;
                 const hits = result.hits.map(h => h.kind === 'reach' ? `✓ ${h.label} in Gen ${h.generation}` : `⚠ ${h.label}: Gefahr in Gen ${h.generation}`);
-                document.getElementById('forecastSummary').textContent = `Prognose über ${result.horizon} Generationen, ohne neue Gegneraussaat: ${hits.length ? hits.join(' · ') : 'kein Ziel erreicht, keine Gefahr.'}`;
+                document.getElementById('forecastSummary').textContent = `Prognose über ${result.horizon} Generationen, ohne neue Gegneraussaat und angekündigte Ereignisse: ${hits.length ? hits.join(' · ') : 'kein Ziel erreicht, keine Gefahr.'}`;
                 this.syncSimControls(); this.render();
             };
         }
@@ -675,7 +675,7 @@ class UIManager {
             if (this.gameState.scenario && (this.gameState.defeatedPlayers?.has(pId) || (this.gameState.scenario.enemies ? !this.gameState.scenario.enemies.some(e => e.house === pId) : !this.gameState.scenario.enemy))) {
                 this.gameState.nextPlayerTurn();
             } else {
-                if (this.gameState.scenario) this.ai.genome = this.ai.getDefaultGenome(this.gameState.playerStrengths[pId]);
+                if (this.gameState.scenario) this.ai.genome = this.ai.getDefaultGenome(this.gameState.playerStrengths[pId], this.gameState.aiProfiles?.[pId]?.doctrine);
                 this.ai.takeTurn();
             }
         } else {

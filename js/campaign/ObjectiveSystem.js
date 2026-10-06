@@ -7,6 +7,7 @@ class ObjectiveSystem {
         this.mission = mission; this.generations = 0; this.streak = 0; this.spent = 0; this.result = null; this.collected = new Set(); this.hold = 0; this.progressText = ''; this.captureTicks = new Map(); this.maxPopulation = 0;
         this.events = []; this.threats = new Map(); this.closestBy = new Map(); this.occupied = new Set(); this.supplied = new Set();
         this.bestStreak = 0; this.bestHold = 0; this.bestSimultaneous = 0; this.bestCapture = 0; this.lastAlive = 0; this.closestToTarget = Infinity; this.defeatedSeen = new Set();
+        this.caches = new Set(); this.pendingMaterial = 0; this.cleared = new Set(); this.bestCleared = 0; this.zoneHistory = []; this.beacon = 0; this.bestBeacon = 0; this.measured = null;
     }
     zone(id) { return this.mission.map.zones.find(z => z.id === id); }
     static clone(value) {
@@ -68,7 +69,17 @@ class ObjectiveSystem {
         }
         return best;
     }
-    hostiles(state) { return Array.from({length: state.playerCount - 1}, (_, i) => i + 2); }
+    // Houses whose flora threatens us; an escorted convoy is allied, not hostile.
+    hostiles(state) {
+        const ally = this.mission.objective.type === 'escort' ? this.mission.objective.owner : null;
+        return Array.from({length: state.playerCount - 1}, (_, i) => i + 2).filter(owner => owner !== ally);
+    }
+    // Own cells of a zone as a compact key, to recognise oscillation.
+    zoneKey(state, zone) {
+        const cells = [];
+        for (let r = zone.rMin; r <= zone.rMax; r++) for (let c = zone.cMin; c <= zone.cMax; c++) if (state.grid.getOwner(r, c) === 1) cells.push(r * 1000 + c);
+        return cells.join(',');
+    }
     // Zones whose approach is dangerous: own habitat, protected and sterile zones, and switches that must still wait.
     watchList(state) {
         const o = this.mission.objective, hostiles = this.hostiles(state), list = [];
@@ -107,7 +118,11 @@ class ObjectiveSystem {
         const status = { state: 'open', progress: null, threat: this.threats.get(id)?.level || 'calm', distance: this.threats.get(id)?.distance ?? Infinity };
         if (o.sterile?.includes(id)) status.state = 'sterile';
         else if (o.protect?.includes(id)) status.state = 'protect';
+        const zone = this.zone(id);
+        if (zone?.cache) { status.state = this.caches.has(id) ? 'done' : 'cache'; return status; }
         if (!targets.includes(id) && o.zone !== id) return status;
+        if (o.type === 'clearZones' && this.cleared.has(id)) status.state = 'done';
+        if (o.type === 'oscillate') { status.progress = Math.min(1, this.beacon / o.value); status.progressLabel = `${Math.min(this.beacon, o.value)}/${o.value}`; }
         if (o.type === 'orderedZones') status.state = this.collected.has(id) ? 'done' : targets.indexOf(id) === this.collected.size ? 'next' : 'locked';
         if (['collectZones', 'captureCamps'].includes(o.type) && this.collected.has(id)) status.state = 'done';
         if (['territoryZones', 'territoryZone'].includes(o.type) && this.supplied.has(id)) status.state = 'done';
@@ -124,6 +139,8 @@ class ObjectiveSystem {
         if (o.type === 'pulse') return g < o.aliveAt ? { label: 'Lebensnachweis in', remaining: o.aliveAt - g } : g < o.emptyAfter ? { label: 'Kammer leer ab', remaining: o.emptyAfter - g } : { label: 'Testende in', remaining: Math.max(0, this.mission.steps - g) };
         if (o.type === 'holdZones' && this.hold > 0) return { label: 'Halten noch', remaining: Math.max(0, o.value - this.hold) };
         if (o.type === 'captureCamps' && o.minGenerations > g) return { label: 'Rückweg schützen noch', remaining: o.minGenerations - g };
+        if (o.type === 'exactCount' && g < o.at) return { label: 'Messung in', remaining: o.at - g };
+        if (o.type === 'oscillate' && this.beacon > 0) return { label: 'Takt halten noch', remaining: Math.max(0, o.value - this.beacon) };
         if (o.type === 'race' && this.raceArrival > g) return { label: 'Hellas am Ziel in ca.', remaining: this.raceArrival - g };
         return null;
     }
@@ -143,6 +160,11 @@ class ObjectiveSystem {
             this.streak = population > 0 ? this.streak + 1 : 0;
             this.bestStreak = Math.max(this.bestStreak, this.streak);
             if (population > 0) this.lastAlive = this.generations;
+            // Supply caches: first contact of own living flora pays out at the start of the next round.
+            for (const z of this.mission.map.zones) if (z.cache && !this.caches.has(z.id) && this.inZone(state, z, 1)) {
+                this.caches.add(z.id); this.pendingMaterial += z.cache;
+                this.events.push({ type: 'cache', zoneId: z.id, label: z.label, amount: z.cache, generation: this.generations });
+            }
         }
         const zone = this.zone(o.zone);
         const hostiles = this.hostiles(state);
@@ -237,18 +259,56 @@ class ObjectiveSystem {
             if (this.collected.size === targets.length && this.generations < (o.minGenerations || 0)) this.progressText = `Camps gesichert · ${o.minGenerations-this.generations} Generationen Rückweg schützen`;
             won = this.collected.size === targets.length && this.generations >= (o.minGenerations || 0) && population > 0;
         }
+        let lostObjective = null;
+        if (o.type === 'clearZones') {
+            const owners = o.owners || [CONSTANTS.OWNER_NEUTRAL];
+            this.cleared = new Set(targets.filter(z => !owners.some(owner => this.inZone(state, z, owner))).map(z => z.id));
+            this.bestCleared = Math.max(this.bestCleared, this.cleared.size);
+            this.progressText = `${this.cleared.size} / ${targets.length} Herde beseitigt`;
+            won = this.cleared.size === targets.length;
+        }
+        if (o.type === 'oscillate') {
+            if (event === 'generation') {
+                this.zoneHistory = [...this.zoneHistory, this.zoneKey(state, zone)].slice(-3);
+                const [before, last, now] = this.zoneHistory;
+                const beating = this.zoneHistory.length === 3 && now !== '' && now === before && now !== last;
+                if (!beating && this.beacon >= 3) this.events.push({ type: 'holdLost', held: this.beacon, generation: this.generations });
+                this.beacon = beating ? this.beacon + 1 : 0;
+                this.bestBeacon = Math.max(this.bestBeacon, this.beacon);
+            }
+            this.progressText = `${this.beacon} / ${o.value} Generationen Leuchtfeuer im Takt`;
+            won = this.beacon >= o.value;
+        }
+        if (o.type === 'escort') {
+            let convoy = 0;
+            for (const v of state.grid.owners) if (v === o.owner) convoy++;
+            const distance = this.distanceToZone(state, zone, [o.owner], Infinity);
+            this.closestToTarget = Math.min(this.closestToTarget, distance); this.currentTargetDistance = distance;
+            won = this.inZone(state, zone, o.owner);
+            if (!convoy) lostObjective = 'Der Geleitzug wurde zerstört.';
+            this.progressText = convoy ? `Geleitzug: ${distance} Felder bis ${zone.label}` : 'Geleitzug verloren';
+        }
+        if (o.type === 'exactCount') {
+            let count = 0;
+            for (let r = zone.rMin; r <= zone.rMax; r++) for (let c = zone.cMin; c <= zone.cMax; c++) if (state.grid.getOwner(r, c) === 1) count++;
+            this.progressText = `${count} / ${o.value} eigene Zellen in ${zone.label} · Messung bei Generation ${o.at}`;
+            if (event === 'generation' && this.generations === o.at) {
+                this.measured = count;
+                if (count === o.value) won = true; else lostObjective = 'Die Kalibrierung wurde verfehlt.';
+            }
+        }
         if (event === 'generation' || event === 'round') this.updateThreats(state);
         const expired = event === 'round' && state.currentRound >= state.maxRounds;
-        if (!lostCamp && !lostRace && !lostProtected && !lostSterile && !wrongOrder && !won && !expired) return false;
-        const success = won && !lostCamp && !lostRace && !lostProtected && !lostSterile && !wrongOrder;
+        if (!lostCamp && !lostRace && !lostProtected && !lostSterile && !wrongOrder && !lostObjective && !won && !expired) return false;
+        const success = won && !lostCamp && !lostRace && !lostProtected && !lostSterile && !wrongOrder && !lostObjective;
         const bonuses = this.mission.bonuses.map(b => success && (b.type === 'rounds' ? state.currentRound <= b.value : b.type === 'generations' ? this.generations <= b.value : b.type === 'population' ? this.maxPopulation <= b.value : b.type === 'margin' ? this.closestMargin(b.zones) >= b.value : this.spent <= b.value));
         this.result = { success, stars: success ? 1 + bonuses.filter(Boolean).length : 0, bonuses,
-            reason: wrongOrder ? 'Die Schalter wurden in falscher Reihenfolge berührt.' : lostSterile ? 'Die Quarantäne wurde durch lebende Flora verletzt.' : lostProtected ? 'Fremde Flora hat die geschützte Zone erreicht.' : lostCamp ? 'Unser Habitat wurde überwuchert.' : lostRace ? 'Hellas hat das Wasser zuerst erreicht.' : !success ? 'Das Zeitfenster ist geschlossen.' : this.mission.debriefing };
+            reason: wrongOrder ? 'Die Schalter wurden in falscher Reihenfolge berührt.' : lostObjective ? lostObjective : lostSterile ? 'Die Quarantäne wurde durch lebende Flora verletzt.' : lostProtected ? 'Fremde Flora hat die geschützte Zone erreicht.' : lostCamp ? 'Unser Habitat wurde überwuchert.' : lostRace ? 'Hellas hat das Wasser zuerst erreicht.' : !success ? 'Das Zeitfenster ist geschlossen.' : this.mission.debriefing };
         if (!success) {
             const breach = wrongOrder ? { zone: wrongZone, owners: [1] } : lostSterile ? { zone: sterileBreach, owners: [1,2,3,4,CONSTANTS.OWNER_NEUTRAL] } : lostProtected ? { zone: protectedBreach, owners: [...hostiles, CONSTANTS.OWNER_NEUTRAL] } : lostCamp ? { zone: ownCamp, owners: hostiles, label: 'HABITAT' } : lostRace ? { zone, owners: [2] } : null;
             const cells = breach ? this.cellsInZone(state, breach.zone, breach.owners) : [];
             this.result.failure = breach ? { zoneId: breach.zone.id ?? 'camp', label: breach.label || breach.zone.label, cells, generation: this.generations } : { zoneId: null, label: null, cells: [], generation: this.generations };
-            this.result.details = [breach && cells.length ? `Generation ${this.generations}: ${this.ownerName(cells[0].owner)} erreichte ${this.result.failure.label}.` : null, this.nearMiss()].filter(Boolean);
+            this.result.details = [breach && cells.length ? `Generation ${this.generations}: ${this.ownerName(cells[0].owner)} erreichte ${this.result.failure.label}.` : lostObjective ? `Generation ${this.generations}: ${lostObjective}` : null, this.nearMiss()].filter(Boolean);
         } else this.result.details = [];
         state.winner = success ? 0 : 1;
         return true;
@@ -272,6 +332,10 @@ class ObjectiveSystem {
             case 'holdZones': return `Bester Haltewert: ${this.bestHold} / ${o.value} Generationen.`;
             case 'evacuate': return `Durchgehalten bis Generation ${Math.min(this.generations, o.value)} von ${o.value}.`;
             case 'pulse': return `Lebensnachweis bei Generation ${o.aliveAt}: ${this.pulseAlive ? 'erbracht' : 'verfehlt'}. Letzte eigene Zelle lebte bis Generation ${this.lastAlive}.`;
+            case 'clearZones': return `Höchstens ${this.bestCleared} / ${n} Herde gleichzeitig beseitigt.`;
+            case 'oscillate': return `Längster gleichmäßiger Takt: ${this.bestBeacon} / ${o.value} Generationen.`;
+            case 'escort': return Number.isFinite(this.closestToTarget) ? `Der Geleitzug kam bis auf ${this.closestToTarget} Felder an das Ziel heran.` : null;
+            case 'exactCount': return `Gemessen: ${this.measured ?? 'keine Messung'} statt ${o.value} eigener Zellen.`;
             case 'captureCamps': return `${this.collected.size} / ${n} Camps erobert${this.collected.size < n ? ` · beste Eroberung ${Math.min(this.bestCapture, o.hold)} / ${o.hold} Generationen gehalten` : ''}.`;
             default: return null;
         }

@@ -20,7 +20,7 @@ const CAMPAIGN_MISSIONS = [
         patterns: ['cell', 'block'], reward: 'glider', rounds: 5, steps: 12, budget: 16,
         objective: { type: 'territoryZone', zone: 'station', label: 'Die Forschungsstation mit Einflussgebiet erreichen' },
         bonuses: [{ type: 'rounds', value: 2, label: 'In höchstens 2 Runden abschließen' }, { type: 'spent', value: 8, label: 'Höchstens 8 Genmaterial einsetzen' }],
-        map: { territory: [[0, 7, 4, 17, 13]], rocks: [[2, 24, 5, 35], [21, 18, 23, 31]], zones: [{ id: 'station', label: 'FORSCHUNG', rMin: 10, rMax: 14, cMin: 21, cMax: 23 }] }
+        map: { territory: [[0, 7, 4, 17, 13]], rocks: [[2, 24, 5, 35], [21, 18, 23, 31]], zones: [{ id: 'station', label: 'FORSCHUNG', rMin: 10, rMax: 14, cMin: 21, cMax: 23 }, { id: 'depot', label: 'VORRAT', cache: 6, rMin: 1, rMax: 3, cMin: 12, cMax: 15 }] }
     },
     {
         id: 'A1_M03', ambience: 'canyon', title: 'Der Pass', region: 'Valles Marineris', kind: 'Conway-Rätsel', point: [45, 55],
@@ -59,6 +59,24 @@ const CAMPAIGN_MISSIONS = [
 
 class MissionManager {
     static seedCells(seed) { return CONSTANTS.PATTERNS[seed.pattern].pattern.map(([r, c]) => [seed.r + r, seed.c + (seed.mirror ? -c : c)]); }
+    static rect([rMin, cMin, rMax, cMax]) { return { rMin, cMin, rMax, cMax }; }
+    // Scenario event actions: generic board and budget changes, no story logic.
+    static applyAction(state, action) {
+        if (Array.isArray(action)) { action.forEach(a => MissionManager.applyAction(state, a)); return; }
+        const each = (a, fn) => { for (let r = a[0]; r <= a[2]; r++) for (let c = a[1]; c <= a[3]; c++) fn(r, c); };
+        if (action.type === 'seed') MissionManager.seedCells(action).forEach(([r, c]) => { if (state.grid.getOwner(r, c) === CONSTANTS.OWNER_NONE) state.grid.setCell(r, c, action.owner, true); });
+        if (action.type === 'clearRocks') each(action.rect, (r, c) => { if (state.grid.getOwner(r, c) === CONSTANTS.OWNER_ROCK) state.grid.setCell(r, c, CONSTANTS.OWNER_NONE); });
+        if (action.type === 'addRocks') each(action.rect, (r, c) => { if (state.grid.getOwner(r, c) === CONSTANTS.OWNER_NONE) state.grid.setCell(r, c, CONSTANTS.OWNER_ROCK, true); });
+        if (action.type === 'budget') state.budgets[action.player] = (state.budgets[action.player] || 0) + action.amount;
+    }
+    // Board areas an event affects, for the announcement outlines.
+    static eventAreas(event) {
+        return [].concat(event.action).map(a => MissionManager.actionArea(a)).filter(Boolean);
+    }
+    static actionArea(a) {
+        if (a.type === 'seed') { const cells = MissionManager.seedCells(a), rs = cells.map(p => p[0]), cs = cells.map(p => p[1]); return { rMin: Math.min(...rs), rMax: Math.max(...rs), cMin: Math.min(...cs), cMax: Math.max(...cs) }; }
+        return a.rect ? MissionManager.rect(a.rect) : null;
+    }
     // Detects spaceships among predefined flora on an unbounded plane: same shape, shifted after one period.
     static seedMotion(seed, maxPeriod = 8) {
         const shape = cells => { const minR = Math.min(...cells.map(p => p[0])), minC = Math.min(...cells.map(p => p[1])); return { minR, minC, key: cells.map(([r, c]) => `${r - minR},${c - minC}`).sort().join(';') }; };
@@ -87,7 +105,11 @@ class MissionManager {
         (mission.map.seeds || []).forEach(s => MissionManager.seedCells(s).forEach(([r, c]) => state.grid.setCell(r, c, s.owner, true)));
         state.budgets = Array(state.playerCount).fill(0);
         state.budgets[0] = mission.budget;
-        if (mission.enemies) mission.enemies.forEach(e => { state.budgets[e.house] = e.budget; state.playerStrengths[e.house] = e.strength || 'hard'; });
+        state.aiProfiles = {};
+        if (mission.enemies) mission.enemies.forEach(e => {
+            state.budgets[e.house] = e.budget; state.playerStrengths[e.house] = e.strength || 'hard';
+            if (e.doctrine) state.aiProfiles[e.house] = { doctrine: e.doctrine, target: e.target ? mission.map.zones.find(z => z.id === e.target) : null };
+        });
         else state.budgets[1] = mission.enemy ? (mission.enemyBudget ?? 8) : 0;
         if (!mission.enemies) state.playerStrengths[1] = mission.enemyStrength || 'easy';
         state.defeatedPlayers = new Set();
