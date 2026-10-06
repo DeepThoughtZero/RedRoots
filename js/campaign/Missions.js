@@ -19,7 +19,7 @@ const CAMPAIGN_MISSIONS = [
         debriefing: 'Die Boje erwacht. Ihr Zeitstempel liegt vor unserer ersten Landung. Eine Datei ist erhalten: PROJECT REDROOTS. Der Absender wurde gelöscht.',
         patterns: ['cell', 'block'], reward: 'glider', rounds: 5, steps: 12, budget: 16,
         objective: { type: 'territoryZone', zone: 'station', label: 'Die Forschungsstation mit Einflussgebiet erreichen' },
-        bonuses: [{ type: 'rounds', value: 2, label: 'In höchstens 2 Runden abschließen' }, { type: 'spent', value: 8, label: 'Höchstens 8 Genmaterial einsetzen' }],
+        bonuses: [{ type: 'rounds', value: 2, label: 'In höchstens 2 Runden abschließen' }, { type: 'onlyPatterns', patterns: ['block'], label: 'Nur mit Blöcken wachsen' }],
         map: { territory: [[0, 7, 4, 17, 13]], rocks: [[2, 24, 5, 35], [21, 18, 23, 31]], zones: [{ id: 'station', label: 'FORSCHUNG', rMin: 10, rMax: 14, cMin: 21, cMax: 23 }, { id: 'depot', label: 'VORRAT', cache: 6, rMin: 1, rMax: 3, cMin: 12, cMax: 15 }] }
     },
     {
@@ -41,7 +41,7 @@ const CAMPAIGN_MISSIONS = [
         debriefing: 'Wasser gesichert. Hellas sendet keine Drohung, sondern eine Warnung: „Die Pflanzen im Süden gehören keinem Haus.“',
         patterns: ['cell', 'block', 'blinker', 'glider'], reward: null, rounds: 3, steps: 64, budget: 20,
         objective: { type: 'race', zone: 'water', label: 'Das Wasserreservoir vor Hellas erreichen' },
-        bonuses: [{ type: 'rounds', value: 1, label: 'In der ersten Runde abschließen' }, { type: 'spent', value: 10, label: 'Höchstens 10 Genmaterial einsetzen' }],
+        bonuses: [{ type: 'rounds', value: 1, label: 'In der ersten Runde abschließen' }, { type: 'noForecast', label: 'Ohne Prognose gewinnen' }],
         map: { territory: [[0, 5, 6, 13, 17]], rocks: [[1, 26, 4, 34], [25, 4, 27, 15]], seeds: [{ pattern: 'glider', r: 1, c: 43, owner: 2, mirror: true }], zones: [{ id: 'water', label: 'WASSEREIS', rMin: 18, rMax: 23, cMin: 23, cMax: 28 }] }
     },
     {

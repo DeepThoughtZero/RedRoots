@@ -144,6 +144,12 @@ Validiert alle Missionslösungen und Spielstandsmechaniken:
   - Doktrinen: Zielrechteck ersetzt das nächste Camp; Missionen ohne Doktrin liefern bitgenau dieselben gesetzten KI-Züge wie zuvor (Fingerabdruck).
   - `clearZones`, `oscillate`, `exactCount` und `escort` mit echten Conway-Lösungen und Gegenbeispielen; der Sturmstoß von A4_M05 erreicht ohne Eingriff tatsächlich den Rettungsplatz.
 
+- **Meisterschaft & Wiederspielwert (`tests/mastery.test.cjs`):**
+  - Mustererkennung in allen Drehungen; Undo und Radieren halten Platzierungs- und Radierzähler konsistent.
+  - Bonustypen `onlyPatterns`, `patterns`, `noForecast`, `caches`, `noErase` und `territory`. Die Referenzlösungen behalten drei Sterne.
+  - Bestwerte als Minimum je Kennzahl; alte Spielstände laden unverändert, ungültige Zusatzwerte verfallen, Codes und Importe bleiben kompatibel.
+  - Expertenprotokolle (Budgetuntergrenze, stärkere Gegner, ohne Hilfen) bleiben für Rätselmissionen lösbar; Funksprüche lösen einmal je Durchgang aus; die Zeitleiste dünnt lange Missionen gleichmäßig aus.
+
 ### Ebene 5: Audio & Systemtests (`tests/audio.test.cjs`)
 Verifikation des Klang- und Narrationssystems:
 - **Standardzustand:** Standardmäßig stummgeschaltet, kein Autoplay-Verstoß.
@@ -162,7 +168,7 @@ Verifikation des Klang- und Narrationssystems:
 ```bash
 node tests/run-all.cjs
 ```
-Führt alle Testsuiten (derzeit dreizehn) nacheinander aus, misst die Laufzeiten und gibt einen übersichtlichen Erfolgs- oder Fehlerbericht aus.
+Führt alle Testsuiten (derzeit vierzehn) nacheinander aus, misst die Laufzeiten und gibt einen übersichtlichen Erfolgs- oder Fehlerbericht aus.
 
 ### Einzelne Suiten ausführen
 ```bash

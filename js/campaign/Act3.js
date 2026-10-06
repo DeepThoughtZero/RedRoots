@@ -13,7 +13,7 @@ CAMPAIGN_MISSIONS.push(
         hint:'Die nummerierten Zielbereiche müssen in Reihenfolge erreicht werden. Mehrere Gleiter auf getrennten Bahnen können zu verschiedenen Zeiten ankommen. Ihre Entfernung zu den Schaltern bestimmt die Reihenfolge. Zu frühe Kontakte sind endgültig.',
         patterns:ACT3_PATTERNS,reward:null,rounds:2,steps:48,budget:15,
         objective:{type:'orderedZones',zones:['one','two','three'],label:'Schalter 1 → 2 → 3 in dieser Reihenfolge mit lebender Flora erreichen'},
-        bonuses:[{type:'margin',value:5,zones:['two','three'],label:'Wartenden Schaltern nie näher als 5 Felder kommen'},{type:'spent',value:15,label:'Höchstens 15 Genmaterial einsetzen'}],
+        bonuses:[{type:'margin',value:5,zones:['two','three'],label:'Wartenden Schaltern nie näher als 5 Felder kommen'},{type:'noForecast',label:'Ohne Prognose öffnen'}],
         map:{rows:36,cols:60,territory:[[0,3,3,9,33]],rocks:[[0,38,12,39],[28,10,35,11]],zones:[{id:'one',label:'1 · ZUGANG',rMin:12,rMax:15,cMin:12,cMax:15},{id:'two',label:'2 · FREIGABE',rMin:18,rMax:21,cMin:30,cMax:33},{id:'three',label:'3 · TOR',rMin:24,rMax:27,cMin:48,cMax:51}]}
     },
     {
@@ -43,7 +43,7 @@ CAMPAIGN_MISSIONS.push(
         hint:'Die drei Archive behalten ihre Daten nach einem kurzen Kontakt. Plane getrennte mobile Kolonien. Der rote Streifen am Südrand darf von keiner lebenden Zelle berührt werden. Eine Lücke im nördlichen Felsriegel lässt die Wache in Richtung deiner Landefläche wachsen. Berge die Daten, bevor sie durchbricht.',
         patterns:[...ACT3_PATTERNS,'rabbits'],reward:'switch_engine',rounds:3,steps:48,budget:18,enemy:true,enemyStrength:'hard',enemyBudget:14,
         objective:{type:'collectZones',zones:['north','middle','south'],sterile:['seal'],label:'Drei Archive bergen; den roten Quarantänestreifen vollständig frei halten'},
-        bonuses:[{type:'rounds',value:2,label:'Vor Ende von Runde 2 bergen'},{type:'spent',value:15,label:'Höchstens 15 Genmaterial einsetzen'}],
+        bonuses:[{type:'rounds',value:2,label:'Vor Ende von Runde 2 bergen'},{type:'noForecast',label:'Ohne Prognose bergen'}],
         map:{territory:[[0,3,4,12,26],[1,22,2,27,11]],rocks:[[0,31,6,32],[20,0,20,6],[20,12,29,15]],camps:[{id:0,rMin:3,rMax:5,cMin:4,cMax:6},{id:1,rMin:24,rMax:26,cMin:3,cMax:7}],zones:[{id:'north',label:'ARCHIV 1',rMin:9,rMax:13,cMin:27,cMax:31},{id:'middle',label:'ARCHIV 2',rMin:20,rMax:24,cMin:25,cMax:29},{id:'south',label:'ARCHIV 3',rMin:22,rMax:27,cMin:38,cMax:43},{id:'seal',label:'QUARANTÄNE · FREI HALTEN',rMin:28,rMax:29,cMin:16,cMax:47}]}
     },
     {
@@ -53,7 +53,7 @@ CAMPAIGN_MISSIONS.push(
         hint:'Drei getrennte Gleiterbahnen können die Relais zeitgleich erreichen. Plane den Durchgang durch die Felsfenster und genügend Aufenthaltszeit in allen drei Zielbereichen. Kontakt zum roten Südrand bedeutet Niederlage. Stabile Inseln helfen mehr als eine ungebremste Front.',
         patterns:[...ACT3_PATTERNS,'rabbits','switch_engine'],reward:'lidka',rounds:3,steps:48,budget:18,
         objective:{type:'holdZones',zones:['west','center','east'],value:16,sterile:['gap'],label:'Alle drei Relais 16 Generationen gleichzeitig halten; Trennstreifen leer lassen'},
-        bonuses:[{type:'rounds',value:2,label:'Die Zentrale bis Runde 2 ersetzen'},{type:'spent',value:15,label:'Höchstens 15 Genmaterial einsetzen'}],
+        bonuses:[{type:'rounds',value:2,label:'Die Zentrale bis Runde 2 ersetzen'},{type:'onlyPatterns',patterns:['glider'],label:'Nur Gleiter einsetzen'}],
         map:{rows:40,cols:72,territory:[[0,3,3,10,41]],rocks:[[0,18,12,19],[24,18,32,19],[0,50,12,51],[24,50,32,51]],zones:[{id:'west',label:'RELAIS WEST',rMin:23,rMax:31,cMin:23,cMax:31},{id:'center',label:'RELAIS MITTE',rMin:23,rMax:31,cMin:39,cMax:47},{id:'east',label:'RELAIS OST',rMin:23,rMax:31,cMin:55,cMax:63},{id:'gap',label:'TRENNSTREIFEN · FREI HALTEN',rMin:34,rMax:39,cMin:0,cMax:71}]}
     }
 );

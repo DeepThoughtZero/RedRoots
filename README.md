@@ -62,6 +62,8 @@ Mission 1 beginnt ausschließlich mit Einzelzellen: Eine Anordnung, die zwölf G
 
 **Lebendige Szenarien:** Manche Sektoren verändern sich während der Mission – stets mit Ankündigung mindestens eine Runde vorher (HUD-Zeile „⚡ Vorwarnung“, gestrichelter Umriss auf dem Spielfeld): In *Die Zangenstellung* flutet ab Runde 5 Wildwuchs die Wasserader unter beiden Camps, in *Das Auge des Sturms* treibt ab Runde 6 ein Sturmstoß zwei Wildwuchsgleiter auf den Rettungsplatz. **Vorratskapseln** (◆, in *Die erste Wurzel*, *Zwei Städte, ein Wasserstrom* und *Tausend rote Morgen*) sind freiwillige Umwege: Der erste Kontakt eigener lebender Flora bringt zusätzliches Genmaterial zur nächsten Runde. In *Zwischen den Fronten* zielen Viridion und Tharsis gezielt auf je einen Rettungsplatz, in *Die letzte Gegenoffensive* greift Viridion die Zivilstation aus der Ferne an; Angriffe werden aus mindestens zwölf Feldern Entfernung gestartet und bleiben abwehrbar.
 
+**Meisterschaft:** Bonusziele verlangen nicht mehr nur wenig Material und Tempo, sondern auch „Nur Gleiter einsetzen“, „Mit höchstens zwei Musterarten“, „Ohne Prognose“, Abstand zu Schutzzonen oder das Bergen eines Vorrats. Nach einem Sieg speichert die Kampagne zusätzlich **Bestwerte** (geringstes Material, früheste Generation, wenigste Runden) und zeigt sie im Sektorbriefing. Mit drei Sternen öffnet sich das **Expertenprotokoll**: weniger eigenes Material (nie unter dem Wert der bekannten Lösung), um 50 % stärkere Gegner, keine Hinweise und keine Prognose; ein Abschluss wird mit ✦ markiert, zählt aber nicht als zusätzlicher Stern. Kurze **Funksprüche** der Biologin, der Hellas-Kommandantin oder des gemeinsamen Funkkanals kommentieren wichtige Momente (nur Text). Der Missionsbericht zeigt eine **Zeitleiste** mit eigener und fremder Flora je Generation, den entscheidenden Ereignissen, einem Fadenkreuz beim Überfahren und einer Tabellenansicht. Bestwerte und Expertenstatus werden zusätzlich im Spielstand abgelegt; ältere Spielstände laden unverändert. Expeditionscodes übertragen weiterhin nur Sterne.
+
 Die Marskarte öffnet weitere Sektoren nach einem Sieg. Zwei optionale Herausforderungen vergeben zusätzliche Sterne; bei Wiederholungen bleibt die beste Wertung erhalten. Genome und kurze Sektorberichte werden nach und nach freigeschaltet. Kampagnenfortschritt wird separat unter `redroots_campaign_v1` im lokalen Browserspeicher abgelegt. Gelöschte Browserdaten löschen auch diesen Fortschritt. Laufende Missionen beginnen nach Neuladen von vorn.
 
 Auf der Marskarte findest du unten **Expedition / Spielstand**:
@@ -121,6 +123,7 @@ node tests/act3.test.cjs         # Ebene 4: Akt III Schalter, Pulse & Quarantän
 node tests/objectives.test.cjs   # Ebene 4: Bedrohungsabstand, Ereignisse, Niederlagenanalyse & Abstandsboni
 node tests/controls.test.cjs     # Ebene 4: Pause, Einzelschritt, Turbo, Zeitlupe, Checkpoints, Prognose, Rennuhr
 node tests/scenario.test.cjs     # Ebene 4: Ereignisse, Vorratskapseln, Doktrinen & neue Zieltypen
+node tests/mastery.test.cjs      # Ebene 4: Bonusvielfalt, Bestwerte, Expertenprotokolle, Funksprüche & Zeitleiste
 node tests/audio.test.cjs        # Ebene 5: GameAudio, Ducking, Tab-Pause & TTS
 node tests/audio-assets.test.cjs # Ebene 5: Audio-Aufnahmen & SHA-256 Integrität
 

@@ -8,8 +8,44 @@ class ObjectiveSystem {
         this.events = []; this.threats = new Map(); this.closestBy = new Map(); this.occupied = new Set(); this.supplied = new Set();
         this.bestStreak = 0; this.bestHold = 0; this.bestSimultaneous = 0; this.bestCapture = 0; this.lastAlive = 0; this.closestToTarget = Infinity; this.defeatedSeen = new Set();
         this.caches = new Set(); this.pendingMaterial = 0; this.cleared = new Set(); this.bestCleared = 0; this.zoneHistory = []; this.beacon = 0; this.bestBeacon = 0; this.measured = null;
+        // Mastery data: placed pattern kinds, erasures, a population timeline and every event for the result screen.
+        this.placements = []; this.erased = 0; this.log = []; this.halfAnnounced = false;
+        this.timeline = { stride: 1, generation: [], own: [], foreign: [] };
     }
     zone(id) { return this.mission.map.zones.find(z => z.id === id); }
+    emit(event) { this.events.push(event); this.log.push(event); }
+    // Identifies a placed pattern by its shape in any rotation.
+    static patternKey(cells) {
+        const norm = list => { const r0 = Math.min(...list.map(p => p[0])), c0 = Math.min(...list.map(p => p[1])); return list.map(([r, c]) => `${r - r0},${c - c0}`).sort().join(';'); };
+        if (!ObjectiveSystem.shapes) {
+            ObjectiveSystem.shapes = new Map();
+            for (const [key, p] of Object.entries(CONSTANTS.PATTERNS)) { let cur = p.pattern; for (let i = 0; i < 4; i++) { if (!ObjectiveSystem.shapes.has(norm(cur))) ObjectiveSystem.shapes.set(norm(cur), key); cur = cur.map(([r, c]) => [c, -r]); } }
+        }
+        return ObjectiveSystem.shapes.get(norm(cells)) || 'custom';
+    }
+    recordPlacement(cells) { this.placements.push(ObjectiveSystem.patternKey(cells)); }
+    // Keeps at most ~1200 samples; long missions are thinned evenly.
+    sample(own, foreign) {
+        const t = this.timeline;
+        if (this.generations % t.stride) return;
+        t.generation.push(this.generations); t.own.push(own); t.foreign.push(foreign);
+        if (t.generation.length > 1200) { for (const key of ['generation', 'own', 'foreign']) t[key] = t[key].filter((_, i) => i % 2 === 0); t.stride *= 2; }
+    }
+    bonusMet(b, state) {
+        switch (b.type) {
+            case 'rounds': return state.currentRound <= b.value;
+            case 'generations': return this.generations <= b.value;
+            case 'population': return this.maxPopulation <= b.value;
+            case 'margin': return this.closestMargin(b.zones) >= b.value;
+            case 'patterns': return new Set(this.placements).size <= b.value;
+            case 'onlyPatterns': return this.placements.every(key => b.patterns.includes(key));
+            case 'noErase': return this.erased === 0;
+            case 'noForecast': return !(state.forecastsUsed > 0);
+            case 'caches': return this.mission.map.zones.filter(z => z.cache).every(z => this.caches.has(z.id));
+            case 'territory': { let n = 0; for (let r = 0; r < state.rows; r++) for (let c = 0; c < state.cols; c++) if (state.territory.getOwnerAt(r, c) === 0) n++; return n >= b.value; }
+            default: return this.spent <= b.value;
+        }
+    }
     static clone(value) {
         if (value instanceof Set) return new Set(value);
         if (value instanceof Map) return new Map([...value].map(([k, v]) => [k, ObjectiveSystem.clone(v)]));
@@ -99,7 +135,7 @@ class ObjectiveSystem {
             const previous = this.threats.get(w.id), announced = { ...(previous?.announced || {}) };
             // Escalations are announced once; flicker at a threshold stays quiet for twelve generations.
             if (rank[level] > rank[previous?.level || 'calm'] && !(this.generations - (announced[level] ?? -Infinity) <= 12)) {
-                this.events.push({ type: 'threat', level, zoneId: w.id, label: w.label, kind: w.kind, distance, generation: this.generations });
+                this.emit({ type: 'threat', level, zoneId: w.id, label: w.label, kind: w.kind, distance, generation: this.generations });
                 announced[level] = this.generations;
             }
             this.threats.set(w.id, { level, distance, label: w.label, kind: w.kind, announced });
@@ -152,18 +188,19 @@ class ObjectiveSystem {
     evaluate(state, event) {
         if (this.result) return true;
         const o = this.mission.objective;
-        let population = 0;
-        for (const v of state.grid.owners) if (v === 1) population++;
+        let population = 0, foreign = 0;
+        for (const v of state.grid.owners) { if (v === 1) population++; else if (v > 1 || v === CONSTANTS.OWNER_NEUTRAL) foreign++; }
         this.maxPopulation = Math.max(this.maxPopulation, population);
         if (event === 'generation') {
             this.generations++;
             this.streak = population > 0 ? this.streak + 1 : 0;
             this.bestStreak = Math.max(this.bestStreak, this.streak);
             if (population > 0) this.lastAlive = this.generations;
+            this.sample(population, foreign);
             // Supply caches: first contact of own living flora pays out at the start of the next round.
             for (const z of this.mission.map.zones) if (z.cache && !this.caches.has(z.id) && this.inZone(state, z, 1)) {
                 this.caches.add(z.id); this.pendingMaterial += z.cache;
-                this.events.push({ type: 'cache', zoneId: z.id, label: z.label, amount: z.cache, generation: this.generations });
+                this.emit({ type: 'cache', zoneId: z.id, label: z.label, amount: z.cache, generation: this.generations });
             }
         }
         const zone = this.zone(o.zone);
@@ -199,7 +236,7 @@ class ObjectiveSystem {
             const next = targets[this.collected.size];
             wrongZone = targets.slice(this.collected.size + 1).find(z => this.inZone(state,z,1)) || null;
             wrongOrder = !!wrongZone;
-            if (!wrongOrder && next && this.inZone(state,next,1)) { this.collected.add(next.id); this.events.push({ type: 'switch', zoneId: next.id, label: next.label, generation: this.generations }); }
+            if (!wrongOrder && next && this.inZone(state,next,1)) { this.collected.add(next.id); this.emit({ type: 'switch', zoneId: next.id, label: next.label, generation: this.generations }); }
             this.progressText = `${this.collected.size} / ${targets.length} Schalter in Reihenfolge`;
             won = this.collected.size === targets.length;
         }
@@ -216,16 +253,17 @@ class ObjectiveSystem {
             won = reached === targets.length;
         }
         if (o.type === 'collectZones') {
-            targets.forEach(z => { if (!this.collected.has(z.id) && this.inZone(state, z, 1)) { this.collected.add(z.id); this.events.push({ type: 'collect', zoneId: z.id, label: z.label, generation: this.generations }); } });
+            targets.forEach(z => { if (!this.collected.has(z.id) && this.inZone(state, z, 1)) { this.collected.add(z.id); this.emit({ type: 'collect', zoneId: z.id, label: z.label, generation: this.generations }); } });
             this.progressText = `${this.collected.size} / ${targets.length} Archive gesichert`;
             won = this.collected.size === targets.length;
         }
         if (o.type === 'holdZones') {
             if (event === 'generation') {
                 const held = this.occupied.size === targets.length;
-                if (!held && this.hold >= 3) this.events.push({ type: 'holdLost', held: this.hold, generation: this.generations });
+                if (!held && this.hold >= 3) this.emit({ type: 'holdLost', held: this.hold, generation: this.generations });
                 this.hold = held ? this.hold + 1 : 0;
                 this.bestHold = Math.max(this.bestHold, this.hold);
+                if (!this.halfAnnounced && this.hold >= Math.ceil(o.value / 2)) { this.halfAnnounced = true; this.emit({ type: 'holdHalf', generation: this.generations }); }
             }
             this.progressText = `${this.hold} / ${o.value} Generationen alle ${targets.length} Ziele besetzt`;
             won = this.hold >= o.value;
@@ -243,16 +281,16 @@ class ObjectiveSystem {
                 const hasMajority = own >= 3 && own > other;
                 const previous = this.captureTicks.get(target.id) || 0;
                 const ticks = hasMajority ? previous + 1 : 0;
-                if (!hasMajority && previous >= Math.ceil(o.hold / 2)) this.events.push({ type: 'captureLost', zoneId: target.id, label: target.label, generation: this.generations });
+                if (!hasMajority && previous >= Math.ceil(o.hold / 2)) this.emit({ type: 'captureLost', zoneId: target.id, label: target.label, generation: this.generations });
                 this.captureTicks.set(target.id,ticks);
                 this.bestCapture = Math.max(this.bestCapture, ticks);
-                if (ticks >= o.hold) { this.collected.add(target.id); this.events.push({ type: 'captured', zoneId: target.id, label: target.label, generation: this.generations }); }
+                if (ticks >= o.hold) { this.collected.add(target.id); this.emit({ type: 'captured', zoneId: target.id, label: target.label, generation: this.generations }); }
             }
             for (const enemy of this.mission.enemies || []) {
                 const bases = targets.filter(z => z.house === enemy.house);
                 if (bases.length && bases.every(z => this.collected.has(z.id))) {
                     state.defeatedPlayers.add(enemy.house); state.budgets[enemy.house] = 0;
-                    if (!this.defeatedSeen.has(enemy.house)) { this.defeatedSeen.add(enemy.house); this.events.push({ type: 'houseDefeated', house: enemy.house, generation: this.generations }); }
+                    if (!this.defeatedSeen.has(enemy.house)) { this.defeatedSeen.add(enemy.house); this.emit({ type: 'houseDefeated', house: enemy.house, generation: this.generations }); }
                 }
             }
             this.progressText = `${this.collected.size} / ${targets.length} Camps erobert`;
@@ -272,9 +310,10 @@ class ObjectiveSystem {
                 this.zoneHistory = [...this.zoneHistory, this.zoneKey(state, zone)].slice(-3);
                 const [before, last, now] = this.zoneHistory;
                 const beating = this.zoneHistory.length === 3 && now !== '' && now === before && now !== last;
-                if (!beating && this.beacon >= 3) this.events.push({ type: 'holdLost', held: this.beacon, generation: this.generations });
+                if (!beating && this.beacon >= 3) this.emit({ type: 'holdLost', held: this.beacon, generation: this.generations });
                 this.beacon = beating ? this.beacon + 1 : 0;
                 this.bestBeacon = Math.max(this.bestBeacon, this.beacon);
+                if (!this.halfAnnounced && this.beacon >= Math.ceil(o.value / 2)) { this.halfAnnounced = true; this.emit({ type: 'holdHalf', generation: this.generations }); }
             }
             this.progressText = `${this.beacon} / ${o.value} Generationen Leuchtfeuer im Takt`;
             won = this.beacon >= o.value;
@@ -301,8 +340,8 @@ class ObjectiveSystem {
         const expired = event === 'round' && state.currentRound >= state.maxRounds;
         if (!lostCamp && !lostRace && !lostProtected && !lostSterile && !wrongOrder && !lostObjective && !won && !expired) return false;
         const success = won && !lostCamp && !lostRace && !lostProtected && !lostSterile && !wrongOrder && !lostObjective;
-        const bonuses = this.mission.bonuses.map(b => success && (b.type === 'rounds' ? state.currentRound <= b.value : b.type === 'generations' ? this.generations <= b.value : b.type === 'population' ? this.maxPopulation <= b.value : b.type === 'margin' ? this.closestMargin(b.zones) >= b.value : this.spent <= b.value));
-        this.result = { success, stars: success ? 1 + bonuses.filter(Boolean).length : 0, bonuses,
+        const bonuses = this.mission.bonuses.map(b => success && this.bonusMet(b, state));
+        this.result = { success, stars: success ? 1 + bonuses.filter(Boolean).length : 0, bonuses, stats: { spent: this.spent, generations: this.generations, rounds: state.currentRound },
             reason: wrongOrder ? 'Die Schalter wurden in falscher Reihenfolge berührt.' : lostObjective ? lostObjective : lostSterile ? 'Die Quarantäne wurde durch lebende Flora verletzt.' : lostProtected ? 'Fremde Flora hat die geschützte Zone erreicht.' : lostCamp ? 'Unser Habitat wurde überwuchert.' : lostRace ? 'Hellas hat das Wasser zuerst erreicht.' : !success ? 'Das Zeitfenster ist geschlossen.' : this.mission.debriefing };
         if (!success) {
             const breach = wrongOrder ? { zone: wrongZone, owners: [1] } : lostSterile ? { zone: sterileBreach, owners: [1,2,3,4,CONSTANTS.OWNER_NEUTRAL] } : lostProtected ? { zone: protectedBreach, owners: [...hostiles, CONSTANTS.OWNER_NEUTRAL] } : lostCamp ? { zone: ownCamp, owners: hostiles, label: 'HABITAT' } : lostRace ? { zone, owners: [2] } : null;

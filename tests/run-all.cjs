@@ -77,6 +77,11 @@ const suites = [
         desc: 'Angekündigte Ereignisse, Vorratskapseln, Doktrinen, Eindämmung, Leuchtfeuer, Kalibrierung, Geleitschutz'
     },
     {
+        name: 'Ebene 4i: Meisterschaft & Wiederspielwert',
+        file: 'tests/mastery.test.cjs',
+        desc: 'Bonusvielfalt, Bestwerte, Spielstandkompatibilität, Expertenprotokolle, Funksprüche, Zeitleiste'
+    },
+    {
         name: 'Ebene 5a: Audio-Steuerung & Sprachausgabe',
         file: 'tests/audio.test.cjs',
         desc: 'GameAudio, Ambience-Ducking, Tab-Pause, Browser-TTS Fallback'

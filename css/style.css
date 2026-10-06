@@ -397,3 +397,32 @@ canvas {
 @media(max-width:1024px) and (orientation:landscape) { #simControls { bottom:8px;left:8px; } #simControls button { min-width:44px;padding:0 8px;font-size:14px; } }
 @media(max-width:1024px) { .forecast-tools { grid-column:1/-1;margin:0; } .sim-options { grid-column:1/-1; } }
 .objective-event { border-left-color:#ff9f43!important; }
+.best-line { font-size:14px!important;color:#bfe9de!important;margin:8px 0; }
+.expert-launch { display:flex;flex-direction:column;gap:6px;margin:12px 0; }
+.expert-launch button { min-height:44px;border-color:#e6c18c;color:#f3dcae; }
+.expert-launch small { font-size:13px;color:#9fb3b0;line-height:1.5; }
+.best-line { font-size:14px!important;color:#bfe9de!important;margin:8px 0; }
+.expert-launch { display:flex;flex-direction:column;gap:6px;margin:12px 0; }
+.expert-launch button { min-height:44px;border-color:#e6c18c;color:#f3dcae; }
+.expert-launch small { font-size:13px;color:#9fb3b0;line-height:1.5; }
+/* Mission timeline (validated palette on #101d24: own #1a9fb0, foreign #c96f38). */
+.mission-timeline { margin:18px 0;padding:14px 16px;border:1px solid #ffffff1a;border-radius:8px;background:#0d181e; }
+.mission-timeline figcaption { font-size:15px;font-weight:600;color:#e3ece9;margin-bottom:6px; }
+.timeline-legend { display:flex;flex-wrap:wrap;gap:16px;font-size:14px;color:#b9c9c5;margin-bottom:6px; }
+.timeline-legend .swatch { display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle; }
+.swatch.own { background:#1a9fb0; } .swatch.foreign { background:#c96f38; }
+.timeline-plot { position:relative; }
+.timeline-plot svg { width:100%;height:auto;display:block;overflow:visible; }
+.tl-line { fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round; }
+.tl-line.own { stroke:#1a9fb0; } .tl-line.foreign { stroke:#c96f38; }
+.tl-axis { stroke:#ffffff40;stroke-width:1; } .tl-grid { stroke:#ffffff14;stroke-width:1; }
+.tl-label { fill:#93a8a3;font-size:11px;font-family:monospace; }
+.tl-mark { stroke:#e6c18c88;stroke-width:1;stroke-dasharray:3 3; } .tl-mark.failure { stroke:#ff8a96;stroke-dasharray:none;stroke-width:1.5; }
+.tl-cross { stroke:#e3ece9aa;stroke-width:1; }
+.tl-hit { fill:transparent;cursor:crosshair; }
+.timeline-tip { position:absolute;top:-6px;width:170px;padding:4px 8px;font-size:13px;color:#e3ece9;background:#0c1722f2;border:1px solid #ffffff2a;border-radius:4px;pointer-events:none; }
+.timeline-events { margin:10px 0 0;padding-left:20px;font-size:14px;line-height:1.6;color:#c6d5cf; }
+.timeline-table summary { min-height:44px;display:flex;align-items:center;font-size:14px;color:#dcb18c;cursor:pointer; }
+.timeline-table table { width:100%;font-size:13px;color:#c6d5cf;border-collapse:collapse; }
+.timeline-table th, .timeline-table td { text-align:right;padding:3px 8px;border-bottom:1px solid #ffffff10; }
+.tl-end { fill:#c6d5cf;font-size:11px;font-weight:600; } .mission-toast button { flex-shrink:0; }

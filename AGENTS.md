@@ -46,7 +46,7 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 | `js/campaign/Act3.js` | Fünf Missionen von Akt III und CAMPAIGN_ACTS für Aktnavigation; nach Act2.js laden |
 | `js/campaign/Act2.js` | Fünf Szenarien von Akt II; nach Story.js laden |
 | `js/campaign/Story.js` | Briefings, Berichte und nach Siegen freigeschaltete Archivtexte |
-| `js/campaign/Assistance.js` | Gestufte Hinweise und Prognose-Kontingente je Mission; nach Act5.js laden |
+| `js/campaign/Assistance.js` | Gestufte Hinweise, Prognose-Kontingente, Expertenprotokolle (`expertMission`) und Funksprüche je Mission; nach Act5.js laden |
 | `js/campaign/CampaignManager.js` | CampaignState, Marskarte, Missions-HUD, Ergebnisse und Codes |
 | `docs/CAMPAIGN_STORY.md` | Durchgehende Geschichte, Figuren, spätere Akte und dramaturgische Regeln |
 | `docs/MISSION_IMPROVEMENT_PLAN.md` | Verbesserungsplan für spannendere Missionen, Fahrplan und Spannungs-Checkliste für neue Missionen |
@@ -90,7 +90,7 @@ Für neue Missionen:
 
 ## Spielstand und Codes
 
-- `redroots_campaign_v1`: Kampagnenversion, ausgewähltes Haus, abgeschlossene Missionen mit Sternen und freigeschaltete Genome.
+- `redroots_campaign_v1`: Kampagnenversion, ausgewähltes Haus, abgeschlossene Missionen mit Sternen und freigeschaltete Genome. Additiv seit Phase 4 je Mission `best` (`spent`, `generations`, `rounds`; jeweils Minimum) und `veteran: true` für bestandene Expertenprotokolle; ungültige Zusatzwerte werden verworfen, nie die Sterne. Codes enthalten nur Sterne.
 - `redroots_config`: Einstellungen des freien Gefechts.
 - `redroots_audio_v1`: Audio-Einstellungen.
 - `redroots_simulation_v1`: Zeitlupe und automatisches Anhalten der Kampagnen-Evolution. Runden-Checkpoints liegen nur im Arbeitsspeicher; der Versuchszähler für Hinweisstufen reist im Link (`attempt`).

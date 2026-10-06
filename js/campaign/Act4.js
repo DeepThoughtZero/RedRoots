@@ -9,7 +9,7 @@ CAMPAIGN_MISSIONS.push(
         hint:'Der gelbe Gleiter zieht nach links unten auf dein Habitat zu. Eine kleine stabile Kolonie kann ihn abfangen. Für den Angriff brauchst du einen unabhängigen Weg zum Camp. Acht Generationen mit mindestens drei eigenen und mehr eigenen als fremden Zellen sichern es; anschließend endet dort die neue Aussaat.',
         patterns:ACT4_PATTERNS,reward:null,rounds:5,steps:120,budget:22,enemy:true,enemies:[{house:3,budget:24,strength:'hard'}],
         objective:{type:'captureCamps',zones:['fort'],hold:8,minGenerations:112,label:'Tharsis-Camp erobern und eigenes Habitat bis Generation 112 schützen'},
-        bonuses:[{type:'generations',value:112,label:'Beim ersten Evakuierungsfenster abschließen'},{type:'spent',value:18,label:'Höchstens 18 Genmaterial einsetzen'}],
+        bonuses:[{type:'generations',value:112,label:'Beim ersten Evakuierungsfenster abschließen'},{type:'patterns',value:2,label:'Mit höchstens zwei Musterarten auskommen'}],
         map:{rows:40,cols:60,territory:[[0,3,3,12,16],[0,10,16,19,28],[0,22,4,26,11],[3,27,28,36,44]],rocks:[[0,39,15,40],[28,16,39,17]],camps:[{id:0,rMin:22,rMax:25,cMin:6,cMax:10},{id:3,rMin:24,rMax:30,cMin:24,cMax:30}],seeds:[{pattern:'glider',r:1,c:34,owner:4,mirror:true}],zones:[{id:'fort',house:3,label:'THARSIS · SPERRCAMP',rMin:24,rMax:30,cMin:24,cMax:30}]}
     },
     {
@@ -19,7 +19,7 @@ CAMPAIGN_MISSIONS.push(
         hint:'Die beiden Camps liegen auf verschiedenen diagonalen Flugbahnen. Felsfenster begrenzen den Zugang. Sichere jeden Standort acht Generationen gegen Gegenwuchs. Erst wenn beide Camps fallen, verliert Tharsis seine weitere Aussaat. Reagiere zwischen den Evolutionsphasen auf neue Kolonien.',
         patterns:ACT4_PATTERNS,reward:null,rounds:6,steps:250,budget:26,enemy:true,enemies:[{house:3,budget:24,strength:'hard'}],
         objective:{type:'captureCamps',zones:['west','east'],hold:8,label:'Beide Tharsis-Camps erobern; eigenes Habitat erhalten'},
-        bonuses:[{type:'rounds',value:3,label:'Beide Camps bis Runde 3 sichern'},{type:'spent',value:22,label:'Höchstens 22 Genmaterial einsetzen'}],
+        bonuses:[{type:'rounds',value:3,label:'Beide Camps bis Runde 3 sichern'},{type:'noForecast',label:'Ohne Prognose erobern'}],
         events:[{id:'flood',round:5,announceRound:4,text:'Der Kanal flutet: Ab Runde 5 wächst Wildwuchs unter beiden Camps in die Wasserader.',action:[{type:'seed',pattern:'acorn',r:37,c:26,owner:-1},{type:'seed',pattern:'acorn',r:37,c:50,owner:-1}]}],
         map:{rows:44,cols:72,territory:[[0,3,3,12,37],[3,29,23,40,57]],rocks:[[0,18,12,19],[24,18,43,19],[0,40,12,41],[24,40,43,41]],camps:[{id:0,rMin:3,rMax:5,cMin:4,cMax:7},{id:3,rMin:24,rMax:30,cMin:24,cMax:30},{id:3,rMin:24,rMax:30,cMin:44,cMax:50}],zones:[{id:'west',house:3,label:'THARSIS · WESTCAMP',rMin:24,rMax:30,cMin:24,cMax:30},{id:'east',house:3,label:'THARSIS · OSTCAMP',rMin:24,rMax:30,cMin:44,cMax:50}]}
     },
@@ -50,7 +50,7 @@ CAMPAIGN_MISSIONS.push(
         hint:'Drei Camps benötigen unabhängige Angriffe. Tharsis bleibt aktiv, solange eines seiner beiden Camps steht. Reserviere Material zum Abfangen der grauen Flora links und nutze die kurzen Runden zur Nachsteuerung. Eine Gleiterkanone lohnt sich nur mit freier Schussbahn; sie ist keine Pflichtlösung.',
         patterns:[...ACT4_PATTERNS,'glider_gun'],reward:null,rounds:7,steps:32,budget:44,enemy:true,enemies:[{house:2,budget:16,strength:'hard'},{house:3,budget:16,strength:'hard'}],
         objective:{type:'captureCamps',zones:['west','center','east'],hold:12,minGenerations:160,protect:['evac'],label:'Alle drei Garnisonen erobern und Rettungsplatz bis Generation 160 schützen'},
-        bonuses:[{type:'generations',value:160,label:'Vor dem letzten Sturmstoß abschließen'},{type:'spent',value:36,label:'Höchstens 36 Genmaterial einsetzen'}],
+        bonuses:[{type:'generations',value:160,label:'Vor dem letzten Sturmstoß abschließen'},{type:'patterns',value:3,label:'Mit höchstens drei Musterarten auskommen'}],
         events:[{id:'storm',round:6,announceRound:5,text:'Sturmstoß: Ab Runde 6 treiben zwei Wildwuchsgleiter von Norden auf den Rettungsplatz zu.',action:[{type:'seed',pattern:'glider',r:2,c:38,owner:-1,mirror:true},{type:'seed',pattern:'glider',r:2,c:30,owner:-1,mirror:true}]}],
         map:{rows:50,cols:88,territory:[[0,3,3,13,61],[0,10,20,19,32],[3,31,24,43,35],[2,31,44,43,55],[3,31,64,43,77]],rocks:[[0,40,12,41],[26,40,49,41],[0,60,12,61],[28,60,49,61]],camps:[{id:0,rMin:3,rMax:5,cMin:4,cMax:7},{id:3,rMin:24,rMax:31,cMin:24,cMax:31},{id:2,rMin:24,rMax:31,cMin:44,cMax:51},{id:3,rMin:24,rMax:31,cMin:64,cMax:71}],seeds:[{pattern:'glider',r:1,c:38,owner:-1,mirror:true}],zones:[{id:'west',house:3,label:'THARSIS · WEST',rMin:24,rMax:31,cMin:24,cMax:31},{id:'center',house:2,label:'VIRIDION · ZENTRUM',rMin:24,rMax:31,cMin:44,cMax:51},{id:'east',house:3,label:'THARSIS · OST',rMin:24,rMax:31,cMin:64,cMax:71},{id:'evac',label:'RETTUNGSPLATZ',rMin:22,rMax:27,cMin:10,cMax:17}]}
     }

@@ -386,6 +386,21 @@ Abnahme:
 - Codes bleiben kompatibel.
 - Vertonte Funksprüche sind per Speaches geprüft, oder sie sind ausdrücklich nur Text.
 
+**Status: umgesetzt (Oktober 2026).**
+- D1: neue Bonustypen `patterns`, `onlyPatterns`, `noErase`, `noForecast`, `caches` und `territory`. Ausgewertet werden sie über `ObjectiveSystem.bonusMet`, ergänzt um ein Platzierungsprotokoll mit Mustererkennung in allen Drehungen. Zwölf der 25 Materialboni sind ersetzt:
+  - A1_M02, A2_M02, A2_M05 und A3_M05: nur bestimmte Muster;
+  - A2_M04, A4_M01 und A4_M05: begrenzte Zahl an Musterarten;
+  - A1_M04, A3_M01, A3_M04 und A4_M02: ohne Prognose;
+  - A5_M01: Notvorrat bergen.
+- D2: `best` und `veteran` werden additiv in `redroots_campaign_v1` gespeichert. Der Lader prüft beide Felder. Das Sektorbriefing zeigt die Bestwerte.
+- D3: `expertMission()` liefert Material × 0,8 (nie unter dem ursprünglichen Materialbonus), Gegnerbudget × 1,5, keine Hinweise und keine Prognose. Optionale Missionsfelder `expert` mit Faktoren und Zusatzereignissen sind möglich. Das Expertenprotokoll öffnet sich mit drei Sternen.
+- D4: 22 Funksprüche in 15 Missionen, nur als Text, höchstens zwölf Wörter, mit Rollenbezeichnungen. Auslöser sind Ereignisse wie `collect`, `alarm:<zone>`, `captured:<zone>`, `houseDefeated:<haus>`, `scenario:<id>`, `cache:<zone>`, `holdHalf` und `holdLost`.
+- D5: Zeitleiste im Missionsbericht. Die Daten liefert `ObjectiveSystem.timeline` mit höchstens etwa 1200 Punkten, gleichmäßig ausgedünnt; dazu kommen Ereignismarken aus `ObjectiveSystem.log`. Die Palette eigene `#1a9fb0` und fremde `#c96f38` ist auf `#101d24` validiert. Dazu gehören Legende, Endbeschriftungen, Fadenkreuz-Tooltip und Tabellenansicht.
+- Offen:
+  - Für Expertenprotokolle mit Gegnern gibt es keine geprüfte Lösung.
+  - Für A5_M01 ist der neue Vorratsbonus nicht automatisch geprüft.
+  - Die Funksprüche sind bewusst nicht vertont.
+
 ---
 
 ## 8. Qualitätssicherung und Playtest

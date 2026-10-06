@@ -8,8 +8,13 @@ class CampaignState {
             const data = JSON.parse(localStorage.getItem(this.key) || 'null');
             if (data?.campaignVersion === 1 && data.completedMissions && typeof data.completedMissions === 'object') {
                 for (const m of CAMPAIGN_MISSIONS) {
-                    const stars = data.completedMissions[m.id]?.stars;
-                    if (Number.isInteger(stars) && stars >= 1 && stars <= 3) this.completed[m.id] = { stars };
+                    const entry = data.completedMissions[m.id], stars = entry?.stars;
+                    if (!(Number.isInteger(stars) && stars >= 1 && stars <= 3)) continue;
+                    this.completed[m.id] = { stars };
+                    // Additive fields since phase 4; invalid values are dropped, never the stars.
+                    const best = entry.best && Object.fromEntries(['spent', 'generations', 'rounds'].filter(k => Number.isInteger(entry.best[k]) && entry.best[k] >= 0).map(k => [k, entry.best[k]]));
+                    if (best && Object.keys(best).length) this.completed[m.id].best = best;
+                    if (entry.veteran === true) this.completed[m.id].veteran = true;
                 }
                 if (['consortium', 'open_genomes'].includes(data.finalChoice)) this.finalChoice = data.finalChoice;
             }
@@ -24,8 +29,13 @@ class CampaignState {
         } catch { this.storageAvailable = false; }
         return this.storageAvailable;
     }
-    record(id, stars) {
-        this.completed[id] = { stars: Math.max(this.completed[id]?.stars || 0, stars) };
+    // Keeps the best star rating and, per metric, the lowest material, generation and round count.
+    record(id, stars, stats = null, expert = false) {
+        const previous = this.completed[id] || {};
+        const entry = { ...previous, stars: Math.max(previous.stars || 0, stars) };
+        if (stats) entry.best = Object.fromEntries(['spent', 'generations', 'rounds'].filter(k => Number.isInteger(stats[k])).map(k => [k, Math.min(previous.best?.[k] ?? Infinity, stats[k])]));
+        if (expert) entry.veteran = true;
+        this.completed[id] = entry;
         this.save();
     }
     chooseEnding(choice) {
@@ -130,7 +140,7 @@ class CampaignState {
         }
         // Merge instead of replacing: a transferred code never reduces earned stars.
         ratings.forEach((stars, i) => {
-            if (stars) this.completed[CAMPAIGN_MISSIONS[i].id] = { stars: Math.max(stars, this.completed[CAMPAIGN_MISSIONS[i].id]?.stars || 0) };
+            if (stars) this.completed[CAMPAIGN_MISSIONS[i].id] = { ...this.completed[CAMPAIGN_MISSIONS[i].id], stars: Math.max(stars, this.completed[CAMPAIGN_MISSIONS[i].id]?.stars || 0) };
         });
         this.save();
         return true;
@@ -184,6 +194,7 @@ class CampaignManager {
         if (selected >= 0 && this.progress.available(selected)) this.selected = selected;
         // Failed attempts travel in the retry link and open further hint stages; nothing is stored.
         this.attempt = Math.max(1, Math.min(9, parseInt(params.get('attempt'), 10) || 1));
+        this.expert = params.get('expert') === '1';
         this.hudBody.addEventListener('click', event => {
             if (!event.target.closest('[data-more-hint]')) return;
             this.hintLevel++; this.hintOpen = true; this.updateHUD();
@@ -199,7 +210,7 @@ class CampaignManager {
         }
     }
     navigateToMap(index) { location.href = `${location.pathname}?campaign&sector=${CAMPAIGN_MISSIONS[index].id}`; }
-    navigate(index, attempt = 1) { location.href = `${location.pathname}?mission=${CAMPAIGN_MISSIONS[index].id}${attempt > 1 ? `&attempt=${attempt}` : ''}`; }
+    navigate(index, attempt = 1, expert = false) { location.href = `${location.pathname}?mission=${CAMPAIGN_MISSIONS[index].id}${attempt > 1 ? `&attempt=${attempt}` : ''}${expert ? '&expert=1' : ''}`; }
     hintStages(m) { return m.hints || [m.hint]; }
     showMap() {
         const m = CAMPAIGN_MISSIONS[this.selected];
@@ -220,8 +231,8 @@ class CampaignManager {
                     <svg class="route-lines" viewBox="0 0 100 100" aria-hidden="true">${visible.filter(n => this.progress.completed[n.id]).map(n => `<circle cx="${n.point[0]}" cy="${n.point[1]}" r="7" fill="#62ffd52b" stroke="#9bffe044" stroke-width=".2"/>`).join('')}${visible.slice(1).map((n,i) => `<line x1="${visible[i].point[0]}" y1="${visible[i].point[1]}" x2="${n.point[0]}" y2="${n.point[1]}" class="${this.progress.completed[visible[i].id] ? 'explored' : ''}"/>`).join('')}</svg>
                     <span class="planet-label label-tharsis">THARSIS<small>VULKANPLATEAU</small></span><span class="planet-label label-chryse">${m.act === 1 ? 'CHRYSE · LANDEEBENE' : m.act === 2 ? 'HELLAS · WASSERSIEDLUNGEN' : m.act === 3 ? 'OLYMPUS · SCHUTZANLAGE' : m.act === 4 ? 'UTOPIA · STURMFRONT' : 'ARCADIA · FERNLEITUNGEN'}</span><span class="planet-label label-valles">${m.act === 1 ? 'VALLES · SCHLUCHTEN' : m.act === 2 ? 'SCHUTZGÜRTEL' : m.act === 3 ? 'UNTER DEM VULKAN' : m.act === 4 ? 'WASSERADERN' : 'OLYMPUS · HAUPTNETZ'}</span>
                     ${visible.map(n => { const i = CAMPAIGN_MISSIONS.indexOf(n); return `<button style="left:${n.point[0]}%;top:${n.point[1]}%" class="sector-node ${this.progress.completed[n.id] ? 'conquered' : ''} ${i === this.selected ? 'selected' : ''}" data-sector="${i}" ${this.progress.available(i) ? '' : 'disabled'} aria-label="${this.progress.available(i) ? n.title : 'Unbekannter Sektor'}" aria-pressed="${i === this.selected}">${i === this.selected ? '▶' : this.progress.completed[n.id] ? '✓' : this.progress.available(i) ? String(i+1).padStart(2,'0') : '·'}</button>`; }).join('')}
-                </div><nav class="sector-list" aria-label="Missionsauswahl">${visible.map(n => { const i = CAMPAIGN_MISSIONS.indexOf(n); return `<button type="button" data-sector="${i}" aria-pressed="${i === this.selected}" ${this.progress.available(i) ? '' : 'disabled'}><span>${String(i+1).padStart(2,'0')}</span> ${this.progress.available(i) ? n.title : 'Unbekannter Sektor'} <span>${i === this.selected ? '▶ AUSGEWÄHLT' : this.progress.completed[n.id] ? '✓' : this.progress.available(i) ? '→' : '🔒'}</span></button>`; }).join('')}</nav><div class="chart-legend"><span>● Gesichert</span><span>◎ Expeditionsziel</span><span>◌ Unbekannt</span></div><div class="chart-transmission"><span class="signal-dot"></span> LANDEFÄHRE / VERBINDUNG STABIL <span>HAUS MARINERIS</span></div></div>
-                <article class="mission-briefing"><div class="mission-art"><img src="assets/missions/${m.image || m.id}.webp" alt="${m.title} – Illustration des Missionsschauplatzes" width="1672" height="941" decoding="async"></div><div class="selected-mission-label">▶ AUSGEWÄHLTE MISSION</div><div class="mission-eyebrow">SEKTOR ${String(this.selected+1).padStart(2,'0')}</div><h2>${m.title}</h2><div class="mission-location">${m.region}</div><blockquote>„${m.quote}“</blockquote><p>${m.briefing}</p>${this.ui.audio.narrationButton(m, 'briefing')}${this.progress.completed[m.id] ? `<div class="sector-report"><div class="mission-eyebrow">SEKTOR GESICHERT</div><p>${m.debriefing}</p></div>` : ''}<div class="brief-objective"><small>PRIMÄRZIEL</small><strong>${m.objective.label}</strong>${m.objective.type === 'captureCamps' ? `<p>Je Camp mindestens 3 eigene Zellen und mehr eigene als fremde Flora: ${m.objective.hold} Generationen ohne Unterbrechung halten.</p>` : ''}${m.map.zones.filter(z => z.cache).map(z => `<p>◆ ${z.label}: Kontakt mit lebender Flora bringt +${z.cache} Genmaterial zur nächsten Runde (freiwillig).</p>`).join('')}</div><ul class="bonus-list">${m.bonuses.map(b => `<li>☆ ${b.label}</li>`).join('')}</ul><div class="mission-meta"><span>${m.rounds} RUNDEN</span><span>${m.budget} GENMATERIAL</span></div>${m.reward ? `<div class="genome-reward"><span>GENOM-ENTDECKUNG</span><strong>+ ${[m.reward, ...(m.additionalRewards || [])].filter(Boolean).map(key => CONSTANTS.PATTERNS[key].name).join(' + ')}</strong></div>` : ''}<button class="launch-button" id="launchMission">${this.progress.completed[m.id] ? 'Sektor erneut betreten' : 'Expedition starten'} <span>→</span></button></article></div>
+                </div><nav class="sector-list" aria-label="Missionsauswahl">${visible.map(n => { const i = CAMPAIGN_MISSIONS.indexOf(n); return `<button type="button" data-sector="${i}" aria-pressed="${i === this.selected}" ${this.progress.available(i) ? '' : 'disabled'}><span>${String(i+1).padStart(2,'0')}</span> ${this.progress.available(i) ? n.title : 'Unbekannter Sektor'} <span>${i === this.selected ? '▶ AUSGEWÄHLT' : this.progress.completed[n.id] ? (this.progress.completed[n.id].veteran ? '✓ ✦' : '✓') : this.progress.available(i) ? '→' : '🔒'}</span></button>`; }).join('')}</nav><div class="chart-legend"><span>● Gesichert</span><span>◎ Expeditionsziel</span><span>◌ Unbekannt</span></div><div class="chart-transmission"><span class="signal-dot"></span> LANDEFÄHRE / VERBINDUNG STABIL <span>HAUS MARINERIS</span></div></div>
+                <article class="mission-briefing"><div class="mission-art"><img src="assets/missions/${m.image || m.id}.webp" alt="${m.title} – Illustration des Missionsschauplatzes" width="1672" height="941" decoding="async"></div><div class="selected-mission-label">▶ AUSGEWÄHLTE MISSION</div><div class="mission-eyebrow">SEKTOR ${String(this.selected+1).padStart(2,'0')}</div><h2>${m.title}</h2><div class="mission-location">${m.region}</div><blockquote>„${m.quote}“</blockquote><p>${m.briefing}</p>${this.ui.audio.narrationButton(m, 'briefing')}${this.progress.completed[m.id] ? `<div class="sector-report"><div class="mission-eyebrow">SEKTOR GESICHERT</div><p>${m.debriefing}</p></div>` : ''}<div class="brief-objective"><small>PRIMÄRZIEL</small><strong>${m.objective.label}</strong>${m.objective.type === 'captureCamps' ? `<p>Je Camp mindestens 3 eigene Zellen und mehr eigene als fremde Flora: ${m.objective.hold} Generationen ohne Unterbrechung halten.</p>` : ''}${m.map.zones.filter(z => z.cache).map(z => `<p>◆ ${z.label}: Kontakt mit lebender Flora bringt +${z.cache} Genmaterial zur nächsten Runde (freiwillig).</p>`).join('')}</div><ul class="bonus-list">${m.bonuses.map(b => `<li>☆ ${b.label}</li>`).join('')}</ul>${this.bestLine(m)}<div class="mission-meta"><span>${m.rounds} RUNDEN</span><span>${m.budget} GENMATERIAL</span></div>${m.reward ? `<div class="genome-reward"><span>GENOM-ENTDECKUNG</span><strong>+ ${[m.reward, ...(m.additionalRewards || [])].filter(Boolean).map(key => CONSTANTS.PATTERNS[key].name).join(' + ')}</strong></div>` : ''}${this.progress.completed[m.id]?.stars === 3 ? `<div class="expert-launch"><button class="quiet-button" id="launchExpert">✦ Expertenprotokoll starten</button><small>Weniger Material, stärkere Gegner, keine Hinweise und keine Prognose. Zählt nicht als zusätzlicher Stern.</small></div>` : ''}<button class="launch-button" id="launchMission">${this.progress.completed[m.id] ? 'Sektor erneut betreten' : 'Expedition starten'} <span>→</span></button></article></div>
             <section class="genome-archive"><div><div class="mission-eyebrow">FORSCHUNG / GENARCHIV</div><h3>Aus einfachen Regeln entsteht Leben.</h3></div><div class="genome-cards">${Object.keys(CONSTANTS.PATTERNS).map(key => {
                 const p = CONSTANTS.PATTERNS[key], unlocked = this.progress.genomes.includes(key);
                 return `<div class="genome-card ${unlocked ? '' : 'locked'}"><svg viewBox="-1 -1 10 6" aria-hidden="true">${p.pattern.map(([r,c]) => `<rect x="${c}" y="${r}" width=".8" height=".8"/>`).join('')}</svg><strong>${unlocked ? p.name : 'Verschlüsselt'}</strong><small>${unlocked ? p.cost+' Material' : 'Forschung ausstehend'}</small></div>`;
@@ -265,13 +276,27 @@ class CampaignManager {
             this.overlay.querySelector('#launchMission').focus();
         };
         this.overlay.querySelector('#launchMission').onclick = () => this.navigate(this.selected);
+        const expertButton = this.overlay.querySelector('#launchExpert');
+        if (expertButton) expertButton.onclick = () => this.navigate(this.selected, 1, true);
         this.overlay.querySelectorAll('[data-sector]').forEach(btn => btn.onclick = () => { this.selected = Number(btn.dataset.sector); this.showMap(); this.overlay.querySelector(`[data-sector="${this.selected}"]`).focus(); });
+    }
+    bestLine(m) {
+        const entry = this.progress.completed[m.id];
+        if (!entry?.best && !entry?.veteran) return '';
+        const best = entry.best || {}, parts = [];
+        if (best.spent !== undefined) parts.push(`${best.spent} Material`);
+        if (best.generations !== undefined) parts.push(`Generation ${best.generations}`);
+        if (best.rounds !== undefined) parts.push(`Runde ${best.rounds}`);
+        return `<p class="best-line">${parts.length ? `Bestwert: ${parts.join(' · ')}` : ''}${entry.veteran ? `${parts.length ? ' · ' : ''}✦ Expertenprotokoll bestanden` : ''}</p>`;
     }
     start(index) {
         this.selected = index;
         document.body.classList.add('in-mission');
-        this.hintLevel = Math.min(this.attempt, this.hintStages(CAMPAIGN_MISSIONS[index]).length);
-        this.ui.startGame(MissionManager.config(CAMPAIGN_MISSIONS[index]));
+        // The expert protocol is a modified copy of the mission, open after three stars.
+        const base = CAMPAIGN_MISSIONS[index];
+        const mission = this.expert && this.progress.completed[base.id]?.stars === 3 ? expertMission(base) : base;
+        this.hintLevel = Math.min(this.attempt, this.hintStages(mission).length);
+        this.ui.startGame(MissionManager.config(mission));
         this.hud.hidden = false;
         this.hasAutoCollapsed = false;
         this.expandHUD();
@@ -281,6 +306,7 @@ class CampaignManager {
         this.ui.audio.enterScene(CAMPAIGN_MISSIONS[index], 'briefing');
     }
     hintDetails(m) {
+        if (!this.hintStages(m).length) return `<details><summary>Ziel · Expertenprotokoll</summary><p><strong>${m.objective.label}</strong></p><p>Expertenprotokoll: weniger Material, stärkere Gegner, keine Hinweise und keine Prognose.</p></details>`;
         const stages = this.hintStages(m), level = Math.max(1, Math.min(this.hintLevel || 1, stages.length));
         return `<details><summary>Ziel & Hinweis · Stufe ${level}/${stages.length}</summary><p><strong>${m.objective.label}</strong></p>${stages.slice(0, level).map((text, i) => `<p class="${i === level - 1 ? 'hint-current' : 'hint-earlier'}">${text}</p>`).join('')}${level < stages.length ? '<button type="button" class="quiet-button" data-more-hint>Mehr Hilfe</button>' : ''}</details>`;
     }
@@ -334,7 +360,7 @@ class CampaignManager {
         const progress = [o.progressText, countdown ? `<span class="objective-countdown${countdown.remaining <= 10 ? ' urgent' : ''}">⏱ ${countdown.label} ${countdown.remaining} Gen.</span>` : ''].filter(Boolean).join(' · ');
         const upcoming = s.upcomingEvents?.()[0];
         const warning = upcoming ? `<p class="objective-progress objective-alert objective-event">⚡ Vorwarnung (${upcoming.when}): ${upcoming.text}</p>` : '';
-        target.innerHTML = `<div class="mission-eyebrow">AKT ${CAMPAIGN_ACTS.find(a => a.id === m.act).roman} / SEKTOR ${String(this.selected+1).padStart(2,'0')}<a href="${location.pathname}?campaign">Marskarte ↗</a></div><h2>${m.title}</h2><p>${m.objective.label}</p>${threat ? `<p class="objective-progress objective-alert ${threat.level}">⚠ ${threat.label}: ${threatText}</p>` : ''}${warning}${progress ? `<p class="objective-progress">${progress}</p>` : ''}<div class="hud-telemetry"><span>GEN ${String(o.generations).padStart(3,'0')}</span><span>${o.spent} MATERIAL EINGESETZT</span></div>${this.hintDetails(m)}`;
+        target.innerHTML = `<div class="mission-eyebrow">AKT ${CAMPAIGN_ACTS.find(a => a.id === m.act).roman} / SEKTOR ${String(this.selected+1).padStart(2,'0')}${m.expertMode ? ' · ✦ EXPERTE' : ''}<a href="${location.pathname}?campaign">Marskarte ↗</a></div><h2>${m.title}</h2><p>${m.objective.label}</p>${threat ? `<p class="objective-progress objective-alert ${threat.level}">⚠ ${threat.label}: ${threatText}</p>` : ''}${warning}${progress ? `<p class="objective-progress">${progress}</p>` : ''}<div class="hud-telemetry"><span>GEN ${String(o.generations).padStart(3,'0')}</span><span>${o.spent} MATERIAL EINGESETZT</span></div>${this.hintDetails(m)}`;
         // Preserve an opened hint across frequent simulation renders.
         if (this.hintOpen) target.querySelector('details').open = true;
         if (!this.hasAutoCollapsed && s.undoStack?.some(d => d.type === 'placement')) {
@@ -349,6 +375,7 @@ class CampaignManager {
         const audio = this.ui.audio;
         for (const e of o.events.splice(0)) {
             const zone = e.zoneId === 'camp' ? s.territory.camps.find(c => c.id === 0) : o.zone(e.zoneId);
+            this.radio(s.scenario, e);
             if (e.type === 'collect' || e.type === 'switch') this.notify(`✓ ${e.label} gesichert`, 'success', zone);
             if (e.type === 'captured') this.notify(`✓ ${e.label} erobert`, 'success', zone);
             if (e.type === 'cache') this.notify(`◆ ${e.label}: +${e.amount} Genmaterial zur nächsten Runde`, 'success', zone);
@@ -362,6 +389,7 @@ class CampaignManager {
                 this.notify(`${e.level === 'alarm' ? '⛔ ALARM' : '⚠'} ${e.label}: ${what} (${e.distance} Felder)`, e.level, zone, `threat:${e.zoneId}`);
             }
         }
+        for (const line of (this.radioQueue || []).splice(0)) this.notify(`${line.voice}: „${line.text}“`, null, null, `radio:${line.on}`);
         if (s.phase !== CONSTANTS.PHASE_SIMULATION || !audio) return;
         const countdown = o.countdown();
         if (countdown && countdown.remaining > 0 && countdown.remaining <= 5 && countdown.remaining !== this.lastTick) { this.lastTick = countdown.remaining; audio.cue('tick'); }
@@ -371,6 +399,16 @@ class CampaignManager {
             this.calmSince ??= o.generations;
             if (o.generations - this.calmSince >= 30) { this.calmSince = null; audio.setSituation('simulation'); }
         }
+    }
+    // Each radio line plays once per mission run, after the event toast it belongs to.
+    radio(m, e) {
+        const id = e.zoneId ?? e.house ?? e.eventId;
+        const keys = [e.type, id !== undefined ? `${e.type}:${id}` : null, e.type === 'threat' && e.level === 'alarm' ? `alarm:${e.zoneId}` : null].filter(Boolean);
+        this.radioUsed ??= new Set();
+        const line = (m.radio || []).find(r => keys.includes(r.on) && !this.radioUsed.has(r.on));
+        if (!line) return;
+        this.radioUsed.add(line.on);
+        (this.radioQueue ??= []).push(line);
     }
     notify(text, cue, zone = null, key = null) {
         if (cue) this.ui.audio?.cue?.(cue);
@@ -403,12 +441,61 @@ class CampaignManager {
     }
     nextHint(m) {
         const stages = this.hintStages(m), level = Math.min((this.hintLevel || 1) + 1, stages.length);
+        if (!stages.length) return '';
         return `<div class="result-hint"><small>HINWEIS FÜR DEN NÄCHSTEN VERSUCH · STUFE ${level}/${stages.length}</small><p>${stages[level - 1]}</p></div>`;
     }
     rewindOptions() {
         const rounds = Object.keys(this.ui.gameState.checkpoints || {}).map(Number).sort((a, b) => a - b);
         if (!rounds.length) return '';
         return `<section class="rewind-options"><small>NEU PLANEN</small><p>Die Mission springt an den Anfang der gewählten Runde zurück. Deine damaligen Platzierungen sind wieder gesetzt; mit Rückgängig änderst du sie.</p><div>${rounds.map(r => `<button type="button" class="quiet-button" data-rewind="${r}">Runde ${r} neu planen</button>`).join('')}</div></section>`;
+    }
+    // Mission timeline: own vs. foreign flora per generation, with the decisive events marked.
+    timelineHtml(o, result) {
+        const t = o.timeline;
+        if (!t || t.generation.length < 2) return '';
+        const W = 560, H = 120, pad = { l: 34, r: 70, t: 10, b: 22 }, last = t.generation.at(-1);
+        const max = Math.max(4, ...t.own, ...t.foreign), x = g => pad.l + (W - pad.l - pad.r) * g / last, y = v => pad.t + (H - pad.t - pad.b) * (1 - v / max);
+        const line = values => values.map((v, i) => `${x(t.generation[i]).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+        const names = { collect: '✓ gesichert', switch: '✓ Schalter', captured: '✓ erobert', houseDefeated: 'Nachsaat gestoppt', cache: '◆ Vorrat', scenario: '⚡ Ereignis', holdLost: 'Kontakt verloren', captureLost: 'Mehrheit verloren', threat: '⚠ Alarm' };
+        const marks = o.log.filter(e => names[e.type] && (e.type !== 'threat' || e.level === 'alarm') && e.generation !== undefined).slice(0, 8);
+        if (!result.success && result.failure?.generation) marks.push({ type: 'failure', generation: result.failure.generation, label: result.failure.label });
+        const markText = e => `Gen ${e.generation}: ${e.type === 'failure' ? `Durchbruch${e.label ? ` · ${e.label}` : ''}` : `${names[e.type]}${e.label ? ` · ${e.label}` : e.house ? ` · ${CONSTANTS.PLAYER_COLORS[e.house].name}` : ''}`}`;
+        const ticks = [0, Math.round(last / 2), last];
+        this.timelineData = { t, x, W, pad, last };
+        const rows = t.generation.filter((_, i) => i % Math.max(1, Math.ceil(t.generation.length / 12)) === 0 || i === t.generation.length - 1);
+        return `<figure class="mission-timeline"><figcaption>Verlauf der Mission</figcaption>
+            <div class="timeline-legend"><span><i class="swatch own"></i>Eigene Flora</span><span><i class="swatch foreign"></i>Fremde Flora und Wildwuchs</span></div>
+            <div class="timeline-plot"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Lebende Zellen je Generation: eigene Flora höchstens ${Math.max(...t.own)}, fremde Flora höchstens ${Math.max(...t.foreign)}, über ${last} Generationen.">
+            <line x1="${pad.l}" x2="${W - pad.r}" y1="${y(0)}" y2="${y(0)}" class="tl-axis"/><line x1="${pad.l}" x2="${W - pad.r}" y1="${y(max)}" y2="${y(max)}" class="tl-grid"/>
+            <text x="${pad.l - 6}" y="${y(max) + 4}" text-anchor="end" class="tl-label">${max}</text><text x="${pad.l - 6}" y="${y(0) + 4}" text-anchor="end" class="tl-label">0</text>
+            ${ticks.map(g => `<text x="${x(g)}" y="${H - 6}" text-anchor="middle" class="tl-label">Gen ${g}</text>`).join('')}
+            ${marks.map(e => `<line x1="${x(e.generation)}" x2="${x(e.generation)}" y1="${pad.t}" y2="${y(0)}" class="tl-mark${e.type === 'failure' ? ' failure' : ''}"><title>${markText(e)}</title></line>`).join('')}
+            <polyline points="${line(t.foreign)}" class="tl-line foreign"/><polyline points="${line(t.own)}" class="tl-line own"/>
+            ${(() => { let a = y(t.own.at(-1)), b = y(t.foreign.at(-1)); if (Math.abs(a - b) < 12) { if (a <= b) { a -= 6; b += 6; } else { a += 6; b -= 6; } } return `<text x="${W - pad.r + 6}" y="${a + 4}" class="tl-end">eigene ${t.own.at(-1)}</text><text x="${W - pad.r + 6}" y="${b + 4}" class="tl-end">fremde ${t.foreign.at(-1)}</text>`; })()}
+            <line class="tl-cross" y1="${pad.t}" y2="${y(0)}" x1="${pad.l}" x2="${pad.l}" style="display:none"/><rect class="tl-hit" x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}"/></svg><div class="timeline-tip" hidden></div></div>
+            ${marks.length ? `<ol class="timeline-events">${marks.map(e => `<li>${markText(e)}</li>`).join('')}</ol>` : ''}
+            <details class="timeline-table"><summary>Als Tabelle anzeigen</summary><table><thead><tr><th>Generation</th><th>Eigene Flora</th><th>Fremde Flora</th></tr></thead><tbody>${rows.map(g => { const i = t.generation.indexOf(g); return `<tr><td>${g}</td><td>${t.own[i]}</td><td>${t.foreign[i]}</td></tr>`; }).join('')}</tbody></table></details></figure>`;
+    }
+    bindTimeline() {
+        const figure = this.overlay.querySelector('.mission-timeline'), data = this.timelineData;
+        if (!figure || !data) return;
+        const svg = figure.querySelector('svg'), tip = figure.querySelector('.timeline-tip'), cross = figure.querySelector('.tl-cross');
+        const show = event => {
+            const box = svg.getBoundingClientRect(), px = (event.touches?.[0] ?? event).clientX;
+            const vx = (px - box.left) / box.width * data.W;
+            const g = Math.max(0, Math.min(data.last, (vx - data.pad.l) / (data.W - data.pad.l - data.pad.r) * data.last));
+            let i = 0;
+            for (let k = 1; k < data.t.generation.length; k++) if (Math.abs(data.t.generation[k] - g) < Math.abs(data.t.generation[i] - g)) i = k;
+            const gx = data.x(data.t.generation[i]);
+            cross.setAttribute('x1', gx); cross.setAttribute('x2', gx); cross.style.display = '';
+            tip.hidden = false;
+            tip.textContent = `Gen ${data.t.generation[i]} · eigene ${data.t.own[i]} · fremde ${data.t.foreign[i]}`;
+            tip.style.left = `${Math.min(box.width - 170, Math.max(0, gx / data.W * box.width - 85))}px`;
+        };
+        const hide = () => { tip.hidden = true; cross.style.display = 'none'; };
+        const hit = figure.querySelector('.tl-hit');
+        hit.addEventListener('pointermove', show); hit.addEventListener('pointerleave', hide);
+        hit.addEventListener('touchstart', show, { passive: true });
     }
     showResult() {
         this.ui.audio.stopNarration();
@@ -417,11 +504,12 @@ class CampaignManager {
         document.querySelector('.failure-return')?.remove();
         const s = this.ui.gameState, result = s.objectiveSystem.result, m = s.scenario;
         const newlyUnlocked = result.success && !this.progress.completed[m.id];
-        if (result.success) this.progress.record(m.id, result.stars);
+        if (result.success) this.progress.record(m.id, result.stars, result.stats, !!m.expertMode);
         this.overlay.hidden = false;
         const ending = m.finalChoices && result.success ? `<section class="campaign-completion"><div class="mission-eyebrow">DIE GEMEINSAME ZUKUNFT</div><h2>${this.progress.finalChoice ? 'Entscheidung gespeichert' : 'Wer trägt die Verantwortung?'}</h2><p>${this.progress.finalChoice ? m.finalChoices.find(c => c.id === this.progress.finalChoice).text : 'Beide Wege bewahren das verteilte Netz. Sie unterscheiden sich darin, wem Kontrolle und Wissen anvertraut werden.'}</p>${this.progress.finalChoice ? `<strong>${m.finalChoices.find(c => c.id === this.progress.finalChoice).title}</strong>` : m.finalChoices.map(c => `<button class="quiet-button" data-ending="${c.id}"><strong>${c.title}</strong><br>${c.text}</button>`).join('')}</section>` : '';
-        this.overlay.innerHTML = `<div class="mission-result"><div class="mission-eyebrow">LANDEFÄHRE / MISSIONSBERICHT</div><div class="result-stars">${'★'.repeat(result.stars)}${'☆'.repeat(3-result.stars)}</div><h1>${result.success ? 'Wurzeln geschlagen.' : 'Signal verloren.'}</h1><h2>${m.title}</h2><p>${result.reason}</p>${this.ui.audio.narrationButton(m, result.success ? 'debriefing' : 'failure')}${this.ui.audio.controls()}${result.details?.length ? `<ul class="result-analysis">${result.details.map(d => `<li>${d}</li>`).join('')}</ul>${result.failure?.cells.length ? '<button type="button" class="quiet-button" id="viewFailure">Moment ansehen</button>' : ''}` : ''}<ul class="result-objectives"><li>${result.success ? '✓' : '○'} ${m.objective.label}</li>${m.bonuses.map((b,i) => `<li>${result.bonuses[i] ? '★' : '☆'} ${b.label}</li>`).join('')}</ul>${result.success && m.reward ? `<div class="genome-reward"><span>${newlyUnlocked ? 'NEUE GENOMSTRUKTUR ENTDECKT' : 'GENOM ARCHIVIERT'}</span><strong>${[m.reward, ...(m.additionalRewards || [])].filter(Boolean).map(key => CONSTANTS.PATTERNS[key].name).join(' + ')}</strong></div>` : !result.success ? this.nextHint(m) : ''}${!result.success ? this.rewindOptions() : ''}${ending}${!this.progress.storageAvailable ? '<p>Fortschritt konnte nicht gespeichert werden.</p>' : ''}${result.success ? `<div class="result-code"><label for="resultCode">Expeditionscode zum Mitnehmen</label><input id="resultCode" readonly value="${this.progress.exportCode()}" onclick="this.select()"><small>Sektorpasswort: ${CampaignState.passwords[Math.min(this.selected + 1, CAMPAIGN_MISSIONS.length - 1)]}</small></div>` : ''}<div class="result-actions"><a class="quiet-button" href="${location.pathname}?campaign">Zur Marskarte</a><button class="launch-button" id="resultContinue">${result.success && this.selected < CAMPAIGN_MISSIONS.length - 1 ? 'Nächster Sektor · Marskarte →' : result.success ? 'Expedition auf der Marskarte ansehen →' : 'Erneut versuchen ↻'}</button></div>${result.success && this.selected === CAMPAIGN_MISSIONS.length - 1 ? '<p class="mission-eyebrow">AKT V ABGESCHLOSSEN · DAS NETZ IST GETEILT UND VERBUNDEN</p>' : ''}</div>`;
+        this.overlay.innerHTML = `<div class="mission-result"><div class="mission-eyebrow">LANDEFÄHRE / MISSIONSBERICHT${m.expertMode ? ` · ✦ EXPERTENPROTOKOLL ${result.success ? 'BESTANDEN' : ''}` : ''}</div><div class="result-stars">${'★'.repeat(result.stars)}${'☆'.repeat(3-result.stars)}</div><h1>${result.success ? 'Wurzeln geschlagen.' : 'Signal verloren.'}</h1><h2>${m.title}</h2><p>${result.reason}</p>${this.ui.audio.narrationButton(m, result.success ? 'debriefing' : 'failure')}${this.ui.audio.controls()}${result.details?.length ? `<ul class="result-analysis">${result.details.map(d => `<li>${d}</li>`).join('')}</ul>${result.failure?.cells.length ? '<button type="button" class="quiet-button" id="viewFailure">Moment ansehen</button>' : ''}` : ''}${this.timelineHtml(s.objectiveSystem, result)}<ul class="result-objectives"><li>${result.success ? '✓' : '○'} ${m.objective.label}</li>${m.bonuses.map((b,i) => `<li>${result.bonuses[i] ? '★' : '☆'} ${b.label}</li>`).join('')}</ul>${result.success && m.reward ? `<div class="genome-reward"><span>${newlyUnlocked ? 'NEUE GENOMSTRUKTUR ENTDECKT' : 'GENOM ARCHIVIERT'}</span><strong>${[m.reward, ...(m.additionalRewards || [])].filter(Boolean).map(key => CONSTANTS.PATTERNS[key].name).join(' + ')}</strong></div>` : !result.success ? this.nextHint(m) : ''}${!result.success ? this.rewindOptions() : ''}${ending}${!this.progress.storageAvailable ? '<p>Fortschritt konnte nicht gespeichert werden.</p>' : ''}${result.success ? `<div class="result-code"><label for="resultCode">Expeditionscode zum Mitnehmen</label><input id="resultCode" readonly value="${this.progress.exportCode()}" onclick="this.select()"><small>Sektorpasswort: ${CampaignState.passwords[Math.min(this.selected + 1, CAMPAIGN_MISSIONS.length - 1)]}</small></div>` : ''}<div class="result-actions"><a class="quiet-button" href="${location.pathname}?campaign">Zur Marskarte</a><button class="launch-button" id="resultContinue">${result.success && this.selected < CAMPAIGN_MISSIONS.length - 1 ? 'Nächster Sektor · Marskarte →' : result.success ? 'Expedition auf der Marskarte ansehen →' : 'Erneut versuchen ↻'}</button></div>${result.success && this.selected === CAMPAIGN_MISSIONS.length - 1 ? '<p class="mission-eyebrow">AKT V ABGESCHLOSSEN · DAS NETZ IST GETEILT UND VERBUNDEN</p>' : ''}</div>`;
         this.overlay.querySelectorAll('[data-ending]').forEach(button => button.onclick = () => { this.progress.chooseEnding(button.dataset.ending); this.showResult(); });
+        this.bindTimeline(s.objectiveSystem);
         const viewFailure = this.overlay.querySelector('#viewFailure');
         if (viewFailure) viewFailure.onclick = () => {
             this.overlay.hidden = true;
@@ -434,7 +522,7 @@ class CampaignManager {
             back.focus();
         };
         this.overlay.querySelectorAll('[data-rewind]').forEach(button => button.onclick = () => this.rewind(Number(button.dataset.rewind)));
-        this.overlay.querySelector('#resultContinue').onclick = () => result.success ? this.navigateToMap(Math.min(this.selected+1, CAMPAIGN_MISSIONS.length-1)) : this.navigate(this.selected, Math.max(this.attempt, this.hintLevel || 1) + 1);
+        this.overlay.querySelector('#resultContinue').onclick = () => result.success ? this.navigateToMap(Math.min(this.selected+1, CAMPAIGN_MISSIONS.length-1)) : this.navigate(this.selected, Math.max(this.attempt, this.hintLevel || 1) + 1, !!m.expertMode);
         if (result.success) this.ui.audio.enterScene(m, 'debriefing');
         else this.ui.audio.failureReport(m, result.reason);
         this.overlay.querySelector('#resultContinue').focus();

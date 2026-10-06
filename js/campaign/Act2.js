@@ -22,7 +22,7 @@ CAMPAIGN_MISSIONS.push(
 
         patterns:[...ACT2_PATTERNS,'r_pentomino'],reward:'lwss',rounds:4,steps:64,budget:15,
         objective:{type:'allZones',zones:['east','south'],label:'In beiden Schleusenkammern gleichzeitig lebende Flora halten'},
-        bonuses:[{type:'rounds',value:1,label:'Beide Schleusen in Runde 1 öffnen'},{type:'spent',value:10,label:'Höchstens 10 Genmaterial einsetzen'}],
+        bonuses:[{type:'rounds',value:1,label:'Beide Schleusen in Runde 1 öffnen'},{type:'onlyPatterns',patterns:['glider'],label:'Nur Gleiter einsetzen'}],
         map:{territory:[[0,3,3,11,14]],rocks:[[0,20,14,21],[22,20,29,21]],zones:[{id:'east',label:'SCHLEUSE OST',rMin:18,rMax:25,cMin:24,cMax:30},{id:'south',label:'SCHLEUSE SÜD',rMin:21,rMax:28,cMin:16,cMax:19}]}
     },
     {
@@ -46,7 +46,7 @@ CAMPAIGN_MISSIONS.push(
 
         patterns:[...ACT2_PATTERNS,'r_pentomino','lwss','diehard'],reward:'acorn',rounds:4,steps:64,budget:22,enemy:true,enemyStrength:'medium',enemyBudget:8,
         objective:{type:'collectZones',zones:['north','middle','south'],label:'Alle 3 Forschungsarchive mit lebenden Zellen erreichen'},
-        bonuses:[{type:'rounds',value:2,label:'Alle Archive bis Runde 2 sichern'},{type:'spent',value:15,label:'Höchstens 15 Genmaterial einsetzen'}],
+        bonuses:[{type:'rounds',value:2,label:'Alle Archive bis Runde 2 sichern'},{type:'patterns',value:1,label:'Alle Archive mit einer einzigen Musterart bergen'}],
         map:{territory:[[0,3,4,12,26],[1,24,3,28,12]],rocks:[[0,31,6,32],[23,16,29,17]],camps:[{id:0,rMin:3,rMax:5,cMin:4,cMax:6},{id:1,rMin:26,rMax:28,cMin:3,cMax:7}],zones:[{id:'north',label:'ARCHIV 1',rMin:9,rMax:13,cMin:27,cMax:31},{id:'middle',label:'ARCHIV 2',rMin:20,rMax:24,cMin:25,cMax:29},{id:'south',label:'ARCHIV 3',rMin:22,rMax:27,cMin:38,cMax:43}]}
     },
     {
@@ -58,7 +58,7 @@ CAMPAIGN_MISSIONS.push(
 
         patterns:[...ACT2_PATTERNS,'r_pentomino','lwss','diehard','acorn'],reward:'b_heptomino',rounds:4,steps:48,budget:20,
         objective:{type:'holdZones',zones:['left','right'],value:12,protect:['settlement'],label:'Beide Notpumpen 12 Generationen gleichzeitig halten; Siedlung schützen'},
-        bonuses:[{type:'rounds',value:2,label:'Den Schutzgürtel bis Runde 2 starten'},{type:'spent',value:14,label:'Höchstens 14 Genmaterial einsetzen'}],
+        bonuses:[{type:'rounds',value:2,label:'Den Schutzgürtel bis Runde 2 starten'},{type:'onlyPatterns',patterns:['glider'],label:'Nur Gleiter einsetzen'}],
         map:{rows:40,cols:64,territory:[[0,3,4,12,27]],rocks:[[0,34,9,35],[18,34,39,35]],camps:[{id:0,rMin:3,rMax:5,cMin:4,cMax:7}],seeds:[{pattern:'glider',r:0,c:62,owner:-1,mirror:true}],zones:[{id:'left',label:'PUMPE WEST',rMin:22,rMax:29,cMin:24,cMax:31},{id:'right',label:'PUMPE OST',rMin:22,rMax:29,cMin:42,cMax:49},{id:'settlement',label:'SIEDLUNG',rMin:32,rMax:38,cMin:25,cMax:32}]}
     }
 );

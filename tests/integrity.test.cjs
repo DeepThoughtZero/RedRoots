@@ -143,6 +143,19 @@ CAMPAIGN_MISSIONS.forEach((m, idx) => {
     }
     if (m.objective.type === 'escort') assert.ok([2, 3, 4].includes(m.objective.owner) && (m.map.seeds || []).some(s => s.owner === m.objective.owner), `Mission ${m.id}: Geleitzug ist vorgegeben`);
     if (m.objective.type === 'exactCount') assert.ok(Number.isInteger(m.objective.at) && m.objective.at <= m.rounds * m.steps, `Mission ${m.id}: Messzeitpunkt erreichbar`);
+    const bonusTypes = ['rounds', 'spent', 'generations', 'population', 'margin', 'patterns', 'onlyPatterns', 'noErase', 'noForecast', 'caches', 'territory'];
+    assert.equal(m.bonuses.length, 2, `Mission ${m.id}: genau zwei Bonusziele (Codes kennen höchstens drei Sterne)`);
+    for (const b of m.bonuses) {
+        assert.ok(bonusTypes.includes(b.type) && b.label, `Mission ${m.id}: Bonustyp ${b.type} bekannt und beschriftet`);
+        if (b.type === 'onlyPatterns') assert.ok(b.patterns.every(k => m.patterns.includes(k)), `Mission ${m.id}: Bonusmuster sind erlaubt`);
+        if (b.type === 'margin' && b.zones) assert.ok(b.zones.every(id => zoneIds.has(id)), `Mission ${m.id}: Abstandsbonus nennt vorhandene Zonen`);
+        if (b.type === 'caches') assert.ok(m.map.zones.some(z => z.cache), `Mission ${m.id}: Vorratsbonus hat einen Vorrat`);
+        if (b.type === 'noForecast') assert.ok(m.forecast, `Mission ${m.id}: Prognosebonus nur mit Prognose`);
+    }
+    for (const line of m.radio || []) {
+        assert.ok(['UNSERE BIOLOGIN', 'DIE HELLAS-KOMMANDANTIN', 'GEMEINSAMER FUNKKANAL', 'DIE LANDEFÄHRE'].includes(line.voice), `Mission ${m.id}: Funkspruch mit Rollenbezeichnung`);
+        assert.ok(typeof line.on === 'string' && line.text.split(/\s+/).length <= 12, `Mission ${m.id}: Funkspruch „${line.text}“ höchstens zwölf Wörter`);
+    }
     assert.ok(m.forecast === null || (Number.isInteger(m.forecast.charges) && m.forecast.charges > 0 && m.forecast.horizon > 0), `Mission ${m.id}: Prognose deaktiviert oder gültig konfiguriert`);
     assert.ok(Array.isArray(m.patterns), `Mission ${m.id}: Muster-Array vorhanden`);
     for (const pat of m.patterns) {

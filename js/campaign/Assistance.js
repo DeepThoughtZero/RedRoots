@@ -40,3 +40,39 @@ CAMPAIGN_MISSIONS.forEach(m => {
     m.hints = [...(MISSION_HINT_STAGES[m.id] || []), m.hint, ...(MISSION_HINT_FOLLOWUPS[m.id] || [])];
     if (m.forecast === undefined) m.forecast = FORECAST_DISABLED.includes(m.id) ? null : { charges: 2, horizon: m.steps >= 1000 ? 120 : 32 };
 });
+
+// Expert protocols (after three stars): less own material, stronger opponents, no hints and no forecast.
+// Own material never drops below the spend of the original material bonus, so the known solutions stay affordable.
+const EXPERT_BUDGET_FLOOR = {A1_M01:4,A1_M02:8,A1_M03:5,A1_M04:10,A1_M05:15,A2_M01:24,A2_M02:10,A2_M03:8,A2_M04:15,A2_M05:14,A3_M01:15,A3_M02:7,A3_M03:12,A3_M04:15,A3_M05:15,A4_M01:18,A4_M02:22,A4_M03:20,A4_M04:24,A4_M05:36,A5_M01:72,A5_M02:90,A5_M03:82,A5_M04:108,A5_M05:124};
+function expertMission(m) {
+    const factors = { budget: .8, enemy: 1.5, ...(m.expert || {}) };
+    return {
+        ...m, expertMode: true,
+        budget: Math.max(EXPERT_BUDGET_FLOOR[m.id] || 0, Math.round(m.budget * factors.budget)),
+        enemyBudget: m.enemy && !m.enemies ? Math.round((m.enemyBudget ?? 8) * factors.enemy) : m.enemyBudget,
+        enemies: m.enemies?.map(e => ({ ...e, budget: Math.round(e.budget * factors.enemy) })),
+        hints: [], forecast: null,
+        events: [...(m.events || []), ...(factors.events || [])]
+    };
+}
+
+// Short radio lines during the evolution (text only, at most twelve words, role names instead of new names).
+// Triggers: <eventType>[:<zone|house|event id>], plus alarm:<zone> for alarms and holdHalf/holdLost.
+const MISSION_RADIO = {
+    A1_M02: [{ on: 'cache:depot', voice: 'UNSERE BIOLOGIN', text: 'Vorrat geborgen. Das Material steht nächste Runde bereit.' }],
+    A2_M01: [{ on: 'cache:depot', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Gut. Mit dem Vorrat reichen die Mittel für beide Leitungen.' }],
+    A2_M03: [{ on: 'alarm:landing', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Der Gleiter ist zu nah! Haltet ihn vom Landeplatz fern!' }],
+    A2_M04: [{ on: 'collect', voice: 'UNSERE BIOLOGIN', text: 'Erstes Archiv gesichert. Weiter zu den anderen Speichern!' }],
+    A2_M05: [{ on: 'holdHalf', voice: 'GEMEINSAMER FUNKKANAL', text: 'Halbzeit an den Pumpen. Haltet die Verbindung!' }, { on: 'holdLost', voice: 'GEMEINSAMER FUNKKANAL', text: 'Kontakt verloren! Beide Pumpen müssen neu besetzt werden.' }],
+    A3_M01: [{ on: 'switch:one', voice: 'UNSERE BIOLOGIN', text: 'Erster Schalter offen. Jetzt bloß nicht zu früh weiter.' }, { on: 'alarm:three', voice: 'UNSERE BIOLOGIN', text: 'Vorsicht, das Tor ist noch gesperrt!' }],
+    A3_M03: [{ on: 'alarm:west', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Die Front ist fast am westlichen Rettungsplatz!' }, { on: 'alarm:east', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Die Front ist fast am östlichen Rettungsplatz!' }],
+    A3_M04: [{ on: 'collect', voice: 'UNSERE BIOLOGIN', text: 'Erster Speicher geborgen. Achtet auf den roten Streifen.' }, { on: 'alarm:seal', voice: 'UNSERE BIOLOGIN', text: 'Zu nah an der Quarantäne!' }],
+    A3_M05: [{ on: 'holdHalf', voice: 'GEMEINSAMER FUNKKANAL', text: 'Acht Generationen. Die Relais halten.' }],
+    A4_M01: [{ on: 'captured:fort', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Das Sperrcamp ist gefallen. Jetzt den Rückweg halten.' }],
+    A4_M02: [{ on: 'houseDefeated:3', voice: 'UNSERE BIOLOGIN', text: 'Beide Camps gesichert. Die gelbe Nachsaat ist gestoppt.' }, { on: 'scenario:flood', voice: 'UNSERE BIOLOGIN', text: 'Die Flutung beginnt. Wildwuchs dringt in die Wasserader!' }],
+    A4_M03: [{ on: 'alarm:west', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Gleiter halten auf den westlichen Rettungsplatz zu!' }, { on: 'alarm:east', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Gleiter halten auf den östlichen Rettungsplatz zu!' }],
+    A4_M04: [{ on: 'alarm:civilians', voice: 'UNSERE BIOLOGIN', text: 'Viridion zielt auf die Zivilstation!' }, { on: 'houseDefeated:2', voice: 'UNSERE BIOLOGIN', text: 'Viridion sät nicht mehr nach.' }],
+    A4_M05: [{ on: 'scenario:storm', voice: 'GEMEINSAMER FUNKKANAL', text: 'Der Sturmstoß ist da. Schützt den Rettungsplatz!' }],
+    A5_M01: [{ on: 'cache:depot', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Notvorrat geborgen. Das hilft in der nächsten Phase.' }]
+};
+CAMPAIGN_MISSIONS.forEach(m => { m.radio = MISSION_RADIO[m.id] || []; });

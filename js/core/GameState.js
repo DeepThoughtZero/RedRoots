@@ -207,7 +207,7 @@ class GameState {
 
         if (!this.isSandbox) {
             this.budgets[this.currentPlayer] -= pattern.length;
-            if (this.objectiveSystem && this.currentPlayer === 0) this.objectiveSystem.spent += pattern.length;
+            if (this.objectiveSystem && this.currentPlayer === 0) { this.objectiveSystem.spent += pattern.length; this.objectiveSystem.recordPlacement(pattern); }
         }
         this.notifyStateUpdate();
         return true;
@@ -231,7 +231,7 @@ class GameState {
             this.boardVersion++;
             if (!this.isSandbox) {
                 this.budgets[this.currentPlayer] += 1;
-                if (this.objectiveSystem && this.currentPlayer === 0) this.objectiveSystem.spent -= 1;
+                if (this.objectiveSystem && this.currentPlayer === 0) { this.objectiveSystem.spent -= 1; this.objectiveSystem.erased++; }
             }
             this.notifyStateUpdate();
             return true;
@@ -254,7 +254,10 @@ class GameState {
         
         // Restore budget
         this.budgets[this.currentPlayer] += delta.cost;
-        if (this.objectiveSystem && this.currentPlayer === 0) this.objectiveSystem.spent -= delta.cost;
+        if (this.objectiveSystem && this.currentPlayer === 0) {
+            this.objectiveSystem.spent -= delta.cost;
+            if (delta.type === 'placement') this.objectiveSystem.placements.pop(); else this.objectiveSystem.erased--;
+        }
         
         this.notifyStateUpdate();
         return true;
@@ -370,14 +373,14 @@ class GameState {
         for (const e of events) {
             if (kind === 'round' && !this.announcedEvents.has(e.id) && this.currentRound >= e.announceRound && !this.appliedEvents.has(e.id)) {
                 this.announcedEvents.add(e.id);
-                this.objectiveSystem.events.push({ type: 'announce', eventId: e.id, text: e.text });
+                this.objectiveSystem.emit({ type: 'announce', eventId: e.id, text: e.text });
             }
             if (this.appliedEvents.has(e.id)) continue;
             const due = kind === 'round' ? e.round !== undefined && this.currentRound >= e.round : e.generation !== undefined && this.objectiveSystem.generations >= e.generation - 1;
             if (!due) continue;
             this.appliedEvents.add(e.id);
             MissionManager.applyAction(this, e.action);
-            this.objectiveSystem.events.push({ type: 'scenario', eventId: e.id, text: e.text });
+            this.objectiveSystem.emit({ type: 'scenario', eventId: e.id, text: e.text });
             this.boardVersion++;
         }
     }
@@ -447,6 +450,7 @@ class GameState {
         const config = this.scenario?.forecast;
         if (!config || this.phase !== CONSTANTS.PHASE_PLACEMENT || !(this.forecastCharges > 0)) return null;
         this.forecastCharges--;
+        this.forecastsUsed = (this.forecastsUsed || 0) + 1;
         const grid = this._cloneGrid(), probe = { grid, rows: this.rows, cols: this.cols, playerCount: this.playerCount, territory: this.territory };
         const os = this.objectiveSystem, o = this.scenario.objective, trail = new Uint8Array(grid.size), hits = [];
         const targets = new Set([...(o.zones || []), o.zone].filter(Boolean));

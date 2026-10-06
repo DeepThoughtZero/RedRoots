@@ -9,7 +9,7 @@ CAMPAIGN_MISSIONS.push(
         hint:'Die Felsrücken teilen das Hochland in drei breite Korridore. Schicke getrennte Angriffe zu beiden Relais und halte eine stabile Reserve beim Habitat. Die langen Evolutionsphasen bestrafen ungebremste Methusalems; nutze die nächste Runde, um auf die tatsächlich entstandenen Trümmerfelder zu reagieren.',
         patterns:ACT5_PATTERNS,reward:null,rounds:5,steps:1000,budget:90,budgetFactor:18,radius:7,enemy:true,enemies:[{house:3,budget:54,strength:'hard'}],
         objective:{type:'captureCamps',zones:['relayNorth','relaySouth'],hold:24,minGenerations:2000,protect:['habitat'],label:'Beide Fernrelais erobern und das Habitat 2.000 Generationen schützen'},
-        bonuses:[{type:'rounds',value:2,label:'Nach genau zwei Evolutionsphasen stabilisieren'},{type:'spent',value:72,label:'Höchstens 72 Genmaterial einsetzen'}],
+        bonuses:[{type:'rounds',value:2,label:'Nach genau zwei Evolutionsphasen stabilisieren'},{type:'caches',label:'Den Notvorrat im mittleren Korridor bergen'}],
         map:{rows:72,cols:112,territory:[[0,27,5,44,25],[0,54,8,66,31],[3,8,78,22,105],[3,48,82,66,105]],rocks:[[0,36,20,38],[31,36,71,38],[0,72,40,74],[54,72,71,74],[25,48,28,65],[43,48,46,65]],camps:[{id:0,rMin:30,rMax:36,cMin:8,cMax:15},{id:3,rMin:10,rMax:18,cMin:88,cMax:98},{id:3,rMin:52,rMax:60,cMin:88,cMax:98}],seeds:[{pattern:'acorn',r:13,c:70,owner:4},{pattern:'switch_engine',r:49,c:73,owner:4}],zones:[{id:'relayNorth',house:3,label:'FERNRELAIS NORD',rMin:10,rMax:18,cMin:88,cMax:98},{id:'relaySouth',house:3,label:'FERNRELAIS SÜD',rMin:52,rMax:60,cMin:88,cMax:98},{id:'habitat',label:'ARCADIA-HABITAT',rMin:29,rMax:39,cMin:4,cMax:18},{id:'depot',label:'NOTVORRAT',cache:20,rMin:33,rMax:38,cMin:54,cMax:60}]}
     },
     {
