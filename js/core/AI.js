@@ -346,19 +346,20 @@ class AI {
                             }
                         }
                         
-                        // Opponents prefer seeding at a safety distance from sterile zones; if every spot is close, the
-                        // uniform penalty leaves the choice unchanged.
-                        if (weight > 0 && this.gameState.sterileZones?.().length && currentPattern.some(([pr, pc]) => this.gameState.inSterileZone(r + pr, c + pc, 8))) weight *= .02;
                         const profile = this.profile(pId);
                         if (profile?.doctrine && weight > 0) weight *= this.doctrineSpotFactor(profile, r, c, chosenKey, pId);
                         if (weight > 0) {
-                            validSpots.push({r, c, pattern: currentPattern, weight});
+                            const near = !!this.gameState.sterileZones?.().length && currentPattern.some(([pr, pc]) => this.gameState.inSterileZone(r + pr, c + pc, 8));
+                            validSpots.push({r, c, pattern: currentPattern, weight, near});
                         }
                     }
                 }
             }
         }
 
+        // Opponents keep eight cells away from sterile zones whenever any such spot exists.
+        const distant = validSpots.filter(spot => !spot.near);
+        if (distant.length && distant.length < validSpots.length) validSpots.splice(0, validSpots.length, ...distant);
         if (validSpots.length > 0) {
             // Weighted selection
             const totalWeight = validSpots.reduce((sum, spot) => sum + spot.weight, 0);
