@@ -55,3 +55,11 @@ const CONSTANTS = {
 Object.values(CONSTANTS.PATTERNS).forEach(p => {
     p.cost = p.pattern.length;
 });
+
+// Small SVG silhouette of a pattern, normalized to its bounding box.
+function patternPreviewSvg(cells) {
+    const rs = cells.map(([r]) => r), cs = cells.map(([, c]) => c);
+    const r0 = Math.min(...rs), c0 = Math.min(...cs), h = Math.max(...rs) - r0 + 1, w = Math.max(...cs) - c0 + 1;
+    const pad = .35;
+    return `<svg viewBox="${-pad} ${-pad} ${w + 2 * pad} ${h + 2 * pad}" aria-hidden="true">${cells.map(([r, c]) => `<rect x="${c - c0 + .08}" y="${r - r0 + .08}" width=".84" height=".84" rx=".18"/>`).join('')}</svg>`;
+}

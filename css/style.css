@@ -381,6 +381,7 @@ body[data-phase="simulation"] .tool-section, body[data-turn="ai"] .tool-section 
 .panel-extras { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line); }
 .panel-extras:empty { display: none; }
 .narration-button { margin: 0; }
+.mission-result .narration-button, .mission-briefing .narration-button { margin-top: 14px; }
 .panel-extras .narration-button { width: 100%; }
 
 /* ---------- 11. Mission HUD ---------- */
@@ -499,8 +500,10 @@ body[data-phase="simulation"] .tool-section, body[data-turn="ai"] .tool-section 
 .mission-eyebrow { font: 500 12px/1.5 var(--font-mono); letter-spacing: .12em; color: #d3a588; }
 
 .expedition-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 20px 0; border-bottom: 1px solid #ffffff17; }
-.expedition-brand { display: inline-block; color: #f3f1ed; font-family: var(--font-display); font-size: 24px; font-weight: 700; letter-spacing: -.02em; text-decoration: none; line-height: 1; }
-.expedition-brand span { color: var(--mars); }
+.expedition-brand { display: inline-flex; align-items: center; gap: 12px; color: #f3f1ed; font-family: var(--font-display); font-size: 24px; font-weight: 700; letter-spacing: -.02em; text-decoration: none; line-height: 1; }
+.expedition-brand .brand-mark { width: 36px; height: 36px; }
+.expedition-brand-text > span { color: var(--mars); }
+.expedition-header > .mission-eyebrow { margin-right: auto; padding-left: 12px; border-left: 1px solid var(--line-2); }
 .expedition-brand small { display: block; margin-top: 8px; font: 500 12px/1.5 var(--font-mono); letter-spacing: .16em; color: #8a9498; }
 .expedition-header .audio-settings { margin: 0; }
 .expedition-header .audio-settings[open] .audio-options { position: absolute; right: 0; top: 100%; z-index: 10; width: 320px; padding: 14px; border-radius: var(--r-lg); background: var(--surface-1); border: 1px solid var(--line-2); box-shadow: var(--shadow-2); }
@@ -594,11 +597,12 @@ body[data-phase="simulation"] .tool-section, body[data-turn="ai"] .tool-section 
 .genome-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; margin-top: 18px; }
 .genome-card { min-width: 0; overflow-wrap: anywhere; padding: 14px; border: 1px solid #ffffff18; border-radius: var(--r-md); background: linear-gradient(180deg, #14232a, #0f1b21); transition: border-color var(--t-fast); }
 .genome-card:not(.locked):hover { border-color: #a5e6ce66; }
-.genome-card svg { width: 60px; height: 35px; fill: #a5e6ce; }
+.genome-shape { display: grid; place-items: center; height: 52px; border-radius: var(--r-sm); background: rgba(0, 0, 0, .3); }
+.genome-shape svg { height: 34px; width: auto; max-width: 100%; fill: #a5e6ce; }
 .genome-card strong { display: block; margin: 8px 0 4px; font-size: 16px; font-weight: 600; }
 .genome-card small { font-size: 14px; line-height: 1.5; color: #a3b6be; }
 .genome-card.locked { opacity: .65; }
-.genome-card.locked svg { filter: blur(2px); }
+.genome-card.locked svg { filter: blur(2px); fill: #6f8f88; }
 
 .story-archive { margin-top: 24px; padding: 24px; border: 1px solid #ffffff16; border-radius: var(--r-xl); background: #0f191f; }
 .story-archive h3 { margin: 10px 0; font-family: var(--font-display); font-size: 22px; font-weight: 600; color: #e3c6ac; }
@@ -617,7 +621,12 @@ body[data-phase="simulation"] .tool-section, body[data-turn="ai"] .tool-section 
 
 /* ---------- 15. Campaign: mission result ---------- */
 .mission-result { max-width: 680px; margin: 6vh auto; padding: 36px; border: 1px solid #79bca733; border-radius: var(--r-xl); background: linear-gradient(180deg, #112029, #0d181e); box-shadow: var(--shadow-3); }
+.mission-result.is-success { border-color: rgba(127, 232, 208, .3); background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(127, 232, 208, .1), transparent 70%), linear-gradient(180deg, #112029, #0d181e); }
+.mission-result.is-failure { border-color: rgba(255, 93, 108, .3); background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 93, 108, .1), transparent 70%), linear-gradient(180deg, #1a1a20, #0f1418); }
 .result-stars { margin: 22px 0; font-size: 44px; letter-spacing: 14px; color: #e6c18c; text-shadow: 0 0 24px rgba(230, 193, 140, .45); }
+.is-failure .result-stars { color: #6d7a80; text-shadow: none; }
+.is-success h1 { color: #e9fff7; }
+.is-failure h1 { color: #ffd6da; }
 .mission-result h1 { font-family: var(--font-display); font-size: 40px; font-weight: 700; line-height: 1.1; letter-spacing: -.03em; }
 .mission-result h2 { margin: 12px 0; font-size: 16px; font-weight: 600; color: #9ccabe; }
 .result-objectives { padding: 16px 0; line-height: 2.2; color: #cfdcd7; }
