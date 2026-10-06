@@ -95,6 +95,7 @@ Das freie Gefecht bleibt mit allen 13 Mustern und den bisherigen Zufallskarten v
 - `js/campaign/Story.js`: Funkbriefings, Missionsberichte und freischaltbare Archivfunde.
 - `js/campaign/CampaignManager.js`: Marskarte, Missions-HUD, Ergebnisansicht und versionierter Fortschritt.
 - [Kampagnengeschichte](docs/CAMPAIGN_STORY.md): vollständiger Handlungsbogen der fünf spielbaren Akte.
+- [Verbesserungsplan für Missionen](docs/MISSION_IMPROVEMENT_PLAN.md): geplante Maßnahmen für spannendere Missionen (Zielanzeigen, Neuversuch, angekündigte Ereignisse, neue Ziel- und Bonustypen).
 
 ### Prüfen und Qualitätssicherung
 

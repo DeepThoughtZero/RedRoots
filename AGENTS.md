@@ -48,6 +48,7 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 | `js/campaign/Story.js` | Briefings, Berichte und nach Siegen freigeschaltete Archivtexte |
 | `js/campaign/CampaignManager.js` | CampaignState, Marskarte, Missions-HUD, Ergebnisse und Codes |
 | `docs/CAMPAIGN_STORY.md` | Durchgehende Geschichte, Figuren, spätere Akte und dramaturgische Regeln |
+| `docs/MISSION_IMPROVEMENT_PLAN.md` | Verbesserungsplan für spannendere Missionen, Fahrplan und Spannungs-Checkliste für neue Missionen |
 | `assets/audio/` | Fertige Audiodateien, Textmanifest und QA-Bericht |
 | `scripts/generate_audio.py` | Lokale Audioerzeugung und Transkriptprüfung, nur für Entwicklung |
 | `tests/` | Node-Tests ohne Browser oder GPU |
