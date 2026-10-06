@@ -46,6 +46,7 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 | `js/campaign/Act3.js` | Fünf Missionen von Akt III und CAMPAIGN_ACTS für Aktnavigation; nach Act2.js laden |
 | `js/campaign/Act2.js` | Fünf Szenarien von Akt II; nach Story.js laden |
 | `js/campaign/Story.js` | Briefings, Berichte und nach Siegen freigeschaltete Archivtexte |
+| `js/campaign/Assistance.js` | Gestufte Hinweise und Prognose-Kontingente je Mission; nach Act5.js laden |
 | `js/campaign/CampaignManager.js` | CampaignState, Marskarte, Missions-HUD, Ergebnisse und Codes |
 | `docs/CAMPAIGN_STORY.md` | Durchgehende Geschichte, Figuren, spätere Akte und dramaturgische Regeln |
 | `docs/MISSION_IMPROVEMENT_PLAN.md` | Verbesserungsplan für spannendere Missionen, Fahrplan und Spannungs-Checkliste für neue Missionen |
@@ -91,6 +92,7 @@ Für neue Missionen:
 - `redroots_campaign_v1`: Kampagnenversion, ausgewähltes Haus, abgeschlossene Missionen mit Sternen und freigeschaltete Genome.
 - `redroots_config`: Einstellungen des freien Gefechts.
 - `redroots_audio_v1`: Audio-Einstellungen.
+- `redroots_simulation_v1`: Zeitlupe und automatisches Anhalten der Kampagnen-Evolution. Runden-Checkpoints liegen nur im Arbeitsspeicher; der Versuchszähler für Hinweisstufen reist im Link (`attempt`).
 - Weitere bestehende Keys betreffen Hilfe/Dojo; Kampagnenreset darf diese nicht pauschal löschen.
 - Gespeichert werden Abschlüsse, nicht der laufende Missionszustand. Browserprofil, Website und Port bestimmen den Speicherbereich; keine automatische Synchronisierung.
 - Progressive Expeditionscodes (z. B. `PASS-2145`, `STURMAUGE-…`) übertragen alle bisherigen Sternwertungen mit Prüfsumme. Sie sind absichtlich keine kryptografisch geschützten Zugangsdaten.

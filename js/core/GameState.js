@@ -71,6 +71,10 @@ class GameState {
         this.onCycleUpdate = null; // Called each simulation step
         
         this.simSpeedMs = 100; // Updated by UI slider
+        // Simulation controls. Every generation is still evaluated; only the waiting time changes.
+        this.paused = false; this.turbo = false; this.slowMotion = false; this.pauseOnAlarm = false;
+        this._pauseResolve = null; this._stepPending = false; this._slowUntil = -1; this._wasCritical = false;
+        this.boardVersion = 0; this.checkpoints = {};
         if (config.scenario) MissionManager.apply(this, config.scenario);
     }
 
@@ -90,6 +94,12 @@ class GameState {
         this.phase = newPhase;
         // Placements of the current round, so the board can highlight fresh enemy colonies.
         if (newPhase === CONSTANTS.PHASE_PLACEMENT) this.roundPlacements = Array.from({ length: this.playerCount }, () => []);
+        this.boardVersion++;
+        // Round checkpoints live in memory only; they allow re-planning a round after a defeat.
+        if (newPhase === CONSTANTS.PHASE_PLACEMENT && this.objectiveSystem) {
+            this.checkpoints[this.currentRound] = this.snapshot();
+            if (this.scenario.objective.type === 'race') this.objectiveSystem.raceArrival = this.raceClock();
+        }
         if (newPhase === CONSTANTS.PHASE_SIMULATION) this.simulationStartedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
         if (this.onPhaseChange) this.onPhaseChange(this.phase);
 
@@ -113,6 +123,12 @@ class GameState {
     }
 
     nextPlayerTurn() {
+        // The human plan of the round can be replayed after a rewind.
+        if (this.currentPlayer === 0 && this.checkpoints[this.currentRound]) {
+            this.checkpoints[this.currentRound].plan = (this.undoStack || []).map(d => d.type === 'placement'
+                ? { type: 'placement', r: d.cells[0].r, c: d.cells[0].c, pattern: d.cells.map(cell => [cell.r - d.cells[0].r, cell.c - d.cells[0].c]) }
+                : { type: 'erase', r: d.cells[0].r, c: d.cells[0].c });
+        }
         this.undoStack = []; // Clear undo stack at the end of turn
         this.currentPlayer++;
         
@@ -186,6 +202,7 @@ class GameState {
         if (!this.undoStack) this.undoStack = [];
         this.undoStack.push(delta);
         this.roundPlacements?.[this.currentPlayer]?.push(delta.cells.map(({ r, c }) => ({ r, c })));
+        this.boardVersion++;
 
         if (!this.isSandbox) {
             this.budgets[this.currentPlayer] -= pattern.length;
@@ -210,6 +227,7 @@ class GameState {
             this.undoStack.push(delta);
             
             this.grid.setCell(r, c, CONSTANTS.OWNER_NONE, false);
+            this.boardVersion++;
             if (!this.isSandbox) {
                 this.budgets[this.currentPlayer] += 1;
                 if (this.objectiveSystem && this.currentPlayer === 0) this.objectiveSystem.spent -= 1;
@@ -226,6 +244,7 @@ class GameState {
 
         const delta = this.undoStack.pop();
         if (delta.type === 'placement') this.roundPlacements?.[this.currentPlayer]?.pop();
+        this.boardVersion++;
         
         // Restore cells
         for (const cellData of delta.cells) {
@@ -249,6 +268,7 @@ class GameState {
 
         // Run Conway steps
         for (let step = 0; step < this.stepsPerRound; step++) {
+            if (this.paused) await this._waitWhilePaused();
             if (this.stopSimulation) break;
             
             this.grid.calculateNextGeneration();
@@ -282,9 +302,18 @@ class GameState {
             hashHistory.push(hash);
             if (hashHistory.length > 10) hashHistory.shift();
 
+            // Decisive moments slow down (or pause on request) so they can be watched.
+            const critical = !!this.objectiveSystem?.isCritical();
+            if (critical && !this._wasCritical) {
+                if (this.pauseOnAlarm) this.setPaused(true);
+                else if (this.slowMotion) this._slowUntil = step + 12;
+            }
+            this._wasCritical = critical;
+            const delay = this.turbo ? 0 : step < this._slowUntil ? Math.max(this.simSpeedMs, 150) : this.simSpeedMs;
+
             // Dynamic delay for visualization
-            if (this.simSpeedMs > 0) {
-                await new Promise(resolve => setTimeout(resolve, this.simSpeedMs)); 
+            if (delay > 0) {
+                await new Promise(resolve => setTimeout(resolve, delay));
             } else if (step % 50 === 0) {
                 // Yield less often at max speed for better throughput
                 await new Promise(resolve => setTimeout(resolve, 0));
@@ -327,6 +356,91 @@ class GameState {
             this.notifyPlayerChange();
             this.notifyStateUpdate();
         }
+    }
+
+    setPaused(paused) {
+        this.paused = paused;
+        if (!paused) this._wake();
+        if (this.onSimControl) this.onSimControl();
+    }
+
+    // Advances exactly one generation while paused.
+    stepOnce() {
+        if (!this.paused || this.phase !== CONSTANTS.PHASE_SIMULATION) return false;
+        this._stepPending = true;
+        this._wake();
+        return true;
+    }
+
+    _wake() { const resolve = this._pauseResolve; this._pauseResolve = null; if (resolve) resolve(); }
+
+    async _waitWhilePaused() {
+        while (this.paused && !this._stepPending && !this.stopSimulation) await new Promise(resolve => { this._pauseResolve = resolve; });
+        this._stepPending = false;
+    }
+
+    snapshot() {
+        return { round: this.currentRound, owners: this.grid.owners.slice(), isOld: this.grid.isOldFlags.slice(), territory: this.territory.territoryMap.map(row => row.slice()), budgets: this.budgets.slice(), defeated: [...(this.defeatedPlayers || [])], aiRandomSeed: this.aiRandomSeed, objective: this.objectiveSystem.snapshot(), plan: [] };
+    }
+
+    // Rewinds a finished mission to the start of a round and replays the plan placed there.
+    restoreCheckpoint(round, replay = true) {
+        const checkpoint = this.checkpoints[round];
+        if (!checkpoint || this.phase !== CONSTANTS.PHASE_GAMEOVER) return false;
+        this._stopRenderLoop();
+        this.stopSimulation = false; this.paused = false; this._stepPending = false; this._slowUntil = -1; this._wasCritical = false;
+        this.grid.owners.set(checkpoint.owners); this.grid.isOldFlags.set(checkpoint.isOld);
+        this.territory.territoryMap = checkpoint.territory.map(row => row.slice());
+        this.budgets = checkpoint.budgets.slice();
+        this.defeatedPlayers = new Set(checkpoint.defeated);
+        this.aiRandomSeed = checkpoint.aiRandomSeed;
+        this.objectiveSystem.restore(checkpoint.objective);
+        for (const key of Object.keys(this.checkpoints)) if (Number(key) > round) delete this.checkpoints[key];
+        this.currentRound = round; this.winner = undefined; this.undoStack = []; this.currentPlayer = 0;
+        this.changePhase(CONSTANTS.PHASE_PLACEMENT);
+        this.checkpoints[round] = checkpoint;
+        this.notifyPlayerChange();
+        if (replay) for (const action of checkpoint.plan) action.type === 'placement' ? this.placePattern(action.pattern, action.r, action.c) : this.eraseCell(action.r, action.c);
+        this.notifyStateUpdate();
+        return true;
+    }
+
+    _cloneGrid() {
+        const grid = new Grid(this.rows, this.cols, this.grid.collisionRule);
+        grid.owners.set(this.grid.owners); grid.isOldFlags.set(this.grid.isOldFlags);
+        return grid;
+    }
+
+    // Looks ahead on a copy of the board without future enemy placements. Consumes one charge.
+    forecast() {
+        const config = this.scenario?.forecast;
+        if (!config || this.phase !== CONSTANTS.PHASE_PLACEMENT || !(this.forecastCharges > 0)) return null;
+        this.forecastCharges--;
+        const grid = this._cloneGrid(), probe = { grid, rows: this.rows, cols: this.cols, playerCount: this.playerCount, territory: this.territory };
+        const os = this.objectiveSystem, o = this.scenario.objective, trail = new Uint8Array(grid.size), hits = [];
+        const targets = new Set([...(o.zones || []), o.zone].filter(Boolean));
+        const watched = os.watchList(probe).filter(w => w.kind !== 'locked');
+        const reached = new Set();
+        for (let generation = 1; generation <= config.horizon; generation++) {
+            grid.calculateNextGeneration();
+            for (let i = 0; i < grid.size; i++) if (grid.owners[i] === 1) trail[i] = 1;
+            for (const id of targets) if (!reached.has(id) && os.inZone(probe, os.zone(id), 1)) { reached.add(id); hits.push({ zoneId: id, label: os.zone(id).label, generation, kind: 'reach' }); }
+            for (const w of watched) if (!reached.has(w.id) && w.owners.some(owner => os.inZone(probe, w.zone, owner))) { reached.add(w.id); hits.push({ zoneId: w.id, label: w.label, generation, kind: 'breach' }); }
+        }
+        this.forecastResult = { owners: grid.owners.slice(), trail, horizon: config.horizon, hits, version: this.boardVersion };
+        return this.forecastResult;
+    }
+
+    // Generation at which Hellas would reach the race target if nobody intervenes (enemy flora only).
+    raceClock(limit = 3 * this.stepsPerRound) {
+        const zone = this.objectiveSystem.zone(this.scenario.objective.zone), grid = this._cloneGrid();
+        for (let i = 0; i < grid.size; i++) if (grid.owners[i] === 1) grid.owners[i] = 0;
+        const probe = { grid };
+        for (let generation = 1; generation <= limit; generation++) {
+            grid.calculateNextGeneration();
+            if (this.objectiveSystem.inZone(probe, zone, 2)) return this.objectiveSystem.generations + generation;
+        }
+        return null;
     }
 
     checkWinCondition() {

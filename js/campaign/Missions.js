@@ -45,7 +45,7 @@ const CAMPAIGN_MISSIONS = [
         map: { territory: [[0, 5, 6, 13, 17]], rocks: [[1, 26, 4, 34], [25, 4, 27, 15]], seeds: [{ pattern: 'glider', r: 1, c: 43, owner: 2, mirror: true }], zones: [{ id: 'water', label: 'WASSEREIS', rMin: 18, rMax: 23, cMin: 23, cMax: 28 }] }
     },
     {
-        id: 'A1_M05', ambience: 'outpost', title: 'Die rote Grenze', region: 'Valles · Hellas-Außenposten', kind: 'Invasion', point: [52, 74],
+        id: 'A1_M05', aiSeed: 2415085369, ambience: 'outpost', title: 'Die rote Grenze', region: 'Valles · Hellas-Außenposten', kind: 'Invasion', point: [52, 74],
         quote: 'Ein Garten. Zwei Flaggen.',
         briefing: 'Hellas versperrt den Ausgang aus dem Tal. Überwuchern Sie ihren Außenposten, bevor unser Habitat fällt. Hinter der östlichen Wand pulsiert Flora ohne Kennung. Sie war vor uns hier.',
         hint: 'Ein Gleiter bei Zeile 9, Spalte 11 fliegt direkt zum Hellas-Camp. Sichere zusätzlich dein Habitat mit stabilen Kolonien. Hellas erhält jede Runde frisches Material und setzt eigene Muster.',
@@ -93,5 +93,6 @@ class MissionManager {
         state.defeatedPlayers = new Set();
         state.aiRandomSeed = Number.isInteger(mission.aiSeed) ? mission.aiSeed >>> 0 : undefined;
         state.objectiveSystem = new ObjectiveSystem(mission);
+        state.forecastCharges = mission.forecast?.charges || 0;
     }
 }

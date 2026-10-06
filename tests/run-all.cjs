@@ -67,6 +67,11 @@ const suites = [
         desc: 'Bedrohungsabstand, Ereignisse, Zonenstatus, Niederlagenanalyse, Abstandsboni'
     },
     {
+        name: 'Ebene 4g: Simulationssteuerung & Neuversuch',
+        file: 'tests/controls.test.cjs',
+        desc: 'Pause, Einzelschritt, Turbo, Zeitlupe, Runden-Checkpoints, Prognose, Rennuhr'
+    },
+    {
         name: 'Ebene 5a: Audio-Steuerung & Sprachausgabe',
         file: 'tests/audio.test.cjs',
         desc: 'GameAudio, Ambience-Ducking, Tab-Pause, Browser-TTS Fallback'

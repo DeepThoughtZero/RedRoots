@@ -487,6 +487,7 @@ class UIManager {
         };
         this.elSimSpeed.addEventListener('input', updateSimSpeed);
         updateSimSpeed(); // Initial read
+        if (config.scenario) this.setupMissionControls(config.scenario);
 
         this.logEvent("Mission gestartet. Initialisiere Landezonen...");
         
@@ -500,9 +501,86 @@ class UIManager {
         this.render();
     }
 
+    // Campaign-only controls: simulation bar on the board, simulation options and the forecast in the panel.
+    setupMissionControls(mission) {
+        const state = this.gameState;
+        let options = { slowMotion: true, pauseOnAlarm: false };
+        try { options = { ...options, ...JSON.parse(localStorage.getItem('redroots_simulation_v1') || '{}') }; } catch { /* defaults */ }
+        state.slowMotion = options.slowMotion === true; state.pauseOnAlarm = options.pauseOnAlarm === true;
+        const fixedTempo = !!mission.evolutionDelayMs;
+        let bar = document.getElementById('simControls');
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'simControls';
+            bar.setAttribute('aria-label', 'Evolution steuern');
+            this.canvas.parentElement.append(bar);
+        }
+        bar.hidden = true;
+        bar.innerHTML = `<button type="button" data-sim="pause" aria-pressed="false">❚❚ Pause</button><button type="button" data-sim="step" disabled aria-label="Eine Generation weiter">+1</button>${fixedTempo ? '' : '<button type="button" data-sim="tempo" aria-label="Tempo wechseln">◷ Normal</button><button type="button" data-sim="turbo" aria-pressed="false">» Turbo</button>'}`;
+        const tempos = [['Langsam', 20], ['Normal', 50], ['Schnell', 85]];
+        bar.onclick = event => {
+            const action = event.target.closest('[data-sim]')?.dataset.sim;
+            if (action === 'pause') state.setPaused(!state.paused);
+            if (action === 'step') state.stepOnce();
+            if (action === 'turbo') { state.turbo = !state.turbo; this.syncSimControls(); }
+            if (action === 'tempo') {
+                const current = tempos.findIndex(([, value]) => Number(this.elSimSpeed.value) <= value);
+                this.elSimSpeed.value = tempos[(Math.max(0, current) + 1) % tempos.length][1];
+                this.elSimSpeed.dispatchEvent(new Event('input'));
+                this.syncSimControls();
+            }
+        };
+        state.onSimControl = () => this.syncSimControls();
+        window.addEventListener('keydown', event => {
+            if (state.phase !== CONSTANTS.PHASE_SIMULATION || event.target.closest?.('input, textarea')) return;
+            if (event.key === 'p' || event.key === 'P') state.setPaused(!state.paused);
+            if (event.key === '.') state.stepOnce();
+        });
+        const panel = this.elRightPanel.querySelector('div');
+        if (mission.forecast) {
+            this.elBtnFinishTurn.parentElement.insertAdjacentHTML('afterend', '<div class="forecast-tools"><button type="button" id="btnForecast" class="forecast-button"></button><p id="forecastSummary" class="forecast-summary" role="status" aria-live="polite"></p></div>');
+            document.getElementById('btnForecast').onclick = () => {
+                const result = state.forecast();
+                if (!result) return;
+                const hits = result.hits.map(h => h.kind === 'reach' ? `✓ ${h.label} in Gen ${h.generation}` : `⚠ ${h.label}: Gefahr in Gen ${h.generation}`);
+                document.getElementById('forecastSummary').textContent = `Prognose über ${result.horizon} Generationen, ohne neue Gegneraussaat: ${hits.length ? hits.join(' · ') : 'kein Ziel erreicht, keine Gefahr.'}`;
+                this.syncSimControls(); this.render();
+            };
+        }
+        panel.insertAdjacentHTML('beforeend', `<details class="sim-options"><summary>Simulation</summary><label><input type="checkbox" data-sim-option="slowMotion" ${state.slowMotion ? 'checked' : ''}> Zeitlupe in entscheidenden Momenten</label><label><input type="checkbox" data-sim-option="pauseOnAlarm" ${state.pauseOnAlarm ? 'checked' : ''}> Bei Alarm automatisch anhalten</label><p>Tasten: P pausiert, Punkt rückt eine Generation weiter.</p></details>`);
+        panel.querySelectorAll('[data-sim-option]').forEach(input => input.onchange = () => {
+            state[input.dataset.simOption] = input.checked;
+            try { localStorage.setItem('redroots_simulation_v1', JSON.stringify({ slowMotion: state.slowMotion, pauseOnAlarm: state.pauseOnAlarm })); } catch { /* optional */ }
+        });
+        this.syncSimControls();
+    }
+
+    syncSimControls() {
+        const state = this.gameState, bar = document.getElementById('simControls');
+        if (!state?.scenario || !bar) return;
+        const simulating = state.phase === CONSTANTS.PHASE_SIMULATION;
+        bar.hidden = !simulating;
+        const pause = bar.querySelector('[data-sim="pause"]');
+        pause.textContent = state.paused ? '▶ Weiter' : '❚❚ Pause';
+        pause.setAttribute('aria-pressed', String(state.paused));
+        bar.querySelector('[data-sim="step"]').disabled = !state.paused;
+        const turbo = bar.querySelector('[data-sim="turbo"]');
+        if (turbo) turbo.setAttribute('aria-pressed', String(state.turbo));
+        const tempo = bar.querySelector('[data-sim="tempo"]');
+        if (tempo) { const v = Number(this.elSimSpeed.value); tempo.textContent = `◷ ${v <= 20 ? 'Langsam' : v <= 50 ? 'Normal' : 'Schnell'}`; }
+        if (simulating && state.paused) this.elGamePhaseDisplay.textContent = `EVOLUTION · PAUSE`;
+        const forecast = document.getElementById('btnForecast');
+        if (forecast) {
+            forecast.textContent = `Prognose · ${state.forecastCharges} übrig`;
+            forecast.disabled = !(state.forecastCharges > 0) || state.phase !== CONSTANTS.PHASE_PLACEMENT || state.currentPlayer !== 0;
+            // A forecast is only valid for the board it was computed on.
+            if (state.phase !== CONSTANTS.PHASE_PLACEMENT || state.forecastResult?.version !== state.boardVersion) document.getElementById('forecastSummary').textContent = '';
+        }
+    }
+
     handlePhaseChange(phase) {
         this.elGamePhaseDisplay.textContent = phase;
-        if (this.gameState.objectiveSystem) this.campaign?.onPhaseChange(phase);
+        if (this.gameState.objectiveSystem) { this.campaign?.onPhaseChange(phase); this.syncSimControls(); }
         
         if (phase === CONSTANTS.PHASE_SIMULATION) {
             if (this.audio) this.audio.setSituation('simulation');
@@ -608,6 +686,7 @@ class UIManager {
 
     handleStateUpdate() {
         this.updateBudgetDisplay();
+        if (this.gameState.objectiveSystem && this.gameState.phase === CONSTANTS.PHASE_PLACEMENT) this.syncSimControls();
         if (this.campaign) this.campaign.updateHUD();
         if (this.gameState.phase === CONSTANTS.PHASE_SIMULATION || this.gameState.phase === CONSTANTS.PHASE_SETUP) {
             this.updateTerritoryBars();

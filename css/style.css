@@ -369,3 +369,30 @@ canvas {
 @media(max-width:1024px) { .mission-hud.collapsed { transform:none; } .mission-toast { bottom:calc(min(230px,35dvh) + 64px); } }
 @media(max-width:1024px) and (orientation:landscape) { .mission-toast { left:calc((100% - 280px) / 2);bottom:64px;max-width:calc(100% - 300px); } }
 @media(max-width:1024px) and (orientation:landscape) and (max-height:500px) { .mission-hud-body > h2, .mission-hud-body > p:not(.objective-progress) { display:none; } .mission-hud-body > .objective-progress { display:block;clear:both;font-size:13px;margin:0; } }
+
+/* Phase 2: simulation controls, forecast, graded hints and round rewind. */
+#simControls { position:absolute;bottom:8px;left:8px;display:flex;gap:4px;z-index:6;background:#0c1722ed;border:1px solid #688b8155;border-radius:8px;padding:3px; }
+#simControls[hidden] { display:none; }
+#simControls button { min-width:48px;min-height:44px;padding:0 10px;font-size:15px;color:#d4ede3;border-radius:4px;white-space:nowrap; }
+#simControls button:hover:not(:disabled) { background:#27403b; }
+#simControls button:disabled { opacity:.4; }
+#simControls button[aria-pressed="true"] { background:#c1e9d9;color:#102b26;font-weight:700; }
+.forecast-tools { margin:0 0 16px; }
+.forecast-button { width:100%;min-height:44px;padding:8px 12px;border:1px solid #6fd6c4;border-radius:6px;color:#bff6ea;background:#0f2a2a;font-size:15px; }
+.forecast-button:disabled { opacity:.45; }
+.forecast-summary { font-size:14px;line-height:1.45;color:#bfe9de;margin:6px 0 0; }
+.forecast-summary:empty { display:none; }
+.sim-options { margin-top:12px;color:#c9d8d3;font-size:15px; }
+.sim-options summary { min-height:44px;display:flex;align-items:center;cursor:pointer; }
+.sim-options label { display:flex;align-items:center;gap:10px;min-height:44px; }
+.sim-options input { width:20px;height:20px; }
+.sim-options p { font-size:13px;color:#93aaa4; }
+.mission-hud .hint-earlier { opacity:.75; }
+.mission-hud .hint-current { color:#f1e3c8!important; }
+.mission-hud [data-more-hint] { min-height:44px;margin-top:4px;padding:0 14px; }
+.result-hint small, .rewind-options small { display:block;font:12px monospace;letter-spacing:1px;color:#e6c18c;margin-bottom:4px; }
+.rewind-options { margin:16px 0;padding:14px 16px;border:1px solid #8ad7bb55;border-radius:8px;background:#17302b; }
+.rewind-options div { display:flex;flex-wrap:wrap;gap:8px; }
+.rewind-options button { min-height:44px;padding:0 14px; }
+@media(max-width:1024px) and (orientation:landscape) { #simControls { bottom:8px;left:8px; } #simControls button { min-width:44px;padding:0 8px;font-size:14px; } }
+@media(max-width:1024px) { .forecast-tools { grid-column:1/-1;margin:0; } .sim-options { grid-column:1/-1; } }

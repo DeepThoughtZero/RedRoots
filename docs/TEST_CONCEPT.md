@@ -132,6 +132,12 @@ Validiert alle Missionslösungen und Spielstandsmechaniken:
   - Niederlagenanalyse (Ort, Generation, Herkunft, Beinahe-Wert) und Abstandsboni (`margin`) mit den Referenzlösungen.
   - Aufklärung: Platzierungen je Runde inklusive Undo und echter KI; Richtungserkennung vorgegebener Raumschiffe.
 
+- **Simulationssteuerung & Neuversuch (`tests/controls.test.cjs`):**
+  - Pause hält vor der nächsten Generation, Einzelschritt rückt genau eine Generation vor, Turbo wartet nie und wertet trotzdem jede Generation aus.
+  - Zeitlupe verlangsamt nach einem entscheidenden Moment; „Bei Alarm anhalten“ pausiert.
+  - Runden-Checkpoints stellen Feld, Budget und Zielzustand wieder her und spielen die Rundenplanung erneut ein; mit festem `aiSeed` verläuft eine unveränderte Runde identisch.
+  - Prognose verbraucht Ladungen, verändert keinen Spielzustand und erkennt erreichte Ziele; die Rennuhr trifft die tatsächliche Ankunft.
+
 ### Ebene 5: Audio & Systemtests (`tests/audio.test.cjs`)
 Verifikation des Klang- und Narrationssystems:
 - **Standardzustand:** Standardmäßig stummgeschaltet, kein Autoplay-Verstoß.
@@ -150,7 +156,7 @@ Verifikation des Klang- und Narrationssystems:
 ```bash
 node tests/run-all.cjs
 ```
-Führt alle Testsuiten (derzeit elf) nacheinander aus, misst die Laufzeiten und gibt einen übersichtlichen Erfolgs- oder Fehlerbericht aus.
+Führt alle Testsuiten (derzeit zwölf) nacheinander aus, misst die Laufzeiten und gibt einen übersichtlichen Erfolgs- oder Fehlerbericht aus.
 
 ### Einzelne Suiten ausführen
 ```bash

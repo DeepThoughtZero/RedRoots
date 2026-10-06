@@ -79,6 +79,7 @@ class GameRenderer {
         // 4. Draw Cells
         this.drawCells();
 
+        this.drawForecast();
         this.drawMissionZones();
         this.drawSeedArrows();
         this.drawRecon();
@@ -144,6 +145,25 @@ class GameRenderer {
             this.label(`⚠ HABITAT · ${campThreat.distance} F.`, x, y - 4, campThreat.level === 'alarm' ? '#ff9fab' : '#ffc98a');
             ctx.restore();
         }
+    }
+
+    // Ghost of the forecast: the path of own flora faintly, its final position and foreign flora outlined.
+    drawForecast() {
+        const state = this.gameState, f = state.forecastResult;
+        if (!f || f.version !== state.boardVersion || state.phase !== CONSTANTS.PHASE_PLACEMENT) return;
+        const ctx = this.ctx, size = this.cellSize, cols = state.cols;
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,255,255,.14)';
+        for (let i = 0; i < f.trail.length; i++) if (f.trail[i]) ctx.fillRect((i % cols) * size, Math.floor(i / cols) * size, size, size);
+        ctx.lineWidth = 1.5;
+        for (let i = 0; i < f.owners.length; i++) {
+            const owner = f.owners[i];
+            if (owner === 0 || owner === CONSTANTS.OWNER_ROCK) continue;
+            ctx.strokeStyle = owner === 1 ? 'rgba(0,255,255,.95)' : owner === CONSTANTS.OWNER_NEUTRAL ? 'rgba(229,231,235,.8)' : CONSTANTS.PLAYER_COLORS[owner - 1].main;
+            ctx.setLineDash(owner === 1 ? [] : [2, 2]);
+            ctx.strokeRect((i % cols) * size + 2, Math.floor(i / cols) * size + 2, size - 4, size - 4);
+        }
+        ctx.restore();
     }
 
     drawSeedArrows() {

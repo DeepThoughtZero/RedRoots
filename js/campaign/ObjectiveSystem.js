@@ -9,6 +9,31 @@ class ObjectiveSystem {
         this.bestStreak = 0; this.bestHold = 0; this.bestSimultaneous = 0; this.bestCapture = 0; this.lastAlive = 0; this.closestToTarget = Infinity; this.defeatedSeen = new Set();
     }
     zone(id) { return this.mission.map.zones.find(z => z.id === id); }
+    static clone(value) {
+        if (value instanceof Set) return new Set(value);
+        if (value instanceof Map) return new Map([...value].map(([k, v]) => [k, ObjectiveSystem.clone(v)]));
+        if (Array.isArray(value)) return value.map(ObjectiveSystem.clone);
+        if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, ObjectiveSystem.clone(v)]));
+        return value;
+    }
+    // Complete evaluation state for round checkpoints; the mission definition is shared.
+    snapshot() {
+        const copy = {};
+        for (const [key, value] of Object.entries(this)) if (key !== 'mission') copy[key] = ObjectiveSystem.clone(value);
+        copy.result = null; copy.events = [];
+        return copy;
+    }
+    restore(snapshot) {
+        for (const key of Object.keys(this)) if (key !== 'mission' && !(key in snapshot)) delete this[key];
+        for (const [key, value] of Object.entries(snapshot)) this[key] = ObjectiveSystem.clone(value);
+    }
+    // A decisive moment: alarm at a watched zone, a goal at 75 % or a target within three cells.
+    isCritical() {
+        if (this.result) return false;
+        if (this.worstThreat()?.level === 'alarm') return true;
+        if ((this.mission.objective.zones || []).some(id => (this.zoneStatus(id).progress || 0) >= .75)) return true;
+        return this.currentTargetDistance <= 3;
+    }
     inZone(state, zone, owner, territory = false) {
         for (let r = zone.rMin; r <= zone.rMax; r++) for (let c = zone.cMin; c <= zone.cMax; c++) {
             if ((territory ? state.territory.getOwnerAt(r, c) : state.grid.getOwner(r, c)) === owner) return true;
@@ -99,6 +124,7 @@ class ObjectiveSystem {
         if (o.type === 'pulse') return g < o.aliveAt ? { label: 'Lebensnachweis in', remaining: o.aliveAt - g } : g < o.emptyAfter ? { label: 'Kammer leer ab', remaining: o.emptyAfter - g } : { label: 'Testende in', remaining: Math.max(0, this.mission.steps - g) };
         if (o.type === 'holdZones' && this.hold > 0) return { label: 'Halten noch', remaining: Math.max(0, o.value - this.hold) };
         if (o.type === 'captureCamps' && o.minGenerations > g) return { label: 'Rückweg schützen noch', remaining: o.minGenerations - g };
+        if (o.type === 'race' && this.raceArrival > g) return { label: 'Hellas am Ziel in ca.', remaining: this.raceArrival - g };
         return null;
     }
     ownerName(owner) {
@@ -133,6 +159,7 @@ class ObjectiveSystem {
             won = this.inZone(state, zone, 1);
             const own = this.distanceToZone(state, zone, [1], Infinity);
             this.closestToTarget = Math.min(this.closestToTarget, own);
+            this.currentTargetDistance = own;
             const rival = o.type === 'race' ? this.distanceToZone(state, zone, [2], Infinity) : Infinity;
             this.progressText = `${Number.isFinite(own) ? `Eigene Flora: ${own} Felder bis ${zone.label}` : 'Keine eigene Flora unterwegs'}${Number.isFinite(rival) ? ` · Hellas: ${rival} Felder` : ''}`;
         }

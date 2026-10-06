@@ -38,7 +38,7 @@ CAMPAIGN_MISSIONS.push(
         map:{territory:[[0,10,16,19,28]],rocks:[[0,4,5,7],[25,36,29,38]],camps:[{id:0,rMin:10,rMax:12,cMin:26,cMax:28}],seeds:[{pattern:'glider',r:1,c:34,owner:-1,mirror:true}],zones:[{id:'landing',label:'EVAKUIERUNG',rMin:22,rMax:27,cMin:6,cMax:13}]}
     },
     {
-        id:'A2_M04',act:2,title:'Die gestohlenen Warnungen',region:'Tharsis · Forschungsstation am Vulkanplateau',kind:'Archivbergung',point:[37,48],ambience:'research',
+        id:'A2_M04',act:2,aiSeed:1013904226,title:'Die gestohlenen Warnungen',region:'Tharsis · Forschungsstation am Vulkanplateau',kind:'Archivbergung',point:[37,48],ambience:'research',
         quote:'Wir brauchen Beweise, keine neue Front.',voice:'UNSERE BIOLOGIN',
         briefing:"Das Energiehaus Tharsis verkaufte uns die alten Genome ohne Warnhinweise. Drei Forschungsarchive könnten das beweisen; eine Wache versperrt den Zugriff. Berühre jedes Archiv mit lebender Flora. Ein kurzer Kontakt genügt: Die Daten bleiben gesichert, auch wenn deine Kolonie weiterzieht.",
         debriefing:"Kesslers alte Berichte beweisen die Vertuschung. Die frühere Forschungsleiterin warnte vor verbundenen Wachstumsnetzen. Doch auch ihr Schutzsystem hat eine Schwäche: eine einzige Energiezentrale. Genau diese fällt jetzt aus.",

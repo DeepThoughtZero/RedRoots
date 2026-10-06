@@ -182,6 +182,12 @@ class CampaignManager {
         const params = new URLSearchParams(location.search);
         const selected = CAMPAIGN_MISSIONS.findIndex(m => m.id === params.get('sector'));
         if (selected >= 0 && this.progress.available(selected)) this.selected = selected;
+        // Failed attempts travel in the retry link and open further hint stages; nothing is stored.
+        this.attempt = Math.max(1, Math.min(9, parseInt(params.get('attempt'), 10) || 1));
+        this.hudBody.addEventListener('click', event => {
+            if (!event.target.closest('[data-more-hint]')) return;
+            this.hintLevel++; this.hintOpen = true; this.updateHUD();
+        });
         const launch = params.get('mission');
         if (launch) {
             const index = CAMPAIGN_MISSIONS.findIndex(m => m.id === launch);
@@ -193,7 +199,8 @@ class CampaignManager {
         }
     }
     navigateToMap(index) { location.href = `${location.pathname}?campaign&sector=${CAMPAIGN_MISSIONS[index].id}`; }
-    navigate(index) { location.href = `${location.pathname}?mission=${CAMPAIGN_MISSIONS[index].id}`; }
+    navigate(index, attempt = 1) { location.href = `${location.pathname}?mission=${CAMPAIGN_MISSIONS[index].id}${attempt > 1 ? `&attempt=${attempt}` : ''}`; }
+    hintStages(m) { return m.hints || [m.hint]; }
     showMap() {
         const m = CAMPAIGN_MISSIONS[this.selected];
         const visible = CAMPAIGN_MISSIONS.filter(n => n.act === m.act);
@@ -263,6 +270,7 @@ class CampaignManager {
     start(index) {
         this.selected = index;
         document.body.classList.add('in-mission');
+        this.hintLevel = Math.min(this.attempt, this.hintStages(CAMPAIGN_MISSIONS[index]).length);
         this.ui.startGame(MissionManager.config(CAMPAIGN_MISSIONS[index]));
         this.hud.hidden = false;
         this.hasAutoCollapsed = false;
@@ -271,6 +279,23 @@ class CampaignManager {
         this.updateHUD();
         this.ui.elPatternList.querySelector('[data-pattern="cell"]').click();
         this.ui.audio.enterScene(CAMPAIGN_MISSIONS[index], 'briefing');
+    }
+    hintDetails(m) {
+        const stages = this.hintStages(m), level = Math.max(1, Math.min(this.hintLevel || 1, stages.length));
+        return `<details><summary>Ziel & Hinweis · Stufe ${level}/${stages.length}</summary><p><strong>${m.objective.label}</strong></p>${stages.slice(0, level).map((text, i) => `<p class="${i === level - 1 ? 'hint-current' : 'hint-earlier'}">${text}</p>`).join('')}${level < stages.length ? '<button type="button" class="quiet-button" data-more-hint>Mehr Hilfe</button>' : ''}</details>`;
+    }
+    // Rewinds to the start of a round in place; the page and its listeners stay, so clean up explicitly.
+    rewind(round) {
+        const m = this.ui.gameState.scenario;
+        this.ui.audio.stopNarration(); this.ui.audio.scene = null;
+        document.querySelector('.failure-return')?.remove();
+        clearTimeout(this.toastTimer); this.toastTimer = null; this.toastQueue = []; this.toast.hidden = true;
+        this.lastTick = null; this.calmSince = null;
+        this.attempt++;
+        this.hintLevel = Math.max(this.hintLevel || 1, Math.min(this.attempt, this.hintStages(m).length));
+        this.overlay.hidden = true;
+        if (!this.ui.gameState.restoreCheckpoint(round)) { this.navigate(this.selected, this.attempt); return; }
+        this.ui.render();
     }
     collapseHUD() {
         this.hudCollapsed = true;
@@ -307,7 +332,7 @@ class CampaignManager {
         const countdown = s.phase !== CONSTANTS.PHASE_GAMEOVER ? o.countdown() : null, threat = o.worstThreat();
         const threatText = threat && !threat.distance ? (threat.kind === 'locked' ? 'zu früh berührt' : 'Flora hat die Zone erreicht') : threat ? (threat.kind === 'locked' ? `eigene Flora ${threat.distance} Felder entfernt – Schalter wartet noch` : threat.kind === 'sterile' ? `Flora ${threat.distance} Felder vor der Sperrzone` : `fremde Flora ${threat.distance} Felder entfernt`) : '';
         const progress = [o.progressText, countdown ? `<span class="objective-countdown${countdown.remaining <= 10 ? ' urgent' : ''}">⏱ ${countdown.label} ${countdown.remaining} Gen.</span>` : ''].filter(Boolean).join(' · ');
-        target.innerHTML = `<div class="mission-eyebrow">AKT ${CAMPAIGN_ACTS.find(a => a.id === m.act).roman} / SEKTOR ${String(this.selected+1).padStart(2,'0')}<a href="${location.pathname}?campaign">Marskarte ↗</a></div><h2>${m.title}</h2><p>${m.objective.label}</p>${threat ? `<p class="objective-progress objective-alert ${threat.level}">⚠ ${threat.label}: ${threatText}</p>` : ''}${progress ? `<p class="objective-progress">${progress}</p>` : ''}<div class="hud-telemetry"><span>GEN ${String(o.generations).padStart(3,'0')}</span><span>${o.spent} MATERIAL EINGESETZT</span></div><details><summary>Ziel & taktischer Hinweis</summary><p><strong>${m.objective.label}</strong></p><p>${m.hint}</p></details>`;
+        target.innerHTML = `<div class="mission-eyebrow">AKT ${CAMPAIGN_ACTS.find(a => a.id === m.act).roman} / SEKTOR ${String(this.selected+1).padStart(2,'0')}<a href="${location.pathname}?campaign">Marskarte ↗</a></div><h2>${m.title}</h2><p>${m.objective.label}</p>${threat ? `<p class="objective-progress objective-alert ${threat.level}">⚠ ${threat.label}: ${threatText}</p>` : ''}${progress ? `<p class="objective-progress">${progress}</p>` : ''}<div class="hud-telemetry"><span>GEN ${String(o.generations).padStart(3,'0')}</span><span>${o.spent} MATERIAL EINGESETZT</span></div>${this.hintDetails(m)}`;
         // Preserve an opened hint across frequent simulation renders.
         if (this.hintOpen) target.querySelector('details').open = true;
         if (!this.hasAutoCollapsed && s.undoStack?.some(d => d.type === 'placement')) {
@@ -371,6 +396,15 @@ class CampaignManager {
             if (player && placements.length) this.notify(`Aufklärung: ${CONSTANTS.PLAYER_COLORS[player].name} setzt ${placements.length} neue ${placements.length === 1 ? 'Kolonie' : 'Kolonien'}`, null);
         });
     }
+    nextHint(m) {
+        const stages = this.hintStages(m), level = Math.min((this.hintLevel || 1) + 1, stages.length);
+        return `<div class="result-hint"><small>HINWEIS FÜR DEN NÄCHSTEN VERSUCH · STUFE ${level}/${stages.length}</small><p>${stages[level - 1]}</p></div>`;
+    }
+    rewindOptions() {
+        const rounds = Object.keys(this.ui.gameState.checkpoints || {}).map(Number).sort((a, b) => a - b);
+        if (!rounds.length) return '';
+        return `<section class="rewind-options"><small>NEU PLANEN</small><p>Die Mission springt an den Anfang der gewählten Runde zurück. Deine damaligen Platzierungen sind wieder gesetzt; mit Rückgängig änderst du sie.</p><div>${rounds.map(r => `<button type="button" class="quiet-button" data-rewind="${r}">Runde ${r} neu planen</button>`).join('')}</div></section>`;
+    }
     showResult() {
         this.ui.audio.stopNarration();
         clearTimeout(this.toastTimer); this.toastTimer = null; this.toastQueue = []; this.toast.hidden = true;
@@ -381,7 +415,7 @@ class CampaignManager {
         if (result.success) this.progress.record(m.id, result.stars);
         this.overlay.hidden = false;
         const ending = m.finalChoices && result.success ? `<section class="campaign-completion"><div class="mission-eyebrow">DIE GEMEINSAME ZUKUNFT</div><h2>${this.progress.finalChoice ? 'Entscheidung gespeichert' : 'Wer trägt die Verantwortung?'}</h2><p>${this.progress.finalChoice ? m.finalChoices.find(c => c.id === this.progress.finalChoice).text : 'Beide Wege bewahren das verteilte Netz. Sie unterscheiden sich darin, wem Kontrolle und Wissen anvertraut werden.'}</p>${this.progress.finalChoice ? `<strong>${m.finalChoices.find(c => c.id === this.progress.finalChoice).title}</strong>` : m.finalChoices.map(c => `<button class="quiet-button" data-ending="${c.id}"><strong>${c.title}</strong><br>${c.text}</button>`).join('')}</section>` : '';
-        this.overlay.innerHTML = `<div class="mission-result"><div class="mission-eyebrow">LANDEFÄHRE / MISSIONSBERICHT</div><div class="result-stars">${'★'.repeat(result.stars)}${'☆'.repeat(3-result.stars)}</div><h1>${result.success ? 'Wurzeln geschlagen.' : 'Signal verloren.'}</h1><h2>${m.title}</h2><p>${result.reason}</p>${this.ui.audio.narrationButton(m, result.success ? 'debriefing' : 'failure')}${this.ui.audio.controls()}${result.details?.length ? `<ul class="result-analysis">${result.details.map(d => `<li>${d}</li>`).join('')}</ul>${result.failure?.cells.length ? '<button type="button" class="quiet-button" id="viewFailure">Moment ansehen</button>' : ''}` : ''}<ul class="result-objectives"><li>${result.success ? '✓' : '○'} ${m.objective.label}</li>${m.bonuses.map((b,i) => `<li>${result.bonuses[i] ? '★' : '☆'} ${b.label}</li>`).join('')}</ul>${result.success && m.reward ? `<div class="genome-reward"><span>${newlyUnlocked ? 'NEUE GENOMSTRUKTUR ENTDECKT' : 'GENOM ARCHIVIERT'}</span><strong>${[m.reward, ...(m.additionalRewards || [])].filter(Boolean).map(key => CONSTANTS.PATTERNS[key].name).join(' + ')}</strong></div>` : !result.success ? `<p class="result-hint">${m.hint}</p>` : ''}${ending}${!this.progress.storageAvailable ? '<p>Fortschritt konnte nicht gespeichert werden.</p>' : ''}${result.success ? `<div class="result-code"><label for="resultCode">Expeditionscode zum Mitnehmen</label><input id="resultCode" readonly value="${this.progress.exportCode()}" onclick="this.select()"><small>Sektorpasswort: ${CampaignState.passwords[Math.min(this.selected + 1, CAMPAIGN_MISSIONS.length - 1)]}</small></div>` : ''}<div class="result-actions"><a class="quiet-button" href="${location.pathname}?campaign">Zur Marskarte</a><button class="launch-button" id="resultContinue">${result.success && this.selected < CAMPAIGN_MISSIONS.length - 1 ? 'Nächster Sektor · Marskarte →' : result.success ? 'Expedition auf der Marskarte ansehen →' : 'Erneut versuchen ↻'}</button></div>${result.success && this.selected === CAMPAIGN_MISSIONS.length - 1 ? '<p class="mission-eyebrow">AKT V ABGESCHLOSSEN · DAS NETZ IST GETEILT UND VERBUNDEN</p>' : ''}</div>`;
+        this.overlay.innerHTML = `<div class="mission-result"><div class="mission-eyebrow">LANDEFÄHRE / MISSIONSBERICHT</div><div class="result-stars">${'★'.repeat(result.stars)}${'☆'.repeat(3-result.stars)}</div><h1>${result.success ? 'Wurzeln geschlagen.' : 'Signal verloren.'}</h1><h2>${m.title}</h2><p>${result.reason}</p>${this.ui.audio.narrationButton(m, result.success ? 'debriefing' : 'failure')}${this.ui.audio.controls()}${result.details?.length ? `<ul class="result-analysis">${result.details.map(d => `<li>${d}</li>`).join('')}</ul>${result.failure?.cells.length ? '<button type="button" class="quiet-button" id="viewFailure">Moment ansehen</button>' : ''}` : ''}<ul class="result-objectives"><li>${result.success ? '✓' : '○'} ${m.objective.label}</li>${m.bonuses.map((b,i) => `<li>${result.bonuses[i] ? '★' : '☆'} ${b.label}</li>`).join('')}</ul>${result.success && m.reward ? `<div class="genome-reward"><span>${newlyUnlocked ? 'NEUE GENOMSTRUKTUR ENTDECKT' : 'GENOM ARCHIVIERT'}</span><strong>${[m.reward, ...(m.additionalRewards || [])].filter(Boolean).map(key => CONSTANTS.PATTERNS[key].name).join(' + ')}</strong></div>` : !result.success ? this.nextHint(m) : ''}${!result.success ? this.rewindOptions() : ''}${ending}${!this.progress.storageAvailable ? '<p>Fortschritt konnte nicht gespeichert werden.</p>' : ''}${result.success ? `<div class="result-code"><label for="resultCode">Expeditionscode zum Mitnehmen</label><input id="resultCode" readonly value="${this.progress.exportCode()}" onclick="this.select()"><small>Sektorpasswort: ${CampaignState.passwords[Math.min(this.selected + 1, CAMPAIGN_MISSIONS.length - 1)]}</small></div>` : ''}<div class="result-actions"><a class="quiet-button" href="${location.pathname}?campaign">Zur Marskarte</a><button class="launch-button" id="resultContinue">${result.success && this.selected < CAMPAIGN_MISSIONS.length - 1 ? 'Nächster Sektor · Marskarte →' : result.success ? 'Expedition auf der Marskarte ansehen →' : 'Erneut versuchen ↻'}</button></div>${result.success && this.selected === CAMPAIGN_MISSIONS.length - 1 ? '<p class="mission-eyebrow">AKT V ABGESCHLOSSEN · DAS NETZ IST GETEILT UND VERBUNDEN</p>' : ''}</div>`;
         this.overlay.querySelectorAll('[data-ending]').forEach(button => button.onclick = () => { this.progress.chooseEnding(button.dataset.ending); this.showResult(); });
         const viewFailure = this.overlay.querySelector('#viewFailure');
         if (viewFailure) viewFailure.onclick = () => {
@@ -394,7 +428,8 @@ class CampaignManager {
             this.ui.renderer.focusCell(r, c);
             back.focus();
         };
-        this.overlay.querySelector('#resultContinue').onclick = () => result.success ? this.navigateToMap(Math.min(this.selected+1, CAMPAIGN_MISSIONS.length-1)) : this.navigate(this.selected);
+        this.overlay.querySelectorAll('[data-rewind]').forEach(button => button.onclick = () => this.rewind(Number(button.dataset.rewind)));
+        this.overlay.querySelector('#resultContinue').onclick = () => result.success ? this.navigateToMap(Math.min(this.selected+1, CAMPAIGN_MISSIONS.length-1)) : this.navigate(this.selected, Math.max(this.attempt, this.hintLevel || 1) + 1);
         if (result.success) this.ui.audio.enterScene(m, 'debriefing');
         else this.ui.audio.failureReport(m, result.reason);
         this.overlay.querySelector('#resultContinue').focus();

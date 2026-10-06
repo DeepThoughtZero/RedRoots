@@ -340,6 +340,18 @@ Abnahme:
 - Die Prognose verändert keinen Spielzustand (Test).
 - Koordinaten in Akt I erscheinen erst in Stufe 3.
 
+**Status: umgesetzt (Oktober 2026).**
+- `GameState`:
+  - Pause-Gate, `stepOnce`, `turbo`, Zeitlupe (12 Generationen mit mindestens 150 ms nach einem entscheidenden Moment laut `ObjectiveSystem.isCritical`) und `pauseOnAlarm`.
+  - Runden-Checkpoints (`snapshot`/`restoreCheckpoint`) mit erneut eingespielter Rundenplanung.
+  - `forecast()` auf einer Gitterkopie und `raceClock()`.
+- Neue Datei `js/campaign/Assistance.js`: Hinweisstufen für alle 25 Missionen und Prognose-Kontingente. Zwei Ladungen, Horizont 32 Generationen (Akt V: 120); A1_M01 und A3_M02 haben keine Prognose.
+- `aiSeed` für A1_M05, A2_M04 und A3_M04. Die Referenzlösungen erreichen weiterhin drei Sterne.
+- Abweichungen vom Plan:
+  - Die Rennuhr rechnet nur mit der Hellas-Flora, damit sie das eigene Ergebnis nicht verrät.
+  - Mission 1 behält ihr festes Tempo ohne Turbo, aber mit Pause.
+  - Checkpoints kosten keine Sterne.
+
 ### Phase 3 – „Lebendige Szenarien“
 Umfang: C1–C4 (inklusive neuer Zieltypen). Nachrüstung von A4_M02 (Flutung), A4_M05 (Sturmstoß), Doktrinen für A4_M03 und A4_M04 sowie Vorratskapseln für A1_M02, A2_M01 und A5_M01.
 Abnahme:

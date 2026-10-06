@@ -24,6 +24,7 @@ const jsFiles = [
     'js/campaign/Act3.js',
     'js/campaign/Act4.js',
     'js/campaign/Act5.js',
+    'js/campaign/Assistance.js',
     'js/campaign/ObjectiveSystem.js',
     'js/campaign/CampaignManager.js',
     'js/core/GameState.js',
@@ -67,6 +68,7 @@ const expectedScripts = [
     'js/campaign/Act3.js',
     'js/campaign/Act4.js',
     'js/campaign/Act5.js',
+    'js/campaign/Assistance.js',
     'js/campaign/ObjectiveSystem.js',
     'js/campaign/CampaignManager.js',
     'js/core/GameState.js',
@@ -92,7 +94,8 @@ for (const file of [
     'js/campaign/Act2.js',
     'js/campaign/Act3.js',
     'js/campaign/Act4.js',
-    'js/campaign/Act5.js'
+    'js/campaign/Act5.js',
+    'js/campaign/Assistance.js'
 ]) {
     vm.runInContext(fs.readFileSync(file, 'utf8'), ctx);
 }
@@ -113,6 +116,9 @@ CAMPAIGN_MISSIONS.forEach((m, idx) => {
     assert.ok(m.briefing && m.briefing.length > 20, `Mission ${m.id}: Ausführliches Briefing vorhanden`);
     assert.ok(m.debriefing && m.debriefing.length > 20, `Mission ${m.id}: Ausführliches Debriefing vorhanden`);
     assert.ok(m.hint, `Mission ${m.id}: Taktischer Hinweis vorhanden`);
+    assert.ok(Array.isArray(m.hints) && m.hints.length >= 2 && m.hints.includes(m.hint) && m.hints.every(h => typeof h === 'string' && h.length > 20), `Mission ${m.id}: Gestufte Hinweise mit dem taktischen Hinweis`);
+    if (m.id !== 'A1_M01') assert.ok(!/Zeile|Spalte/.test(m.hints[0]), `Mission ${m.id}: Erste Hinweisstufe verrät keine Koordinaten`);
+    assert.ok(m.forecast === null || (Number.isInteger(m.forecast.charges) && m.forecast.charges > 0 && m.forecast.horizon > 0), `Mission ${m.id}: Prognose deaktiviert oder gültig konfiguriert`);
     assert.ok(Array.isArray(m.patterns), `Mission ${m.id}: Muster-Array vorhanden`);
     for (const pat of m.patterns) {
         assert.ok(CONSTANTS.PATTERNS[pat], `Mission ${m.id}: Muster ${pat} ist in CONSTANTS definiert`);
