@@ -335,6 +335,7 @@ input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent);
 .btn-finish br { display: none; }
 .btn-sub { display: block; font-size: 13px; font-weight: 500; opacity: .8; }
 .btn-finish.btn-stop { background: linear-gradient(180deg, #ff8a95, #e6495a); color: #2a0509; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 8px 24px rgba(230, 73, 90, .25); }
+.btn-finish.btn-stop:hover:not(:disabled) { background: linear-gradient(180deg, #ffa3ab, #f05d6c); }
 
 .evolution-status { padding: 12px 14px; border-radius: var(--r-md); background: rgba(127, 232, 208, .06); border: 1px solid rgba(127, 232, 208, .22); }
 .evo-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
@@ -364,6 +365,7 @@ body[data-phase="simulation"] .tool-section, body[data-turn="ai"] .tool-section 
 .tool-btn:hover { background: var(--surface-3); color: var(--text-1); border-color: var(--line-3); }
 .tool-btn.active, .tool-btn[aria-pressed="true"] { background: var(--danger-soft); border-color: rgba(255, 93, 108, .6); color: var(--danger-2); }
 .tool-btn--danger { color: var(--danger-2); }
+.tool-btn--danger:hover { background: var(--danger-soft); border-color: rgba(255, 93, 108, .6); color: #fff; }
 
 .pattern-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .pattern-btn { position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 6px; min-height: 48px; padding: 8px; border-radius: var(--r-md); border: 1px solid var(--line-2); background: var(--surface-2); color: var(--text-1); text-align: left; transition: background-color var(--t-fast), border-color var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast); }

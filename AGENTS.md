@@ -51,6 +51,8 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 | `docs/CAMPAIGN_STORY.md` | Durchgehende Geschichte, Figuren, spätere Akte und dramaturgische Regeln |
 | `docs/MISSION_IMPROVEMENT_PLAN.md` | Verbesserungsplan für spannendere Missionen, Fahrplan und Spannungs-Checkliste für neue Missionen |
 | `assets/audio/` | Fertige Audiodateien, Textmanifest und QA-Bericht |
+| `assets/fonts/` | Selbst gehostete Schriften (Inter, Space Grotesk, Fira Code; SIL OFL mit Lizenztexten) |
+| `assets/ui/` | WebP-Oberflächenbilder: Startbild, Häuserporträts (Quelle: PNGs im Wurzel-`assets/`) |
 | `scripts/generate_audio.py` | Lokale Audioerzeugung und Transkriptprüfung, nur für Entwicklung |
 | `tests/` | Node-Tests ohne Browser oder GPU |
 

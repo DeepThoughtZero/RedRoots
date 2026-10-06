@@ -49,6 +49,8 @@ Das Spiel besteht aus purem HTML, CSS und JavaScript. Es werden keine externen S
   - `Mausrad scrollen`: Zoom
   - `R` oder `Rechtsklick`: Figur rotieren
   - `Strg+Z`: Rückgängig
+  - `Esc`: Dialog oder Menü schließen
+  - `P` / `.`: Pause bzw. eine Generation weiter (Kampagne)
 - **Überleben:** Conway's Game of Life Kernregeln gelten (Unterbevölkerung, Überleben, Überbevölkerung, Wachstum). Bei uns entscheidet die *Mehrheitsregel* bei Geburten in Konfliktzonen.
 
 
@@ -142,7 +144,9 @@ Akt II setzt die Rettung der Hellas-Siedlungen fort: zwei Versorgungswege, gleic
 ## 🛠️ Architektur
 
 - `index.html`: UI-Struktur.
-- `css/style.css`: Custom Styling und Mars-Hintergründe.
+- `css/style.css`: Eigenes Designsystem (Farb-, Abstands- und Schrift-Tokens in `:root`), Spiel-Layout als CSS-Grid und responsive Regeln.
+- `assets/fonts/`: Selbst gehostete variable Schriften (Inter, Space Grotesk, Fira Code) samt OFL-Lizenztexten.
+- `assets/ui/`: Oberflächenbilder (Startbild, Häuserporträts) als WebP.
 - `js/utils/Constants.js`: Farben, Häuser und Figuren.
 - `js/core/`: Spiel-Engine (`GameState`, `Grid`, `Territory`, `AI`, `InputHandler`).
 - `js/ui/`: Visuelles Rendering auf dem Canvas und Menüsteuerung.
