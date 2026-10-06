@@ -34,7 +34,7 @@ CAMPAIGN_MISSIONS.push(
 
         patterns:[...ACT2_PATTERNS,'r_pentomino','lwss'],reward:'diehard',rounds:3,steps:96,budget:12,
         objective:{type:'evacuate',value:96,protect:['landing'],label:'96 Generationen überstehen: fremde Flora vom Landeplatz fernhalten'},
-        bonuses:[{type:'rounds',value:1,label:'Die erste Evakuierungsfrist einhalten'},{type:'spent',value:8,label:'Höchstens 8 Genmaterial einsetzen'}],
+        bonuses:[{type:'margin',value:9,zones:['landing'],label:'Fremde Flora stets mehr als 8 Felder vom Landeplatz fernhalten'},{type:'spent',value:8,label:'Höchstens 8 Genmaterial einsetzen'}],
         map:{territory:[[0,10,16,19,28]],rocks:[[0,4,5,7],[25,36,29,38]],camps:[{id:0,rMin:10,rMax:12,cMin:26,cMax:28}],seeds:[{pattern:'glider',r:1,c:34,owner:-1,mirror:true}],zones:[{id:'landing',label:'EVAKUIERUNG',rMin:22,rMax:27,cMin:6,cMax:13}]}
     },
     {

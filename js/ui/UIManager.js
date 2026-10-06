@@ -502,6 +502,7 @@ class UIManager {
 
     handlePhaseChange(phase) {
         this.elGamePhaseDisplay.textContent = phase;
+        if (this.gameState.objectiveSystem) this.campaign?.onPhaseChange(phase);
         
         if (phase === CONSTANTS.PHASE_SIMULATION) {
             if (this.audio) this.audio.setSituation('simulation');

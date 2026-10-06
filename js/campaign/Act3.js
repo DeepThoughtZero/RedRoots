@@ -13,7 +13,7 @@ CAMPAIGN_MISSIONS.push(
         hint:'Die nummerierten Zielbereiche müssen in Reihenfolge erreicht werden. Mehrere Gleiter auf getrennten Bahnen können zu verschiedenen Zeiten ankommen. Ihre Entfernung zu den Schaltern bestimmt die Reihenfolge. Zu frühe Kontakte sind endgültig.',
         patterns:ACT3_PATTERNS,reward:null,rounds:2,steps:48,budget:15,
         objective:{type:'orderedZones',zones:['one','two','three'],label:'Schalter 1 → 2 → 3 in dieser Reihenfolge mit lebender Flora erreichen'},
-        bonuses:[{type:'rounds',value:2,label:'Alle Schalter im ersten Zeitfenster öffnen'},{type:'spent',value:15,label:'Höchstens 15 Genmaterial einsetzen'}],
+        bonuses:[{type:'margin',value:5,zones:['two','three'],label:'Wartenden Schaltern nie näher als 5 Felder kommen'},{type:'spent',value:15,label:'Höchstens 15 Genmaterial einsetzen'}],
         map:{rows:36,cols:60,territory:[[0,3,3,9,33]],rocks:[[0,38,12,39],[28,10,35,11]],zones:[{id:'one',label:'1 · ZUGANG',rMin:12,rMax:15,cMin:12,cMax:15},{id:'two',label:'2 · FREIGABE',rMin:18,rMax:21,cMin:30,cMax:33},{id:'three',label:'3 · TOR',rMin:24,rMax:27,cMin:48,cMax:51}]}
     },
     {
@@ -33,7 +33,7 @@ CAMPAIGN_MISSIONS.push(
         hint:'Beide grauen Gleiter bewegen sich nach links unten. Jede Front benötigt eine eigene Kollision. Platziere sparsam und halte eine Reservekolonie abseits der Flugbahnen am Leben. Eine einzige abgefangene Front reicht diesmal nicht.',
         patterns:[...ACT3_PATTERNS,'rabbits'],reward:null,rounds:2,steps:48,budget:16,
         objective:{type:'evacuate',value:96,protect:['west','east'],label:'Beide Rettungsplätze 96 Generationen schützen und eigene Flora erhalten'},
-        bonuses:[{type:'generations',value:96,label:'Beide Fähren beim ersten Druckausgleich retten'},{type:'spent',value:12,label:'Höchstens 12 Genmaterial einsetzen'}],
+        bonuses:[{type:'margin',value:9,zones:['west','east'],label:'Fremde Flora stets mehr als 8 Felder von beiden Rettungsplätzen fernhalten'},{type:'spent',value:12,label:'Höchstens 12 Genmaterial einsetzen'}],
         map:{rows:50,cols:64,territory:[[0,10,16,19,28],[0,26,40,35,52]],rocks:[[0,3,7,6],[42,49,49,52]],camps:[{id:0,rMin:18,rMax:19,cMin:26,cMax:28}],seeds:[{pattern:'glider',r:1,c:34,owner:-1,mirror:true},{pattern:'glider',r:17,c:58,owner:-1,mirror:true}],zones:[{id:'west',label:'RETTUNG WEST',rMin:22,rMax:27,cMin:6,cMax:13},{id:'east',label:'RETTUNG OST',rMin:38,rMax:43,cMin:30,cMax:37}]}
     },
     {

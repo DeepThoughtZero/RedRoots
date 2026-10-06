@@ -62,6 +62,11 @@ const suites = [
         desc: 'Langzeitziele, Großkarten, Sperrkorridore, Codes und finale Entscheidung'
     },
     {
+        name: 'Ebene 4f: Missionsrückmeldung & Spannung',
+        file: 'tests/objectives.test.cjs',
+        desc: 'Bedrohungsabstand, Ereignisse, Zonenstatus, Niederlagenanalyse, Abstandsboni'
+    },
+    {
         name: 'Ebene 5a: Audio-Steuerung & Sprachausgabe',
         file: 'tests/audio.test.cjs',
         desc: 'GameAudio, Ambience-Ducking, Tab-Pause, Browser-TTS Fallback'

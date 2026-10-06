@@ -351,3 +351,21 @@ canvas {
 @media(max-width:1024px) and (orientation:landscape) { .mission-art img { max-height:220px;object-fit:contain; } }
 .sector-report { margin-top:20px;padding:16px;border-left:2px solid #9cdcc5;background:#83dbc008; }
 .sector-report p { margin:8px 0 0; }
+
+/* Mission tension feedback: threats, countdowns, event toasts and failure analysis. */
+.objective-alert { border-left:4px solid #ffb347;padding-left:8px;color:#ffd7a8!important; }
+.objective-alert.alarm { border-left-color:#ff4d5e;color:#ffc2c9!important;background:#ff4d5e1f; }
+.objective-countdown { white-space:nowrap; }
+.objective-countdown.urgent { color:#ff9fab;font-weight:800; }
+.mission-toast { position:absolute;z-index:20;left:50%;bottom:64px;transform:translateX(-50%);width:max-content;display:flex;align-items:center;gap:12px;max-width:min(560px,calc(100% - 32px));padding:10px 14px;background:#0c1722f2;border:1px solid #8bf5c777;border-left:5px solid #8bf5c7;border-radius:8px;color:#e8f6f1;font-size:16px;line-height:1.4;box-shadow:0 8px 24px #0008; }
+.mission-toast.urgent { border-color:#ff4d5e;border-left-color:#ff4d5e;background:#2a0f16f2; }
+.mission-toast[hidden] { display:none; }
+.mission-toast button { flex-shrink:0;min-height:44px;min-width:44px;padding:0 12px;white-space:nowrap;font-size:15px; }
+@media(min-width:1025px) { .in-mission .mission-toast { left:calc(50% - 144px); } }
+@media(max-width:1024px) and (orientation:landscape) { .mission-toast { bottom:60px;font-size:15px;padding:6px 10px; } .mission-hud > .objective-alert { display:block;clear:both;font-size:13px;margin:0; } }
+.result-analysis { list-style:none;margin:12px 0;padding:12px 16px;border-left:3px solid #ff8a96;background:#ff4d5e14;color:#f3d5d9;font-size:16px;line-height:1.6; }
+.failure-return { position:fixed;z-index:60;width:auto;left:50%;bottom:24px;transform:translateX(-50%);min-height:48px; }
+/* Compact screens have no HUD toggle; the compact strip stays visible so alarms remain readable. */
+@media(max-width:1024px) { .mission-hud.collapsed { transform:none; } .mission-toast { bottom:calc(min(230px,35dvh) + 64px); } }
+@media(max-width:1024px) and (orientation:landscape) { .mission-toast { left:calc((100% - 280px) / 2);bottom:64px;max-width:calc(100% - 300px); } }
+@media(max-width:1024px) and (orientation:landscape) and (max-height:500px) { .mission-hud-body > h2, .mission-hud-body > p:not(.objective-progress) { display:none; } .mission-hud-body > .objective-progress { display:block;clear:both;font-size:13px;margin:0; } }

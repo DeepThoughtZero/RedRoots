@@ -110,7 +110,7 @@ Jede Maßnahme ist mit Aufwand (S/M/L), betroffenen Dateien und Prüfung angegeb
 **A3 · Ereignis-Toasts und kurze Signale** · M
 - `ObjectiveSystem` legt Ereignisse in einer Warteschlange ab, zum Beispiel `{type, zoneId, generation}`. Typen: Archiv oder Schalter gesichert, Haltezähler unterbrochen, Eroberung begonnen oder abgeschlossen, Haus besiegt (`defeatedPlayers`), Warnung, Alarm, letzte 10 Generationen.
 - `CampaignManager` zeigt sie als Toast im HUD (`aria-live="polite"`). Höchstens ein Toast pro 1,5 s, Duplikate werden zusammengefasst. Optional gibt es die Taste „Zum Ereignis springen“, die die Kamera zur Zone bewegt. Automatische Kamerafahrten gibt es nicht.
-- Signale werden lokal per WebAudio-Oszillator erzeugt (keine Assets, keine KI) oder als kleine, CPU-gestaltete MP3 mit Herkunftseintrag in `ambience-manifest.json`. Lautstärke über einen eigenen Regler „Signale“ oder über den Atmosphäre-Regler. Standardmäßig stumm, wie bisher.
+- Signale werden lokal per WebAudio-Oszillator erzeugt (keine Assets, keine KI) oder als kleine, CPU-gestaltete MP3 mit Herkunftseintrag in `ambience-manifest.json`. Lautstärke über einen eigenen Regler „Signale“. Umgesetzt: Synthese per WebAudio, Standardlautstärke 50 %, hörbar erst nach der ersten Interaktion; Regler auf 0 schaltet die Signale ab.
 - Prüfung: `tests/audio.test.cjs` um Cues erweitern (Stummschaltung, Lautstärke, kein Abspielen bei verborgenem Tab).
 
 **A4 · Countdown und Uhr** · S
@@ -325,6 +325,12 @@ Abnahme:
 - `node tests/run-all.cjs` ist grün.
 - Browserprüfung bei 844×390, 1024×768 und auf dem Desktop: keine Überlagerung von HUD, Toasts und Zoomtasten.
 - Signale respektieren Stummschaltung, Regler und verborgenen Tab.
+
+**Status: umgesetzt (Oktober 2026).**
+- `ObjectiveSystem` liefert `zoneStatus`, `countdown`, `worstThreat`, eine Ereigniswarteschlange (`events`), die Niederlagenanalyse (`result.failure`, `result.details`) und den Bonustyp `margin` (geringster gemessener Abstand ≥ Wert, optional auf `zones` begrenzt).
+- Bonus-Audit: A2_M03 und A3_M03 verlangen jetzt mehr als 8 Felder Abstand zu den Rettungsplätzen. A3_M01 verlangt mindestens 5 Felder Abstand zu wartenden Schaltern. A5_M02 verlangt, dass kein Habitat in Alarmstufe gerät. Die Referenzlösungen von A2_M03, A3_M01 und A3_M03 erreichen weiterhin drei Sterne (`tests/objectives.test.cjs`). Für A5_M02 gibt es keine automatisch geprüfte Lösung.
+- Nebenbei behoben: Auf Bildschirmen bis 1024 px verschwand das HUD nach der ersten Platzierung vollständig, weil der Aufklappknopf dort ausgeblendet ist. Das kompakte HUD bleibt jetzt sichtbar. Auf niedrigen Querformat-Bildschirmen haben Warnung und Fortschritt Vorrang vor dem Zieltext.
+- Bewusst nicht umgesetzt: Zeitlupe und Rennuhr. Sie gehören zu Phase 2 (B2, B5).
 
 ### Phase 2 – „Noch ein Versuch“
 Umfang: B1–B5 sowie `aiSeed` für A1_M05, A2_M04 und A3_M04.

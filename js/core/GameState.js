@@ -88,6 +88,9 @@ class GameState {
 
     changePhase(newPhase) {
         this.phase = newPhase;
+        // Placements of the current round, so the board can highlight fresh enemy colonies.
+        if (newPhase === CONSTANTS.PHASE_PLACEMENT) this.roundPlacements = Array.from({ length: this.playerCount }, () => []);
+        if (newPhase === CONSTANTS.PHASE_SIMULATION) this.simulationStartedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
         if (this.onPhaseChange) this.onPhaseChange(this.phase);
 
         if (this.phase === CONSTANTS.PHASE_SIMULATION) {
@@ -182,6 +185,7 @@ class GameState {
 
         if (!this.undoStack) this.undoStack = [];
         this.undoStack.push(delta);
+        this.roundPlacements?.[this.currentPlayer]?.push(delta.cells.map(({ r, c }) => ({ r, c })));
 
         if (!this.isSandbox) {
             this.budgets[this.currentPlayer] -= pattern.length;
@@ -221,6 +225,7 @@ class GameState {
         if (!this.undoStack || this.undoStack.length === 0) return false;
 
         const delta = this.undoStack.pop();
+        if (delta.type === 'placement') this.roundPlacements?.[this.currentPlayer]?.pop();
         
         // Restore cells
         for (const cellData of delta.cells) {

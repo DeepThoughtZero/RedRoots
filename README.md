@@ -56,6 +56,8 @@ Fünf Akte mit fünfundzwanzig handgebauten Missionen sind spielbar. Akt I führ
 
 Mission 1 beginnt ausschließlich mit Einzelzellen: Eine Anordnung, die zwölf Generationen überlebt, muss selbst gefunden werden. Die erste Mission läuft bewusst langsam (0,8 Sekunden je Generation) und zeigt den Endzustand kurz vor dem Ergebnis. Der Sieg schaltet die Block-Vorlage frei; nach Mission 2 folgen Gleiter und Blinker. Auch beim Wiederholen bleiben die missionsspezifischen Musterbeschränkungen bestehen.
 
+**Lagebild während der Mission:** Zielzonen zeigen ihren Zustand direkt auf dem Spielfeld – gesicherte Archive und Schalter mit ✓, der nächste Schalter pulsiert, wartende Schalter sind als „WARTET“ markiert, Halte- und Eroberungsziele haben einen Fortschrittsbalken (z. B. `4/8`). Nähert sich Flora einer Schutzzone, dem eigenen Habitat oder einer roten Sperrzone (dort zählt auch eigene Flora), färbt sich der Rand orange (≤ 8 Felder) bzw. pulsiert rot (≤ 3 Felder); das HUD nennt Zone und Abstand. Fristen erscheinen als Countdown (⏱). Kurze Meldungen über dem Spielfeld berichten von gesicherten Zielen, verlorenen Haltezählern, eroberten Camps und gegnerischer Aussaat („Aufklärung“); **Zum Ort** springt mit der Kamera dorthin. Neue gegnerische Kolonien werden zu Beginn der Evolution kurz umrandet, vorgegebene Gleiter und Raumschiffe zeigen in der ersten Planungsphase einen Richtungspfeil. Nach einer Niederlage nennt der Bericht Generation, Ort und Herkunft des Durchbruchs sowie den besten erreichten Wert; **Moment ansehen** zeigt die Stelle auf dem Spielfeld. Unter **Ton & Atmosphäre** regelt **Signale** die kurzen, lokal erzeugten Hinweistöne (Regler auf 0 schaltet sie ab); bei Alarm oder kurz vor dem Ziel wechselt die Hintergrundmusik in eine angespanntere Variante.
+
 Die Marskarte öffnet weitere Sektoren nach einem Sieg. Zwei optionale Herausforderungen vergeben zusätzliche Sterne; bei Wiederholungen bleibt die beste Wertung erhalten. Genome und kurze Sektorberichte werden nach und nach freigeschaltet. Kampagnenfortschritt wird separat unter `redroots_campaign_v1` im lokalen Browserspeicher abgelegt. Gelöschte Browserdaten löschen auch diesen Fortschritt. Laufende Missionen beginnen nach Neuladen von vorn.
 
 Auf der Marskarte findest du unten **Expedition / Spielstand**:
@@ -112,6 +114,7 @@ node tests/ai.test.cjs           # Ebene 3: KI-Budgetdisziplin & Grenzfälle
 node tests/campaign.test.cjs     # Ebene 4: Akt I Lösungswege, Reset & Codes
 node tests/act2.test.cjs         # Ebene 4: Akt II Versorgung & Hold-Zonen
 node tests/act3.test.cjs         # Ebene 4: Akt III Schalter, Pulse & Quarantäne
+node tests/objectives.test.cjs   # Ebene 4: Bedrohungsabstand, Ereignisse, Niederlagenanalyse & Abstandsboni
 node tests/audio.test.cjs        # Ebene 5: GameAudio, Ducking, Tab-Pause & TTS
 node tests/audio-assets.test.cjs # Ebene 5: Audio-Aufnahmen & SHA-256 Integrität
 

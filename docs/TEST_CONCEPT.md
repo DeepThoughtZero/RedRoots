@@ -126,6 +126,12 @@ Validiert alle Missionslösungen und Spielstandsmechaniken:
 
 ---
 
+- **Missionsrückmeldung (`tests/objectives.test.cjs`):**
+  - Bedrohungsstufen (Warnung ≤ 8, Alarm ≤ 3 Felder, Chebyshev-Abstand) für Schutz-, Steril- und Habitatzonen sowie wartende Schalter; jede Eskalation wird genau einmal gemeldet.
+  - Zonenstatus (`next`/`locked`/`done`, Halte- und Eroberungsfortschritt), Countdowns, Ereigniswarteschlange.
+  - Niederlagenanalyse (Ort, Generation, Herkunft, Beinahe-Wert) und Abstandsboni (`margin`) mit den Referenzlösungen.
+  - Aufklärung: Platzierungen je Runde inklusive Undo und echter KI; Richtungserkennung vorgegebener Raumschiffe.
+
 ### Ebene 5: Audio & Systemtests (`tests/audio.test.cjs`)
 Verifikation des Klang- und Narrationssystems:
 - **Standardzustand:** Standardmäßig stummgeschaltet, kein Autoplay-Verstoß.
@@ -134,6 +140,7 @@ Verifikation des Klang- und Narrationssystems:
 - **Visibility API:** Automatisches Stummschalten/Pausieren bei `document.hidden = true` (Tab-Wechsel).
 - **Persistenz:** Lautstärke-Einstellungen bleiben in `redroots_audio_v1` erhalten.
 - **Browser-TTS Fallback:** Sprachausgabe mit deutscher Systemstimme (`de-DE`) für dynamische Berichte.
+- **Signale:** Lokal per Web Audio erzeugte Hinweistöne bleiben ohne Web-Audio-Unterstützung, vor der ersten Interaktion, in verborgenen Tabs und bei Lautstärke 0 stumm; schnelle Wiederholungen werden gedrosselt; der Regler wird gespeichert.
 
 ---
 
@@ -143,7 +150,7 @@ Verifikation des Klang- und Narrationssystems:
 ```bash
 node tests/run-all.cjs
 ```
-Führt alle sieben Testsuiten nacheinander aus, misst die Laufzeiten und gibt einen übersichtlichen Erfolgs- oder Fehlerbericht aus.
+Führt alle Testsuiten (derzeit elf) nacheinander aus, misst die Laufzeiten und gibt einen übersichtlichen Erfolgs- oder Fehlerbericht aus.
 
 ### Einzelne Suiten ausführen
 ```bash

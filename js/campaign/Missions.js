@@ -58,6 +58,21 @@ const CAMPAIGN_MISSIONS = [
 ];
 
 class MissionManager {
+    static seedCells(seed) { return CONSTANTS.PATTERNS[seed.pattern].pattern.map(([r, c]) => [seed.r + r, seed.c + (seed.mirror ? -c : c)]); }
+    // Detects spaceships among predefined flora on an unbounded plane: same shape, shifted after one period.
+    static seedMotion(seed, maxPeriod = 8) {
+        const shape = cells => { const minR = Math.min(...cells.map(p => p[0])), minC = Math.min(...cells.map(p => p[1])); return { minR, minC, key: cells.map(([r, c]) => `${r - minR},${c - minC}`).sort().join(';') }; };
+        const start = MissionManager.seedCells(seed), origin = shape(start);
+        let cells = start;
+        for (let period = 1; period <= maxPeriod && cells.length; period++) {
+            const alive = new Set(cells.map(([r, c]) => `${r},${c}`)), counts = new Map();
+            for (const [r, c] of cells) for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) if (dr || dc) { const k = `${r + dr},${c + dc}`; counts.set(k, (counts.get(k) || 0) + 1); }
+            cells = [...counts].filter(([k, n]) => n === 3 || (n === 2 && alive.has(k))).map(([k]) => k.split(',').map(Number));
+            const now = shape(cells);
+            if (now.key === origin.key && (now.minR !== origin.minR || now.minC !== origin.minC)) return { dr: now.minR - origin.minR, dc: now.minC - origin.minC, period };
+        }
+        return null;
+    }
     static config(mission) {
         return { rows: mission.map.rows || 30, cols: mission.map.cols || 48, rounds: mission.rounds, steps: mission.steps, playerCount: mission.enemies ? Math.max(1, ...mission.enemies.map(e => e.house)) + 1 : 2,
             humanFlags: [true, false, false, false], radius: mission.radius || 5, budgetFactor: mission.budgetFactor || 25, rocks: 0, collisionRule: 'majority', scenario: mission };
@@ -69,7 +84,7 @@ class MissionManager {
         const rect = (a, fn) => { for (let r = a[0]; r <= a[2]; r++) for (let c = a[1]; c <= a[3]; c++) fn(r, c); };
         mission.map.territory.forEach(([owner, ...a]) => rect(a, (r, c) => state.territory.territoryMap[r][c] = owner));
         mission.map.rocks.forEach(a => rect(a, (r, c) => state.grid.setCell(r, c, CONSTANTS.OWNER_ROCK, true)));
-        (mission.map.seeds || []).forEach(s => CONSTANTS.PATTERNS[s.pattern].pattern.forEach(([r, c]) => state.grid.setCell(s.r + r, s.c + (s.mirror ? -c : c), s.owner, true)));
+        (mission.map.seeds || []).forEach(s => MissionManager.seedCells(s).forEach(([r, c]) => state.grid.setCell(r, c, s.owner, true)));
         state.budgets = Array(state.playerCount).fill(0);
         state.budgets[0] = mission.budget;
         if (mission.enemies) mission.enemies.forEach(e => { state.budgets[e.house] = e.budget; state.playerStrengths[e.house] = e.strength || 'hard'; });

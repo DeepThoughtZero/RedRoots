@@ -169,6 +169,14 @@ class CampaignManager {
         this.hudCollapsed = false;
         this.hasAutoCollapsed = false;
         document.querySelector('#app > main').prepend(this.hud);
+        // Event toasts sit above the board; they repeat nothing that the HUD does not also show.
+        this.toast = document.createElement('div');
+        this.toast.className = 'mission-toast';
+        this.toast.setAttribute('role', 'status');
+        this.toast.setAttribute('aria-live', 'polite');
+        this.toast.hidden = true;
+        document.querySelector('#app > main').append(this.toast);
+        this.toastQueue = [];
         document.getElementById('btnCampaign').onclick = () => this.showMap();
         // A page transition disposes all simulation timers, canvas listeners and AI work.
         const params = new URLSearchParams(location.search);
@@ -296,22 +304,96 @@ class CampaignManager {
         const o = s.objectiveSystem, m = s.scenario;
         const target = this.hudBody || this.hud;
         this.hintOpen = target.querySelector('details')?.open ?? this.hintOpen;
-        target.innerHTML = `<div class="mission-eyebrow">AKT ${CAMPAIGN_ACTS.find(a => a.id === m.act).roman} / SEKTOR ${String(this.selected+1).padStart(2,'0')}<a href="${location.pathname}?campaign">Marskarte ↗</a></div><h2>${m.title}</h2><p>${m.objective.label}</p>${o.progressText ? `<p class="objective-progress">${o.progressText}</p>` : ''}<div class="hud-telemetry"><span>GEN ${String(o.generations).padStart(3,'0')}</span><span>${o.spent} MATERIAL EINGESETZT</span></div><details><summary>Ziel & taktischer Hinweis</summary><p><strong>${m.objective.label}</strong></p><p>${m.hint}</p></details>`;
+        const countdown = s.phase !== CONSTANTS.PHASE_GAMEOVER ? o.countdown() : null, threat = o.worstThreat();
+        const threatText = threat && !threat.distance ? (threat.kind === 'locked' ? 'zu früh berührt' : 'Flora hat die Zone erreicht') : threat ? (threat.kind === 'locked' ? `eigene Flora ${threat.distance} Felder entfernt – Schalter wartet noch` : threat.kind === 'sterile' ? `Flora ${threat.distance} Felder vor der Sperrzone` : `fremde Flora ${threat.distance} Felder entfernt`) : '';
+        const progress = [o.progressText, countdown ? `<span class="objective-countdown${countdown.remaining <= 10 ? ' urgent' : ''}">⏱ ${countdown.label} ${countdown.remaining} Gen.</span>` : ''].filter(Boolean).join(' · ');
+        target.innerHTML = `<div class="mission-eyebrow">AKT ${CAMPAIGN_ACTS.find(a => a.id === m.act).roman} / SEKTOR ${String(this.selected+1).padStart(2,'0')}<a href="${location.pathname}?campaign">Marskarte ↗</a></div><h2>${m.title}</h2><p>${m.objective.label}</p>${threat ? `<p class="objective-progress objective-alert ${threat.level}">⚠ ${threat.label}: ${threatText}</p>` : ''}${progress ? `<p class="objective-progress">${progress}</p>` : ''}<div class="hud-telemetry"><span>GEN ${String(o.generations).padStart(3,'0')}</span><span>${o.spent} MATERIAL EINGESETZT</span></div><details><summary>Ziel & taktischer Hinweis</summary><p><strong>${m.objective.label}</strong></p><p>${m.hint}</p></details>`;
         // Preserve an opened hint across frequent simulation renders.
         if (this.hintOpen) target.querySelector('details').open = true;
         if (!this.hasAutoCollapsed && s.undoStack?.some(d => d.type === 'placement')) {
             this.onFirstPlacement();
         }
+        this.processEvents();
+    }
+    // Turns objective events into toasts and signals and drives the simulation's tension music.
+    processEvents() {
+        const s = this.ui.gameState, o = s?.objectiveSystem;
+        if (!o) return;
+        const audio = this.ui.audio;
+        for (const e of o.events.splice(0)) {
+            const zone = e.zoneId === 'camp' ? s.territory.camps.find(c => c.id === 0) : o.zone(e.zoneId);
+            if (e.type === 'collect' || e.type === 'switch') this.notify(`✓ ${e.label} gesichert`, 'success', zone);
+            if (e.type === 'captured') this.notify(`✓ ${e.label} erobert`, 'success', zone);
+            if (e.type === 'houseDefeated') this.notify(`${CONSTANTS.PLAYER_COLORS[e.house].name} sät nicht mehr nach`, 'success');
+            if (e.type === 'captureLost') this.notify(`${e.label}: Mehrheit verloren – Eroberung beginnt neu`, 'lost', zone);
+            if (e.type === 'holdLost') this.notify(`Kontakt verloren nach ${e.held} Generationen – Haltezähler neu`, 'lost');
+            if (e.type === 'threat') {
+                const what = e.kind === 'locked' ? 'Eigene Flora nähert sich dem wartenden Schalter' : e.kind === 'sterile' ? 'Flora nähert sich der Sperrzone' : 'Fremde Flora nähert sich';
+                this.notify(`${e.level === 'alarm' ? '⛔ ALARM' : '⚠'} ${e.label}: ${what} (${e.distance} Felder)`, e.level, zone, `threat:${e.zoneId}`);
+            }
+        }
+        if (s.phase !== CONSTANTS.PHASE_SIMULATION || !audio) return;
+        const countdown = o.countdown();
+        if (countdown && countdown.remaining > 0 && countdown.remaining <= 5 && countdown.remaining !== this.lastTick) { this.lastTick = countdown.remaining; audio.cue('tick'); }
+        const goal = s.scenario.objective, nearGoal = (goal.zones || []).some(id => (o.zoneStatus(id).progress || 0) >= .75);
+        if (o.worstThreat()?.level === 'alarm' || nearGoal) { this.calmSince = null; audio.setSituation('tension'); }
+        else if (audio.currentSituation === 'tension') {
+            this.calmSince ??= o.generations;
+            if (o.generations - this.calmSince >= 30) { this.calmSince = null; audio.setSituation('simulation'); }
+        }
+    }
+    notify(text, cue, zone = null, key = null) {
+        if (cue) this.ui.audio?.cue?.(cue);
+        if (!this.toast) return;
+        // A newer message about the same zone replaces an older one that is still waiting or showing.
+        if (key) this.toastQueue = this.toastQueue.filter(t => t.key !== key);
+        this.toastQueue.push({ text, zone, key, urgent: cue === 'alarm' });
+        if (key && this.toastTimer && this.currentToastKey === key) { clearTimeout(this.toastTimer); this.toastTimer = null; }
+        // Keep the queue short; alarms are never dropped in favour of older news.
+        while (this.toastQueue.length > 3) { const stale = this.toastQueue.findIndex(t => !t.urgent); this.toastQueue.splice(stale < 0 ? 0 : stale, 1); }
+        if (!this.toastTimer) this.nextToast();
+    }
+    nextToast() {
+        const item = this.toastQueue.shift();
+        this.currentToastKey = item?.key;
+        if (!item) { this.toast.hidden = true; this.toastTimer = null; return; }
+        this.toast.hidden = false;
+        this.toast.className = `mission-toast${item.urgent ? ' urgent' : ''}`;
+        this.toast.innerHTML = `<span></span>${item.zone ? '<button type="button" class="quiet-button">Zum Ort</button>' : ''}`;
+        this.toast.querySelector('span').textContent = item.text;
+        if (item.zone) this.toast.querySelector('button').onclick = () => this.ui.renderer?.focusCell((item.zone.rMin + item.zone.rMax) / 2, (item.zone.cMin + item.zone.cMax) / 2);
+        this.toastTimer = setTimeout(() => this.nextToast(), item.urgent ? 3200 : 2400);
+    }
+    onPhaseChange(phase) {
+        const s = this.ui.gameState;
+        if (phase !== CONSTANTS.PHASE_SIMULATION || !s?.roundPlacements) return;
+        s.roundPlacements.forEach((placements, player) => {
+            if (player && placements.length) this.notify(`Aufklärung: ${CONSTANTS.PLAYER_COLORS[player].name} setzt ${placements.length} neue ${placements.length === 1 ? 'Kolonie' : 'Kolonien'}`, null);
+        });
     }
     showResult() {
         this.ui.audio.stopNarration();
+        clearTimeout(this.toastTimer); this.toastTimer = null; this.toastQueue = []; this.toast.hidden = true;
+        this.updateHUD();
+        document.querySelector('.failure-return')?.remove();
         const s = this.ui.gameState, result = s.objectiveSystem.result, m = s.scenario;
         const newlyUnlocked = result.success && !this.progress.completed[m.id];
         if (result.success) this.progress.record(m.id, result.stars);
         this.overlay.hidden = false;
         const ending = m.finalChoices && result.success ? `<section class="campaign-completion"><div class="mission-eyebrow">DIE GEMEINSAME ZUKUNFT</div><h2>${this.progress.finalChoice ? 'Entscheidung gespeichert' : 'Wer trägt die Verantwortung?'}</h2><p>${this.progress.finalChoice ? m.finalChoices.find(c => c.id === this.progress.finalChoice).text : 'Beide Wege bewahren das verteilte Netz. Sie unterscheiden sich darin, wem Kontrolle und Wissen anvertraut werden.'}</p>${this.progress.finalChoice ? `<strong>${m.finalChoices.find(c => c.id === this.progress.finalChoice).title}</strong>` : m.finalChoices.map(c => `<button class="quiet-button" data-ending="${c.id}"><strong>${c.title}</strong><br>${c.text}</button>`).join('')}</section>` : '';
-        this.overlay.innerHTML = `<div class="mission-result"><div class="mission-eyebrow">LANDEFÄHRE / MISSIONSBERICHT</div><div class="result-stars">${'★'.repeat(result.stars)}${'☆'.repeat(3-result.stars)}</div><h1>${result.success ? 'Wurzeln geschlagen.' : 'Signal verloren.'}</h1><h2>${m.title}</h2><p>${result.reason}</p>${this.ui.audio.narrationButton(m, result.success ? 'debriefing' : 'failure')}${this.ui.audio.controls()}<ul class="result-objectives"><li>${result.success ? '✓' : '○'} ${m.objective.label}</li>${m.bonuses.map((b,i) => `<li>${result.bonuses[i] ? '★' : '☆'} ${b.label}</li>`).join('')}</ul>${result.success && m.reward ? `<div class="genome-reward"><span>${newlyUnlocked ? 'NEUE GENOMSTRUKTUR ENTDECKT' : 'GENOM ARCHIVIERT'}</span><strong>${[m.reward, ...(m.additionalRewards || [])].filter(Boolean).map(key => CONSTANTS.PATTERNS[key].name).join(' + ')}</strong></div>` : !result.success ? `<p class="result-hint">${m.hint}</p>` : ''}${ending}${!this.progress.storageAvailable ? '<p>Fortschritt konnte nicht gespeichert werden.</p>' : ''}${result.success ? `<div class="result-code"><label for="resultCode">Expeditionscode zum Mitnehmen</label><input id="resultCode" readonly value="${this.progress.exportCode()}" onclick="this.select()"><small>Sektorpasswort: ${CampaignState.passwords[Math.min(this.selected + 1, CAMPAIGN_MISSIONS.length - 1)]}</small></div>` : ''}<div class="result-actions"><a class="quiet-button" href="${location.pathname}?campaign">Zur Marskarte</a><button class="launch-button" id="resultContinue">${result.success && this.selected < CAMPAIGN_MISSIONS.length - 1 ? 'Nächster Sektor · Marskarte →' : result.success ? 'Expedition auf der Marskarte ansehen →' : 'Erneut versuchen ↻'}</button></div>${result.success && this.selected === CAMPAIGN_MISSIONS.length - 1 ? '<p class="mission-eyebrow">AKT V ABGESCHLOSSEN · DAS NETZ IST GETEILT UND VERBUNDEN</p>' : ''}</div>`;
+        this.overlay.innerHTML = `<div class="mission-result"><div class="mission-eyebrow">LANDEFÄHRE / MISSIONSBERICHT</div><div class="result-stars">${'★'.repeat(result.stars)}${'☆'.repeat(3-result.stars)}</div><h1>${result.success ? 'Wurzeln geschlagen.' : 'Signal verloren.'}</h1><h2>${m.title}</h2><p>${result.reason}</p>${this.ui.audio.narrationButton(m, result.success ? 'debriefing' : 'failure')}${this.ui.audio.controls()}${result.details?.length ? `<ul class="result-analysis">${result.details.map(d => `<li>${d}</li>`).join('')}</ul>${result.failure?.cells.length ? '<button type="button" class="quiet-button" id="viewFailure">Moment ansehen</button>' : ''}` : ''}<ul class="result-objectives"><li>${result.success ? '✓' : '○'} ${m.objective.label}</li>${m.bonuses.map((b,i) => `<li>${result.bonuses[i] ? '★' : '☆'} ${b.label}</li>`).join('')}</ul>${result.success && m.reward ? `<div class="genome-reward"><span>${newlyUnlocked ? 'NEUE GENOMSTRUKTUR ENTDECKT' : 'GENOM ARCHIVIERT'}</span><strong>${[m.reward, ...(m.additionalRewards || [])].filter(Boolean).map(key => CONSTANTS.PATTERNS[key].name).join(' + ')}</strong></div>` : !result.success ? `<p class="result-hint">${m.hint}</p>` : ''}${ending}${!this.progress.storageAvailable ? '<p>Fortschritt konnte nicht gespeichert werden.</p>' : ''}${result.success ? `<div class="result-code"><label for="resultCode">Expeditionscode zum Mitnehmen</label><input id="resultCode" readonly value="${this.progress.exportCode()}" onclick="this.select()"><small>Sektorpasswort: ${CampaignState.passwords[Math.min(this.selected + 1, CAMPAIGN_MISSIONS.length - 1)]}</small></div>` : ''}<div class="result-actions"><a class="quiet-button" href="${location.pathname}?campaign">Zur Marskarte</a><button class="launch-button" id="resultContinue">${result.success && this.selected < CAMPAIGN_MISSIONS.length - 1 ? 'Nächster Sektor · Marskarte →' : result.success ? 'Expedition auf der Marskarte ansehen →' : 'Erneut versuchen ↻'}</button></div>${result.success && this.selected === CAMPAIGN_MISSIONS.length - 1 ? '<p class="mission-eyebrow">AKT V ABGESCHLOSSEN · DAS NETZ IST GETEILT UND VERBUNDEN</p>' : ''}</div>`;
         this.overlay.querySelectorAll('[data-ending]').forEach(button => button.onclick = () => { this.progress.chooseEnding(button.dataset.ending); this.showResult(); });
+        const viewFailure = this.overlay.querySelector('#viewFailure');
+        if (viewFailure) viewFailure.onclick = () => {
+            this.overlay.hidden = true;
+            const back = document.createElement('button');
+            back.type = 'button'; back.className = 'launch-button failure-return'; back.textContent = 'Zurück zum Bericht';
+            back.onclick = () => { back.remove(); this.overlay.hidden = false; this.overlay.querySelector('#viewFailure').focus(); };
+            document.body.append(back);
+            const { r, c } = result.failure.cells[0];
+            this.ui.renderer.focusCell(r, c);
+            back.focus();
+        };
         this.overlay.querySelector('#resultContinue').onclick = () => result.success ? this.navigateToMap(Math.min(this.selected+1, CAMPAIGN_MISSIONS.length-1)) : this.navigate(this.selected);
         if (result.success) this.ui.audio.enterScene(m, 'debriefing');
         else this.ui.audio.failureReport(m, result.reason);

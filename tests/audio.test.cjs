@@ -87,3 +87,20 @@ audio.enterScene({ id: 'A2_M01', ambience: 'ice' }, 'briefing');
 assert.equal(spoken.text, 'Die Landefähre wartet.', 'Missionsstart auf Karte liest Briefing automatisch vor');
 
 console.log('PASS: dual-channel crossfading, situational pools, non-repeating shuffle, game start ambience, mission overview silent briefing');
+
+// Signals: silent without Web Audio, before interaction, in hidden tabs and at volume 0; otherwise synthesized locally.
+{
+ const quiet=new AudioManager();assert.equal(quiet.settings.signalVolume,.5);assert.equal(quiet.cue('success'),false,'no Web Audio support stays silent');
+ let oscillators=0;const param={setValueAtTime(){},exponentialRampToValueAtTime(){}};
+ context.window.AudioContext=class{constructor(){this.currentTime=0;this.state='running';this.destination={};}createOscillator(){oscillators++;return{frequency:param,connect(){},start(){},stop(){}};}createGain(){return{gain:param,connect(){}};}};
+ const signals=new AudioManager();
+ assert.equal(signals.cue('success'),false,'no signal before the first interaction');
+ signals.unlocked=true;assert.equal(signals.cue('success'),true);assert.equal(oscillators,2);
+ assert.equal(signals.cue('alarm'),false,'rapid repeats are throttled');
+ signals.lastCueAt=0;document.hidden=true;assert.equal(signals.cue('alarm'),false,'hidden tab stays silent');document.hidden=false;
+ signals.settings.signalVolume=0;assert.equal(signals.cue('alarm'),false,'volume 0 disables signals');
+ assert.equal(signals.cue('unknown'),false);
+ signals.settings.signalVolume=.3;signals.save();assert.equal(new AudioManager().settings.signalVolume,.3,'signal volume persists');
+ delete context.window.AudioContext;
+ console.log('PASS: synthesized mission signals respect interaction, hidden tab, volume and throttling');
+}

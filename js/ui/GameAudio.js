@@ -31,14 +31,23 @@ const FAILURE_AUDIO = {
     'Fremde Flora hat die geschützte Zone erreicht.': 'assets/audio/failure-protected.mp3'
 };
 
+// Short mission signals are synthesized locally: [frequency, start, duration, waveform].
+const SIGNAL_CUES = {
+    success: [[660, 0, .12, 'sine'], [990, .1, .2, 'sine']],
+    warning: [[520, 0, .18, 'triangle']],
+    alarm: [[300, 0, .14, 'square'], [300, .22, .14, 'square']],
+    lost: [[520, 0, .12, 'triangle'], [340, .12, .24, 'triangle']],
+    tick: [[1200, 0, .04, 'square']]
+};
+
 class GameAudio {
     constructor() {
-        this.settings = { ambient: false, ambienceVolume: .35, voiceVolume: .85 };
+        this.settings = { ambient: false, ambienceVolume: .35, voiceVolume: .85, signalVolume: .5 };
         try {
             const saved = JSON.parse(localStorage.getItem('redroots_audio_v1') || 'null');
             if (saved) {
                 this.settings.ambient = saved.ambient === true;
-                for (const key of ['ambienceVolume', 'voiceVolume']) {
+                for (const key of ['ambienceVolume', 'voiceVolume', 'signalVolume']) {
                     if (Number.isFinite(saved[key])) this.settings[key] = Math.max(0, Math.min(1, saved[key]));
                 }
             }
@@ -94,7 +103,7 @@ class GameAudio {
         });
         document.addEventListener('input', event => {
             const key = event.target.dataset.audioVolume;
-            if (!['ambienceVolume', 'voiceVolume'].includes(key)) return;
+            if (!['ambienceVolume', 'voiceVolume', 'signalVolume'].includes(key)) return;
             this.settings[key] = Number(event.target.value) / 100;
             this.save(); this.sync();
         });
@@ -123,11 +132,38 @@ class GameAudio {
     }
 
     controls() {
-        return `<details class="audio-settings"><summary>Ton &amp; Atmosphäre</summary><div class="audio-options"><button type="button" data-ambient aria-pressed="${this.settings.ambient}">${this.settings.ambient ? 'Atmosphäre ausschalten' : 'Atmosphäre einschalten'}</button><label>Hintergrund<input type="range" min="0" max="100" value="${Math.round(this.settings.ambienceVolume*100)}" data-audio-volume="ambienceVolume"></label><label>Stimme<input type="range" min="0" max="100" value="${Math.round(this.settings.voiceVolume*100)}" data-audio-volume="voiceVolume"></label><p data-audio-status role="status"></p></div></details>`;
+        return `<details class="audio-settings"><summary>Ton &amp; Atmosphäre</summary><div class="audio-options"><button type="button" data-ambient aria-pressed="${this.settings.ambient}">${this.settings.ambient ? 'Atmosphäre ausschalten' : 'Atmosphäre einschalten'}</button><label>Hintergrund<input type="range" min="0" max="100" value="${Math.round(this.settings.ambienceVolume*100)}" data-audio-volume="ambienceVolume"></label><label>Stimme<input type="range" min="0" max="100" value="${Math.round(this.settings.voiceVolume*100)}" data-audio-volume="voiceVolume"></label><label>Signale<input type="range" min="0" max="100" value="${Math.round(this.settings.signalVolume*100)}" data-audio-volume="signalVolume"></label><p data-audio-status role="status"></p></div></details>`;
     }
 
     narrationButton(mission, kind) {
         return `<button type="button" class="quiet-button narration-button" data-narration="${mission.id}_${kind}" aria-pressed="false">${kind === 'briefing' ? 'Briefing vorlesen' : 'Bericht vorlesen'} ▶</button>`;
+    }
+
+    // Plays a short signal for mission events. Silent before the first interaction, in hidden tabs and at volume 0.
+    cue(type) {
+        const notes = SIGNAL_CUES[type];
+        const Context = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext);
+        if (!notes || !Context || !this.unlocked || document.hidden || !(this.settings.signalVolume > 0)) return false;
+        const now = Date.now();
+        if (now - (this.lastCueAt || 0) < 120) return false;
+        this.lastCueAt = now;
+        try {
+            this.cueContext ??= new Context();
+            const ctx = this.cueContext, t0 = ctx.currentTime;
+            if (ctx.state === 'suspended') ctx.resume?.();
+            for (const [frequency, start, duration, wave] of notes) {
+                const osc = ctx.createOscillator(), gain = ctx.createGain();
+                const peak = .22 * this.settings.signalVolume * (wave === 'square' ? .45 : 1);
+                osc.type = wave;
+                osc.frequency.setValueAtTime(frequency, t0 + start);
+                gain.gain.setValueAtTime(.0001, t0 + start);
+                gain.gain.exponentialRampToValueAtTime(Math.max(.0002, peak), t0 + start + .015);
+                gain.gain.exponentialRampToValueAtTime(.0001, t0 + start + duration);
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(t0 + start); osc.stop(t0 + start + duration + .02);
+            }
+            return true;
+        } catch { return false; }
     }
 
     save() { try { localStorage.setItem('redroots_audio_v1', JSON.stringify(this.settings)); } catch { /* optional */ } }
