@@ -48,7 +48,8 @@ for(const id of ['A1_M02','A2_M01','A5_M01'])assert.ok(missions.find(m=>m.id===i
 s=create('A4_M03');assert.equal(s.aiProfiles[2].doctrine,'raid');assert.equal(s.aiProfiles[2].target.id,'east');assert.equal(s.aiProfiles[3].target.id,'west');
 s.currentPlayer=2;const ai=new AI(s);assert.equal(ai.getNearestEnemyCamp(10,60,2).id,'east');assert.ok(ai.genome.glider_weight>=1,'raiders favour gliders');
 assert.equal(create('A4_M04').aiProfiles[2].target.id,'civilians');
-const before={A1_M05:146374426,A2_M04:3763444888,A3_M04:1414227562,A4_M01:1871258490,A4_M02:2364985806,A4_M05:4213402834,A5_M01:2027174418,A5_M02:3511569193,A5_M03:1461345291,A5_M04:1182372394,A5_M05:2842492467};
+// A5_M03 changed deliberately: opponents avoid seeding within eight cells of sterile corridors (their start area overlapped one).
+const before={A1_M05:146374426,A2_M04:3763444888,A3_M04:1414227562,A4_M01:1871258490,A4_M02:2364985806,A4_M05:4213402834,A5_M01:2027174418,A5_M02:3511569193,A5_M03:2352119563,A5_M04:1182372394,A5_M05:2842492467};
 for(const [id,expected] of Object.entries(before)){
  const m=missions.find(m=>m.id===id),g=create(id);g.nextPlayerTurn=()=>{};let h=0;
  for(const p of m.enemies?m.enemies.map(e=>e.house):[1]){g.currentPlayer=p;await new AI(g).takeTurn();}

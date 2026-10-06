@@ -177,6 +177,8 @@ class GameState {
             
             // Territory check
             if (this.territory.getOwnerAt(r, c) !== this.currentPlayer) return false;
+            // Red sterile zones of a mission can never be seeded, by anyone.
+            if (this.inSterileZone(r, c)) return false;
         }
 
         return true;
@@ -389,6 +391,16 @@ class GameState {
     upcomingEvents() {
         return (this.scenario?.events || []).filter(e => !this.appliedEvents.has(e.id) && this.currentRound >= e.announceRound)
             .map(e => ({ ...e, areas: MissionManager.eventAreas(e), when: e.round !== undefined ? `Runde ${e.round}` : `Generation ${e.generation}` }));
+    }
+
+    sterileZones() {
+        if (this._sterileZones === undefined) this._sterileZones = (this.scenario?.objective.sterile || []).map(id => this.scenario.map.zones.find(z => z.id === id)).filter(Boolean);
+        return this._sterileZones;
+    }
+
+    // Chebyshev distance margin around sterile zones (0 = inside only).
+    inSterileZone(r, c, margin = 0) {
+        return this.sterileZones().some(z => r >= z.rMin - margin && r <= z.rMax + margin && c >= z.cMin - margin && c <= z.cMax + margin);
     }
 
     setPaused(paused) {

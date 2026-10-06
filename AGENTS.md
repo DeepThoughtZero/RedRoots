@@ -65,6 +65,8 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 - Koordinaten sind Zeile/Spalte. Rechtecke in den Szenariodaten sind inklusive ihrer Endpunkte; Felder nutzen `rMin/rMax/cMin/cMax`.
 - Die Engine kennt keine Story-Sonderfälle. Missionen konfigurieren Gelände, Besitz, Camps, Startflora, Gegner, Budget und erlaubte Muster.
 - Dynamik bleibt deklarativ: `events` (Saat, Felsen, Budget; Pflichtankündigung `announceRound` vor dem Ereignis), Zonen mit `cache` (Auszahlung zur nächsten Runde, zusätzlich zum Gebietseinkommen) und `enemies[].doctrine`/`target` (`raid`, `siege`, `defend`, `expand`). Ohne Doktrin bleiben gesetzte KI-Züge bitgenau gleich; Raids starten mindestens zwölf Felder vom Ziel entfernt. Neue Zieltypen: `clearZones`, `oscillate`, `escort` (verbündeter Konvoi `owner`, gilt nicht als feindlich) und `exactCount`.
+- Rote Sperrzonen (`objective.sterile`) sind für niemanden besäbar; die KI bevorzugt Plätze mit mindestens acht Feldern Abstand (Gewicht × 0,02, gleichmäßig, wenn alle Plätze nahe liegen).
+- Expertenprotokolle (`expertMission`) öffnen nur, wenn `tests/expert.test.cjs` eine Lösung gegen die echte KI enthält; sonst `mission.expert.disabled`. Neue Gegner-Missionen brauchen dort eine Lösung oder eine bewusste Sperre.
 - Das freie Gefecht behält die klassische Camp-Siegbedingung. Kampagnenziele werden während jeder Generation sowie nach der Gebietsauswertung am Rundenende geprüft.
 - Periodenerkennung darf die tatsächlichen Generationen von Überlebenszielen nicht überspringen. Missionssimulationen deaktivieren deshalb den periodischen Frühabbruch.
 - Budget wird nach Runden anhand des Gebiets **hinzugefügt**, nicht schlicht auf einen festen Wert gesetzt. Bei Änderungen an dieser Semantik alle Modi prüfen.

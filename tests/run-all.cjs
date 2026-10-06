@@ -82,6 +82,11 @@ const suites = [
         desc: 'Bonusvielfalt, Bestwerte, Spielstandkompatibilität, Expertenprotokolle, Funksprüche, Zeitleiste'
     },
     {
+        name: 'Ebene 4j: Lösbarkeit der Expertenprotokolle',
+        file: 'tests/expert.test.cjs',
+        desc: 'Expertenprotokolle mit Gegnern gegen die echte KI gelöst oder ausdrücklich geschlossen'
+    },
+    {
         name: 'Ebene 5a: Audio-Steuerung & Sprachausgabe',
         file: 'tests/audio.test.cjs',
         desc: 'GameAudio, Ambience-Ducking, Tab-Pause, Browser-TTS Fallback'

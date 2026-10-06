@@ -346,6 +346,9 @@ class AI {
                             }
                         }
                         
+                        // Opponents prefer seeding at a safety distance from sterile zones; if every spot is close, the
+                        // uniform penalty leaves the choice unchanged.
+                        if (weight > 0 && this.gameState.sterileZones?.().length && currentPattern.some(([pr, pc]) => this.gameState.inSterileZone(r + pr, c + pc, 8))) weight *= .02;
                         const profile = this.profile(pId);
                         if (profile?.doctrine && weight > 0) weight *= this.doctrineSpotFactor(profile, r, c, chosenKey, pId);
                         if (weight > 0) {
