@@ -131,6 +131,8 @@ node tests/audio-assets.test.cjs # Ebene 5: Audio-Aufnahmen & SHA-256 Integritä
 ./scripts/install-hooks.sh
 ```
 
+**Arbeitsablauf:** Änderungen werden immer direkt auf `main` committet und gepusht (`git add`, `git commit`, `git push origin main`) – nach grüner Testsuite, ohne Feature-Branch oder Pull Request. Details: [CONTRIBUTING.md](CONTRIBUTING.md).
+
 Für den Browser: `python3 -m http.server 8765`, dann `http://localhost:8765/index.html`. Es gibt keinen Build-Schritt. Die bestehende Oberfläche lädt Tailwind und Schriften weiterhin über CDNs.
 
 Akt II setzt die Rettung der Hellas-Siedlungen fort: zwei Versorgungswege, gleichzeitige Schleusenkontrolle, Evakuierung unter Wildwuchs, drei Forschungsarchive und ein gemeinsamer Schutzgürtel. Akt III führt diese Geschichte unter Olympus mit sequenziellen Schaltern und Quarantänezonen fort. Akt IV ergänzt fünf schwere Gefechte gegen Tharsis und Viridion. Akt V schließt die Geschichte mit fünf planetaren Langzeitgefechten und einer verantwortbaren Zukunftsentscheidung ab.
