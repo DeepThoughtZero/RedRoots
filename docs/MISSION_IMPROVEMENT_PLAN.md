@@ -408,7 +408,17 @@ Abnahme:
 - Gefundener Fehler in A5_M03: Das Startgebiet beider Gegner überlappte den östlichen Sperrkorridor, sodass die KI hineinsäen konnte (Niederlage in Generation 1 bzw. 20, auch im Normalmodus). Behoben durch eine generische Regel: Sperrzonen sind unbesäbar, die KI hält Abstand.
   - Danach bricht der vorgegebene Acorn-Wildwuchs nach etwa 40 Generationen in den westlichen Korridor ein; chaotisches Wachstum lässt sich nicht aufhalten.
   - Überarbeitet: Ein grauer Wildwuchs-Gleiter (abfangbar, Bruch ohne Eingriff erst in Generation 71) ersetzt den Acorn. Die gegnerischen Startgebiete beginnen ab Spalte 112. Die KI sät nur dann näher als acht Felder an einer Sperrzone, wenn kein anderer Platz frei ist.
-- Für A5_M01 und A5_M04 fand die automatische Suche bisher keine Lösung. Ihre Expertenprotokolle bleiben geschlossen (`expert.disabled`), bis eine Lösung nachgewiesen ist.
+- Für A5_M01 und A5_M04 fand die automatische Suche bisher keine Lösung. Ihre Expertenprotokolle bleiben geschlossen. Versucht wurde:
+  - gierige Suche über bis zu drei Züge je Runde;
+  - alle Einzelplatzierungen großer Muster in Runde 1;
+  - ein mehrrundiger Planer, der das Gebiet mit Switch Engines bis auf zwei Felder an die Zielcamps heranbringt.
+
+  Blöcke lassen sich auch dann nicht in die Camps setzen, weil Camp-Felder ihren Eigentümer behalten. Eine Eroberung gelingt nur, wenn eigene Flora hineinwächst und dort 24 Generationen lang die Mehrheit hält.
+- Auch A5_M03 hat nach der Korrektur noch keine vollständige Lösung (Expertenprotokoll geschlossen):
+  - Sechs Abwehrzüge in Runde 1 halten die Korridore bis Generation 2187.
+  - Die Eroberung beider Steuerlager fehlt noch.
+  - Im Normalmodus eroberte die Suche ein Lager; danach säte Viridion in Runde 2 zu dicht am Korridor. Seither gilt die strikte Abstandsregel; dieser Lauf wurde danach nicht wiederholt.
+- Offen und wichtig: Auch für den **Normalmodus** von A5_M01, A5_M03 und A5_M04 gibt es keine geprüfte Lösung. Eine Prüfung der Akt-V-Lösbarkeit (zum Beispiel mit einem stärkeren Planer oder durch Anspielen) ist ein eigener Arbeitsschritt. Ihre Expertenprotokolle bleiben geschlossen (`expert.disabled`), bis eine Lösung nachgewiesen ist.
 
 ---
 
