@@ -21,7 +21,8 @@ const SOLUTIONS={
  A4_M03:[3,[[['block',10,19],['block',26,43],['block',18,26]]]],
  A4_M04:[2,[[['acorn',15,26,3],['b_heptomino',10,32]],[['block',21,18]],[['glider',3,15]]]],
  A4_M05:[2,[[['glider',10,12],['glider',10,32],['glider',10,52],['block',10,23]],[['acorn',24,42,2]]]],
- A5_M02:[3,[[['r_pentomino',8,56,1]]]]
+ A5_M02:[3,[[['r_pentomino',8,56,1]]]],
+ A5_M05:[3,[[['r_pentomino',42,114,2]]]]
 };
 (async()=>{
 for(const [id,[stars,rounds]] of Object.entries(SOLUTIONS)){const r=await play(id,rounds);assert.equal(r.success,true,`${id}: expert protocol solvable (${r.reason})`);assert.equal(r.stars,stars,`${id}: expected stars`);}

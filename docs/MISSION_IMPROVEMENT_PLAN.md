@@ -404,11 +404,11 @@ Abnahme:
 **Prüfung der Expertenprotokolle mit Gegnern (Oktober 2026):**
 - Gegen die echte, gesetzte KI gelöst und in `tests/expert.test.cjs` festgehalten sind neun Missionen:
   - mit der unveränderten Referenzlösung: A1_M05, A2_M04, A3_M04, A4_M01 und A4_M03;
-  - mit neu gesuchten Zügen: A4_M02 (zweiter Gleiter bei Zeile 3, Spalte 24), A4_M04 (Block vor der Zivilstation, dann Gleiter; zwei Sterne), A4_M05 (Acorn statt der blockierten R-Pentominos; zwei Sterne) und A5_M02 (ein R-Pentomino).
+  - mit neu gesuchten Zügen: A4_M02 (zweiter Gleiter bei Zeile 3, Spalte 24), A4_M04 (Block vor der Zivilstation, dann Gleiter; zwei Sterne), A4_M05 (Acorn statt der blockierten R-Pentominos; zwei Sterne), A5_M02 (ein R-Pentomino) und A5_M05 (ein R-Pentomino auf der mittleren Insel; drei Sterne nach 4.000 Generationen).
 - Gefundener Fehler in A5_M03: Das Startgebiet beider Gegner überlappte den östlichen Sperrkorridor, sodass die KI hineinsäen konnte (Niederlage in Generation 1 bzw. 20, auch im Normalmodus). Behoben durch eine generische Regel: Sperrzonen sind unbesäbar, die KI hält Abstand.
   - Danach bricht der vorgegebene Acorn-Wildwuchs nach etwa 40 Generationen in den westlichen Korridor ein; chaotisches Wachstum lässt sich nicht aufhalten.
   - Überarbeitet: Ein grauer Wildwuchs-Gleiter (abfangbar, Bruch ohne Eingriff erst in Generation 71) ersetzt den Acorn. Die gegnerischen Startgebiete beginnen ab Spalte 112. Die KI sät nur dann näher als acht Felder an einer Sperrzone, wenn kein anderer Platz frei ist.
-- Für A5_M01, A5_M04 und A5_M05 fand die automatische Suche bisher keine Lösung. Ihre Expertenprotokolle bleiben geschlossen (`expert.disabled`), bis eine Lösung nachgewiesen ist.
+- Für A5_M01 und A5_M04 fand die automatische Suche bisher keine Lösung. Ihre Expertenprotokolle bleiben geschlossen (`expert.disabled`), bis eine Lösung nachgewiesen ist.
 
 ---
 

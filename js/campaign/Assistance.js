@@ -46,7 +46,7 @@ CAMPAIGN_MISSIONS.forEach(m => {
 const EXPERT_BUDGET_FLOOR = {A1_M01:4,A1_M02:8,A1_M03:5,A1_M04:10,A1_M05:15,A2_M01:24,A2_M02:10,A2_M03:8,A2_M04:15,A2_M05:14,A3_M01:15,A3_M02:7,A3_M03:12,A3_M04:15,A3_M05:15,A4_M01:18,A4_M02:22,A4_M03:20,A4_M04:24,A4_M05:36,A5_M01:72,A5_M02:90,A5_M03:82,A5_M04:108,A5_M05:124};
 // Expert protocols open only where a solution against the real AI is verified (tests/expert.test.cjs).
 // These Act V protocols stay closed until a solution is found.
-['A5_M01', 'A5_M03', 'A5_M04', 'A5_M05'].forEach(id => { const m = CAMPAIGN_MISSIONS.find(x => x.id === id); m.expert = { ...(m.expert || {}), disabled: true }; });
+['A5_M01', 'A5_M03', 'A5_M04'].forEach(id => { const m = CAMPAIGN_MISSIONS.find(x => x.id === id); m.expert = { ...(m.expert || {}), disabled: true }; });
 function expertMission(m) {
     const factors = { budget: .8, enemy: 1.5, ...(m.expert || {}) };
     return {
