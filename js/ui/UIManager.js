@@ -276,6 +276,9 @@ class UIManager {
             syncHelpVoice();
         };
         document.getElementById('btnHelp')?.addEventListener('click', showHelp);
+        document.getElementById('btnMenuHelp')?.addEventListener('click', () => { this.closeDialog(this.elSettingsOverlay); showHelp(); });
+        const homeHint = document.getElementById('homeScreenHint');
+        if (homeHint) homeHint.hidden = DisplayControls.fsSupported() || DisplayControls.isStandalone() || !matchMedia('(pointer: coarse)').matches;
         document.getElementById('btnShowBriefing')?.addEventListener('click', showHelp);
         document.getElementById('btnHelpClose')?.addEventListener('click', () => this.closeDialog(this.helpOverlay));
 
@@ -298,7 +301,7 @@ class UIManager {
         if (this.elBtnSettingsConfirm) {
             this.elBtnSettingsConfirm.addEventListener('click', () => {
                 if (this.audio) this.audio.stopNarration();
-                location.href = location.pathname + (this.gameState?.scenario ? '?campaign' : '');
+                DisplayControls.navigate(location.pathname + (this.gameState?.scenario ? '?campaign' : ''));
             });
         }
 
@@ -432,9 +435,10 @@ class UIManager {
             zoomControls.id = 'boardZoomControls';
             zoomControls.setAttribute('role', 'toolbar');
             zoomControls.setAttribute('aria-label', 'Spielfeld-Zoom');
-            zoomControls.innerHTML = `<button type="button" data-zoom="1.25" aria-label="Spielfeld vergrößern" title="Vergrößern">${uiIcon('plus')}</button><button type="button" data-zoom="0.8" aria-label="Spielfeld verkleinern" title="Verkleinern">${uiIcon('minus')}</button><button type="button" data-zoom="fit" aria-label="Ganzes Spielfeld anzeigen" title="Einpassen">${uiIcon('fit')}</button>`;
+            zoomControls.innerHTML = `<button type="button" data-side aria-controls="rightPanel" aria-expanded="true" aria-label="Seitenleiste einklappen" title="Seitenleiste einklappen">${uiIcon('chevron-right')}</button><button type="button" data-zoom="1.25" aria-label="Spielfeld vergrößern" title="Vergrößern">${uiIcon('plus')}</button><button type="button" data-zoom="0.8" aria-label="Spielfeld verkleinern" title="Verkleinern">${uiIcon('minus')}</button><button type="button" data-zoom="fit" aria-label="Ganzes Spielfeld anzeigen" title="Einpassen">${uiIcon('fit')}</button>`;
             this.canvas.parentElement.append(zoomControls);
             zoomControls.addEventListener('click', event => {
+                if (event.target.closest('[data-side]')) { this.display?.toggle(); return; }
                 const factor = event.target.closest('[data-zoom]')?.dataset.zoom;
                 if (!factor) return;
                 if (factor === 'fit') { this.renderer.fit(); return; }
@@ -443,6 +447,7 @@ class UIManager {
             });
         }
         this.inputHandler = new InputHandler(this.canvas, this.gameState, this);
+        this.display = new DisplayControls(this);
 
         this.evolver = config.isDojoMode ? new AIEvolver(this.gameState) : null;
         this.ai = new AI(this.gameState); // Single instance, will swap genomes
@@ -566,6 +571,11 @@ class UIManager {
 
     // Primary action reflects the phase: end the turn, start the evolution, or (sandbox) stop it.
     updateFinishButton() {
+        this.renderFinishButton();
+        this.display?.syncRail();
+    }
+
+    renderFinishButton() {
         const s = this.gameState, btn = this.elBtnFinishTurn;
         if (!s) return;
         btn.classList.remove('btn-stop');
@@ -587,6 +597,7 @@ class UIManager {
         const [key, label] = PHASE_LABELS[phase] || ['setup', phase];
         this.setPhaseLabel(label, key);
         document.body.dataset.phase = key;
+        this.display?.apply();
         if (this.gameState.objectiveSystem) { this.campaign?.onPhaseChange(phase); this.syncSimControls(); }
 
         if (phase === CONSTANTS.PHASE_SIMULATION) {
@@ -679,6 +690,8 @@ class UIManager {
             this.elCurrentPlayerDisplay.textContent = isHuman ? `${player.name} ist am Zug` : `${player.name} (Computer) plant …`;
         }
         this.showPlayerCard(pId, this.gameState.isSandbox ? 'Sandbox' : isHuman ? 'Am Zug · Mensch' : 'Computer plant …');
+        if (!scenario) this.display?.setStatus(this.gameState.isSandbox ? 'Sandbox' : `Am Zug: ${player.name} · ${isHuman ? 'Mensch' : 'Computer'}`);
+        this.display?.syncRail();
 
         if (!isHuman && this.gameState.phase === CONSTANTS.PHASE_PLACEMENT) {
             this.elBtnFinishTurn.disabled = true;
@@ -805,6 +818,7 @@ class UIManager {
             }
         }
         this.lastBudget = budget;
+        this.display?.syncRail();
         this.elPatternList.querySelectorAll('[data-pattern]').forEach(btn => {
             const tooExpensive = CONSTANTS.PATTERNS[btn.dataset.pattern].cost > budget;
             btn.classList.toggle('is-unaffordable', tooExpensive);

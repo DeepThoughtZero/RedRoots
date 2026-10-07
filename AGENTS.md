@@ -40,6 +40,7 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 | `js/core/InputHandler.js` | Maus, Touch, Rotation und Platzierung |
 | `js/ui/UIManager.js` | Spielaufbau, Bedienelemente und Engine-Callbacks |
 | `js/ui/GameRenderer.js` | Canvas, Kamera, ResizeObserver, Camps, Flora und Zielzonen |
+| `js/ui/DisplayControls.js` | Vollbild (inkl. Wiederherstellung nach Seitenwechsel), einklappbare Seitenspalte und Kurzleiste auf niedrigen Querformat-Bildschirmen; vor UIManager laden |
 | `js/ui/GameAudio.js` | Audio-Einstellungen, Wiedergabe, Pause, Hintergrundabsenkung |
 | `js/campaign/Missions.js` | Deklarative Missionen und MissionManager zur Szenarioinitialisierung |
 | `js/campaign/ObjectiveSystem.js` | Missionsziele, Niederlagen, Statistiken und Sterne |
@@ -76,6 +77,7 @@ Wenn ein Port belegt ist, einen freien Port wählen; keine fremden Server beende
 - Mission abbrechen führt zur Marskarte (Kampagne) bzw. zur Modusauswahl (Gefecht/Sandbox), nicht zum Neuladen derselben Missions-URL.
 - Ein Missionswechsel erfolgt derzeit per Seitenwechsel. Dies entsorgt alte Listener, Animationen, KI-Züge und Audiowiedergabe. Bei Umstellung auf Navigation ohne Neuladen explizites Cleanup implementieren.
 - HUD, Spielfeld und Werkzeugleiste sind angedockte Grid-Bereiche und überdecken sich nicht; nur kurze Einblendungen (Toasts, Hinweis-Popover, Zoom-/Simulationsleiste) liegen auf dem Spielfeld. Der Renderer misst ausschließlich den Spielfeld-Container (`#canvasContainer`), rendert mit `devicePixelRatio` (max. 2) und kennt keine Panel-Offsets; Breakpoints daher nur in CSS ändern. Hat der Spieler Kamera/Zoom verändert, bleibt der Bildmittelpunkt bei Größenänderungen erhalten, sonst wird eingepasst. Touch-Koordinaten müssen nach Zoom und Formatwechsel stimmen.
+- Niedriges Querformat (`(orientation: landscape) and (max-height: 520px)`, identisch in CSS und `DisplayControls.COMPACT_QUERY`): Kopfzeile, HUD und Werkzeugleiste teilen sich die rechte Spalte (`#app` als Grid, `main` mit `display: contents`), das Spielfeld hat die volle Höhe. Eingeklappt bleibt die Kurzleiste `#sideRail`; der Statuschip `.board-status` zählt als kurze Einblendung. Seitenwechsel immer über `DisplayControls.navigate()` bzw. `CampaignManager.go()`, damit der Vollbildwunsch erhalten bleibt; Vollbild wird beim nächsten `pointerup`/`touchend`/`mousedown`/`keydown` wieder angefordert (nicht `click`, das Canvas unterdrückt Touch-Standardaktionen). Kein `orientation`-Zwang im Manifest (Hochformat bleibt bedienbar).
 
 ## Kampagne und Geschichte
 
@@ -97,6 +99,7 @@ Für neue Missionen:
 - `redroots_campaign_v1`: Kampagnenversion, ausgewähltes Haus, abgeschlossene Missionen mit Sternen und freigeschaltete Genome. Additiv seit Phase 4 je Mission `best` (`spent`, `generations`, `rounds`; jeweils Minimum) und `veteran: true` für bestandene Expertenprotokolle; ungültige Zusatzwerte werden verworfen, nie die Sterne. Codes enthalten nur Sterne.
 - `redroots_config`: Einstellungen des freien Gefechts.
 - `redroots_audio_v1`: Audio-Einstellungen.
+- `redroots_layout_v1`: Seitenspalte auf niedrigen Querformat-Bildschirmen (`side`: `auto`/`open`/`closed`, `autoRail`). `redroots_fullscreen` (sessionStorage, nur dieser Tab): Vollbildwunsch für die Wiederherstellung nach Seitenwechseln. Kampagnenreset lässt beide unberührt.
 - `redroots_simulation_v1`: Zeitlupe und automatisches Anhalten der Kampagnen-Evolution. Runden-Checkpoints liegen nur im Arbeitsspeicher; der Versuchszähler für Hinweisstufen reist im Link (`attempt`).
 - Weitere bestehende Keys betreffen Hilfe/Dojo; Kampagnenreset darf diese nicht pauschal löschen.
 - Gespeichert werden Abschlüsse, nicht der laufende Missionszustand. Browserprofil, Website und Port bestimmen den Speicherbereich; keine automatische Synchronisierung.

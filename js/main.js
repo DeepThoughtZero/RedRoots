@@ -1,6 +1,7 @@
 // js/main.js
 
 document.addEventListener('DOMContentLoaded', () => {
+    DisplayControls.initPage();
     const canvas = document.getElementById('gameCanvas');
     
     // UIManager handles the lifecycle, starting with the setup menu

@@ -95,6 +95,11 @@ const suites = [
         name: 'Ebene 5b: Audio-Aufnahmen & Story-Integrität',
         file: 'tests/audio-assets.test.cjs',
         desc: '50 Qwen3-Aufnahmen gegen Storytexte & SHA-256 Prüfsummen'
+    },
+    {
+        name: 'Ebene 5c: Vollbild & Seitenspalte',
+        file: 'tests/display.test.cjs',
+        desc: 'Einklappregeln der Seitenspalte, gespeicherte Wahl, blockierter Speicher'
     }
 ];
 

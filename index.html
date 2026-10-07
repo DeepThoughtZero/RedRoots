@@ -50,6 +50,9 @@
         <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5Z" /></symbol>
         <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" /></symbol>
         <symbol id="i-exit" viewBox="0 0 24 24"><path d="M14 4h5v16h-5" /><path d="M10 16l-4-4 4-4M6 12h10" /></symbol>
+        <symbol id="i-fullscreen" viewBox="0 0 24 24"><path d="M14 3h7v7M10 21H3v-7M21 3l-7 7M3 21l7-7" /></symbol>
+        <symbol id="i-fullscreen-exit" viewBox="0 0 24 24"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" /></symbol>
+        <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5" /></symbol>
         <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5Z" /><path d="M9 4v13M15 6.5v13" /></symbol>
     </svg>
 
@@ -63,7 +66,10 @@
         <div class="start-shell">
             <header class="start-top">
                 <span class="brand brand--large"><svg class="brand-mark" aria-hidden="true"><use href="#i-brand" /></svg><span class="brand-word">Red<b>Roots</b></span></span>
-                <button id="btnShowBriefing" class="btn btn-ghost" type="button"><svg class="icon" aria-hidden="true"><use href="#i-help" /></svg><span>Spielregeln</span></button>
+                <div class="start-top-actions">
+                    <button class="btn btn-ghost" type="button" data-fs aria-pressed="false" hidden><svg class="icon" aria-hidden="true"><use href="#i-fullscreen" /></svg><span>Vollbild</span></button>
+                    <button id="btnShowBriefing" class="btn btn-ghost" type="button"><svg class="icon" aria-hidden="true"><use href="#i-help" /></svg><span>Spielregeln</span></button>
+                </div>
             </header>
 
             <section id="modeSelection" class="start-section" aria-labelledby="modeTitle">
@@ -157,6 +163,7 @@
 
             <div class="topbar-actions">
                 <button id="btnHelp" class="btn btn-icon btn-ghost" type="button" title="Spielregeln" aria-label="Spielregeln"><svg class="icon" aria-hidden="true"><use href="#i-help" /></svg></button>
+                <button id="btnFullscreen" class="btn btn-icon btn-ghost" type="button" data-fs aria-pressed="false" title="Vollbild" aria-label="Vollbild" hidden><svg class="icon" aria-hidden="true"><use href="#i-fullscreen" /></svg></button>
                 <button id="btnSettings" class="btn btn-ghost btn-menu" type="button" title="Menü: Ton, Simulation, Mission abbrechen" aria-label="Menü öffnen" aria-haspopup="dialog" hidden><svg class="icon" aria-hidden="true"><use href="#i-menu" /></svg><span class="btn-menu-label">Menü</span></button>
             </div>
         </header>
@@ -215,6 +222,17 @@
             </aside>
         </main>
 
+        <!-- Short landscape screens: the folded side column leaves this rail beside the board. -->
+        <nav id="sideRail" class="side-rail" aria-label="Kurzleiste" hidden>
+            <button id="btnRailExpand" class="rail-btn" type="button" aria-controls="rightPanel" aria-expanded="false" aria-label="Seitenleiste einblenden" title="Seitenleiste einblenden"><svg class="icon" aria-hidden="true"><use href="#i-chevron-left" /></svg></button>
+            <button id="btnRailPrimary" class="rail-btn rail-primary" type="button" aria-label="Evolution starten"><svg class="icon" aria-hidden="true"><use href="#i-play" /></svg></button>
+            <div id="railBudget" class="rail-stat" title="Genmaterial"><small>Material</small><b>–</b></div>
+            <div id="railRound" class="rail-stat" title="Runde"><small>Runde</small><b>–</b></div>
+            <span class="rail-spacer"></span>
+            <button id="btnRailFullscreen" class="rail-btn" type="button" data-fs aria-pressed="false" aria-label="Vollbild" title="Vollbild" hidden><svg class="icon" aria-hidden="true"><use href="#i-fullscreen" /></svg></button>
+            <button id="btnRailMenu" class="rail-btn" type="button" aria-haspopup="dialog" aria-label="Menü öffnen" title="Menü"><svg class="icon" aria-hidden="true"><use href="#i-menu" /></svg></button>
+        </nav>
+
         <div id="eventLog" class="sr-only" role="status" aria-live="polite">System bereit.</div>
     </div>
 
@@ -238,6 +256,12 @@
             <div class="dialog-head">
                 <h2 id="settingsTitle" class="dialog-title">Menü</h2>
                 <button class="btn btn-icon btn-ghost" type="button" data-dialog-close aria-label="Menü schließen"><svg class="icon" aria-hidden="true"><use href="#i-close" /></svg></button>
+            </div>
+            <div class="menu-display">
+                <button id="btnMenuFullscreen" class="btn" type="button" data-fs aria-pressed="false" hidden><svg class="icon" aria-hidden="true"><use href="#i-fullscreen" /></svg><span>Vollbild</span></button>
+                <button id="btnMenuHelp" class="btn" type="button"><svg class="icon" aria-hidden="true"><use href="#i-help" /></svg><span>Spielregeln</span></button>
+                <label class="check menu-check"><input type="checkbox" id="optAutoRail" checked><span>Seitenleiste während der Evolution einklappen (Handy quer)</span></label>
+                <p id="homeScreenHint" class="menu-hint" hidden>Mehr Platz auf dem iPhone: Teilen → „Zum Home-Bildschirm“ – dann startet RedRoots ohne Browserleiste.</p>
             </div>
             <div id="settingsExtras" class="menu-extras"></div>
             <dl class="shortcut-list">
@@ -323,6 +347,7 @@
     <script src="js/core/GameState.js"></script>
     <script src="js/ui/GameRenderer.js"></script>
     <script src="js/ui/GameAudio.js"></script>
+    <script src="js/ui/DisplayControls.js"></script>
     <script src="js/ui/UIManager.js"></script>
     <script src="js/main.js"></script>
 </body>

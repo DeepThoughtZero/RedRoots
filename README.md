@@ -42,7 +42,9 @@ Das Spiel besteht aus purem HTML, CSS und JavaScript. Es werden keine externen S
 - **Ziel:** Erreiche das feindliche, schraffiert markierte Lager (in den Ecken). Wer das Lager infiltriert, gewinnt den Sektor für sein Haus!
 - **Tablet & Handy:** Muster auswählen und auf das Spielfeld tippen. Mit zwei Fingern zoomen/verschieben oder die Tasten **+ / − / Einpassen** rechts unten am Spielfeld verwenden. Die Werkzeugleiste liegt im Querformat rechts neben dem Spielfeld, im Hochformat darunter. Die Marskarte bietet zusätzlich eine große Missionsliste.
 - **Aufteilung:** Kopfzeile, Missionsinformation, Spielfeld und Werkzeugleiste überdecken sich nie. Auf breiten Bildschirmen (ab 1280 px) steht die Missionsinformation links als Spalte (mit dem Pfeil einklappbar), darunter als Streifen über dem Spielfeld; Ziel & Hinweis öffnen sich dort als Einblendung. Hat man gezoomt oder verschoben, bleibt der Bildausschnitt beim Drehen des Geräts oder Einklappen erhalten; **Einpassen** zeigt wieder das ganze Feld.
-- **Menü (☰ oben rechts):** Ton & Atmosphäre, Simulationsoptionen (Kampagne), Tastenkürzel und **Mission abbrechen**.
+- **Handy quer – maximales Spielfeld:** Auf niedrigen Querformat-Bildschirmen (bis 520 px Höhe) stehen Kopfzeile, Missionsinformation und Werkzeuge gemeinsam in einer Spalte rechts; das Spielfeld nutzt die volle Höhe. Mit **›** (über den Zoomtasten) klappt die Spalte zur schmalen **Kurzleiste** ein (Aufklappen, Evolution starten, Genmaterial, Runde, Vollbild, Menü); die wichtigste Missionszeile (Alarm, Vorwarnung, Fortschritt) bleibt dann als Hinweis oben links auf dem Spielfeld, ein Tipp darauf klappt die Spalte wieder auf. Während der Evolution klappt die Spalte automatisch ein (abschaltbar im Menü); wer sie dabei öffnet, behält sie offen. Die Wahl wird unter `redroots_layout_v1` gespeichert.
+- **Vollbild:** Der Knopf mit den Pfeilen (Startbildschirm, Kopfzeile, Kurzleiste, Menü, Marskarte) blendet Browser- und Systemleisten aus, sofern der Browser das erlaubt (Android Chrome, Samsung Internet, Firefox, Desktop, iPad). Ein Seitenwechsel (Missionsstart, Marskarte, Ergebnis) beendet den Vollbildmodus technisch; RedRoots stellt ihn beim nächsten Tippen automatisch wieder her (gemerkt nur für diesen Tab unter `redroots_fullscreen`). Wer ihn selbst verlässt (Zurück-Geste, Esc, Knopf), bleibt ohne Vollbild. Auf dem iPhone gibt es keine Vollbild-Funktion für Webseiten: Dort **Teilen → „Zum Home-Bildschirm“** wählen; das Spiel startet dann ohne Browserleiste. Auch auf Android startet RedRoots über „Zum Startbildschirm hinzufügen“ dauerhaft im Vollbild (Web-App-Manifest, ohne Offline-Modus).
+- **Menü (☰ oben rechts):** Vollbild, Spielregeln, Einklappen während der Evolution, Ton & Atmosphäre, Simulationsoptionen (Kampagne), Tastenkürzel und **Mission abbrechen**.
 - **Steuerung (Maus):** 
   - `Linksklick`: Figur platzieren
   - `Mausrad halten`: Kamera verschieben
@@ -130,6 +132,7 @@ node tests/scenario.test.cjs     # Ebene 4: Ereignisse, Vorratskapseln, Doktrine
 node tests/mastery.test.cjs      # Ebene 4: Bonusvielfalt, Bestwerte, Expertenprotokolle, Funksprüche & Zeitleiste
 node tests/audio.test.cjs        # Ebene 5: GameAudio, Ducking, Tab-Pause & TTS
 node tests/audio-assets.test.cjs # Ebene 5: Audio-Aufnahmen & SHA-256 Integrität
+node tests/display.test.cjs      # Ebene 5: Vollbild-Wunsch & einklappbare Seitenspalte
 
 # Git Pre-Push Hook aktivieren (verhindert Push bei Testfehlern):
 ./scripts/install-hooks.sh

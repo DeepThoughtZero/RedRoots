@@ -30,6 +30,7 @@ const jsFiles = [
     'js/core/GameState.js',
     'js/ui/GameRenderer.js',
     'js/ui/GameAudio.js',
+    'js/ui/DisplayControls.js',
     'js/ui/UIManager.js',
     'js/main.js'
 ];
@@ -74,6 +75,7 @@ const expectedScripts = [
     'js/core/GameState.js',
     'js/ui/GameRenderer.js',
     'js/ui/GameAudio.js',
+    'js/ui/DisplayControls.js',
     'js/ui/UIManager.js',
     'js/main.js'
 ];
