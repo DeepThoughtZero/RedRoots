@@ -44,3 +44,16 @@ const code=CampaignState.encodeExpedition(Array(25).fill(3));
 assert.match(code,/^ERBE-/);assert.equal(new CampaignState().importCode(code),true,'25-sector codes round-trip');
 assert.equal(CampaignState.decodeExpedition(CampaignState.encodeExpedition(Array(20).fill(3))).slice(0,20).every(v=>v===3),true,'20-sector expedition codes remain compatible');
 console.log('PASS: Act V long battles, large maps, protection, codes and ending choice');
+// Verified solutions against the real seeded AI (the maintenance platforms make the distant targets reachable).
+const AI=vm.runInContext('AI',ctx),rot=(k,n)=>{let p=C.PATTERNS[k].pattern;for(let i=0;i<n;i++)p=p.map(([r,c])=>[c,-r]);return p;};
+async function solve(id,rounds){
+ const i=missions.findIndex(m=>m.id===id),s=create(i);s.nextPlayerTurn=()=>{};
+ const battle=async()=>{for(const e of s.scenario.enemies){if(s.defeatedPlayers.has(e.house))continue;s.currentPlayer=e.house;await new AI(s).takeTurn();}s.currentPlayer=-1;s.phase=C.PHASE_SIMULATION;await s.runSimulation();};
+ for(const plan of rounds){if(s.objectiveSystem.result)break;s.currentPlayer=0;for(const [k,r,c,n=0] of plan)assert.equal(s.placePattern(rot(k,n),r,c),true,`${id}: ${k} ${r},${c}`);await battle();}
+ let n=0;while(!s.objectiveSystem.result&&n++<12)await battle();return s.objectiveSystem.result;
+}
+(async()=>{
+ let r=await solve('A5_M01',[[['glider',9,84,0],['r_pentomino',59,86,1]]]);assert.equal(r.success,true,'A5_M01 relays captured from the maintenance platforms');assert.equal(r.stars,2);
+ r=await solve('A5_M04',[[['r_pentomino',9,122,1],['r_pentomino',74,122,2]]]);assert.equal(r.success,true,'A5_M04 key stations captured from the maintenance platforms');assert.equal(r.stars,3);
+ console.log('PASS: A5_M01 and A5_M04 solved against the real AI');
+})().catch(e=>{console.error(e);process.exitCode=1});

@@ -58,4 +58,11 @@ CAMPAIGN_MISSIONS.push(
 // without ever having to grow through a protected strip.
 CAMPAIGN_MISSIONS.find(m => m.id === 'A5_M03').map.territory.push([0,8,108,25,110],[0,52,108,70,110]);
 CAMPAIGN_MISSIONS.find(m => m.id === 'A5_M05').map.territory.push([0,7,108,25,123],[0,40,108,57,123],[0,70,108,88,123]);
+// Maintenance platforms beside the distant relays and key stations: without them no own flora could ever
+// reach the targets, because camp cells always keep their owner. Tested with real AI in act5.test.cjs.
+// "Die offenen Tore": every sterile corridor is walled on both sides (rocks are no Conway neighbours), so life
+// can only reach it through a few open gates that the player has to guard.
+CAMPAIGN_MISSIONS.find(m => m.id === 'A5_M03').map.rocks.push([0,41,23,41],[27,41,79,41],[0,45,59,45],[63,45,79,45],[0,75,33,75],[37,75,79,75],[0,79,13,79],[17,79,79,79],[0,103,21,103],[25,103,50,103],[54,103,79,103],[0,107,39,107],[43,107,79,107]);
+CAMPAIGN_MISSIONS.find(m => m.id === 'A5_M01').map.territory.push([0,9,84,19,86],[0,51,84,61,86]);
+CAMPAIGN_MISSIONS.find(m => m.id === 'A5_M04').map.territory.push([0,8,120,20,122],[0,71,120,83,122]);
 CAMPAIGN_MISSIONS.filter(m => m.act === 5).forEach(m => { m.narration = 'recorded'; m.audioRevision = '20260915-v1'; });

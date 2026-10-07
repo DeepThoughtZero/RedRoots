@@ -418,7 +418,14 @@ Abnahme:
   - Sechs Abwehrzüge in Runde 1 halten die Korridore bis Generation 2187.
   - Die Eroberung beider Steuerlager fehlt noch.
   - Im Normalmodus eroberte die Suche ein Lager; danach säte Viridion in Runde 2 zu dicht am Korridor. Seither gilt die strikte Abstandsregel; dieser Lauf wurde danach nicht wiederholt.
-- Offen und wichtig: Auch für den **Normalmodus** von A5_M01, A5_M03 und A5_M04 gibt es keine geprüfte Lösung. Eine Prüfung der Akt-V-Lösbarkeit (zum Beispiel mit einem stärkeren Planer oder durch Anspielen) ist ein eigener Arbeitsschritt. Ihre Expertenprotokolle bleiben geschlossen (`expert.disabled`), bis eine Lösung nachgewiesen ist.
+- **Vertiefte Prüfung (Folgeauftrag):**
+  - Ursache für A5_M01 und A5_M04: Ohne lebende Kolonien schrumpft das eigene Gebiet nach Runde 1 auf etwa 60 bzw. 120 Felder. Die Zielcamps liegen 60–90 Felder entfernt und sind selbst nie besäbar.
+  - Anpassung: schmale Wartungsplattformen (3 Spalten) direkt neben den Zielcamps, nach dem Muster der Inseln in A5_M03 und A5_M05.
+  - Danach sind beide Missionen gegen die echte KI lösbar:
+    - A5_M01: Gleiter und R-Pentomino, zwei Sterne, auch im Expertenmodus;
+    - A5_M04: zwei R-Pentominos, drei Sterne im Normalmodus.
+  - A5_M03: Jeder Sperrkorridor ist jetzt beidseitig von Felswänden mit wenigen offenen Toren eingefasst. Felsen sind keine Conway-Nachbarn, also gelangt Leben nur durch die Tore hinein (passend zum Titel „Die offenen Tore“). Ohne Eingriff übersteht die Mission jetzt die gesamte erste Runde.
+- Offen: A5_M03 (beide Modi) und das Expertenprotokoll von A5_M04 sind noch ohne nachgewiesene Lösung. Eine Prüfung der Akt-V-Lösbarkeit (zum Beispiel mit einem stärkeren Planer oder durch Anspielen) ist ein eigener Arbeitsschritt. Ihre Expertenprotokolle bleiben geschlossen (`expert.disabled`), bis eine Lösung nachgewiesen ist.
 
 ---
 

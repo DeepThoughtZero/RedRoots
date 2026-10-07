@@ -24,10 +24,10 @@ const MISSION_HINT_STAGES = {
     A4_M03: ['Beide Gegner zielen diesmal direkt auf die Rettungsplätze: Viridion auf den Osten, Tharsis auf den Westen. Baue vor jedem Platz eine eigene Abwehr und behalte Material für spätere Runden.'],
     A4_M04: ['Zwei Angriffe, ein Schutzauftrag: Viridion schickt seine Gleiter aus der Ferne auf die Zivilstation. Sie muss auch nach dem Fall der Posten geschützt bleiben.'],
     A4_M05: ['Drei Camps und eine graue Front: Verteile dein Material auf unabhängige Angriffe und halte eine Reserve für den Rettungsplatz. Ab Runde 6 treibt ein Sturmstoß weiteren Wildwuchs von Norden heran.'],
-    A5_M01: ['Lange Phasen belohnen stabile Fronten: Sichere zuerst das Habitat und greife die Relais dann auf getrennten Wegen an. Der Notvorrat im mittleren Korridor liefert zusätzliches Material für spätere Phasen.'],
+    A5_M01: ['Neben beiden Relais liegen Wartungsplattformen in deinem Gebiet. Von dort erreichen Kolonien die Relais direkt; das Habitat musst du trotzdem schützen. Der Notvorrat im mittleren Korridor liefert zusätzliches Material für spätere Phasen.'],
     A5_M02: ['Jedes Habitat braucht eine eigene Abfangzone. Nach jeder Phase bestimmt das neue Einflussgebiet, wo du säen kannst.'],
-    A5_M03: ['Rote Korridore dürfen nie berührt werden. Kämpfe auf ihrer jeweils sicheren Seite.'],
-    A5_M04: ['Vier Fronten: Teile Angriff und Verteidigung auf und spare Material für spätere Phasen.'],
+    A5_M03: ['Felswände umschließen die roten Korridore; Leben gelangt nur durch die offenen Tore hinein. Bewache die Tore und erobere die Steuerlager von den Inseln neben ihnen.'],
+    A5_M04: ['Neben beiden Kontrollstationen liegen Wartungsplattformen in deinem Gebiet. Von dort wachsen Kolonien in die Stationen; die zivilen Verteiler brauchen weiter Abstand zu fremder Flora.'],
     A5_M05: ['Verteile Angriff, Schutz und Reserve auf drei Fronten. Der rote Ring bleibt immer leer.']
 };
 // In mission 1 the regular hint explains the rules; the extra stage follows it and still names no pattern.
@@ -46,7 +46,7 @@ CAMPAIGN_MISSIONS.forEach(m => {
 const EXPERT_BUDGET_FLOOR = {A1_M01:4,A1_M02:8,A1_M03:5,A1_M04:10,A1_M05:15,A2_M01:24,A2_M02:10,A2_M03:8,A2_M04:15,A2_M05:14,A3_M01:15,A3_M02:7,A3_M03:12,A3_M04:15,A3_M05:15,A4_M01:18,A4_M02:22,A4_M03:20,A4_M04:24,A4_M05:36,A5_M01:72,A5_M02:90,A5_M03:82,A5_M04:108,A5_M05:124};
 // Expert protocols open only where a solution against the real AI is verified (tests/expert.test.cjs).
 // These Act V protocols stay closed until a solution is found.
-['A5_M01', 'A5_M03', 'A5_M04'].forEach(id => { const m = CAMPAIGN_MISSIONS.find(x => x.id === id); m.expert = { ...(m.expert || {}), disabled: true }; });
+['A5_M03', 'A5_M04'].forEach(id => { const m = CAMPAIGN_MISSIONS.find(x => x.id === id); m.expert = { ...(m.expert || {}), disabled: true }; });
 function expertMission(m) {
     const factors = { budget: .8, enemy: 1.5, ...(m.expert || {}) };
     return {
