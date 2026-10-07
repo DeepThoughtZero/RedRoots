@@ -55,5 +55,6 @@ async function solve(id,rounds){
 (async()=>{
  let r=await solve('A5_M01',[[['glider',9,84,0],['r_pentomino',59,86,1]]]);assert.equal(r.success,true,'A5_M01 relays captured from the maintenance platforms');assert.equal(r.stars,2);
  r=await solve('A5_M04',[[['r_pentomino',9,122,1],['r_pentomino',74,122,2]]]);assert.equal(r.success,true,'A5_M04 key stations captured from the maintenance platforms');assert.equal(r.stars,3);
- console.log('PASS: A5_M01 and A5_M04 solved against the real AI');
+ r=await solve('A5_M03',[[['r_pentomino',10,108,3],['block',52,108,0]]]);assert.equal(r.success,true,'A5_M03 control stations captured while the walled gates hold');assert.equal(r.stars,2);
+ console.log('PASS: A5_M01, A5_M03 and A5_M04 solved against the real AI');
 })().catch(e=>{console.error(e);process.exitCode=1});

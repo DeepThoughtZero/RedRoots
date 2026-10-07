@@ -23,6 +23,8 @@ const SOLUTIONS={
  A4_M05:[2,[[['glider',10,12],['glider',10,32],['glider',10,52],['block',10,23]],[['acorn',24,42,2]]]],
  A5_M01:[2,[[['glider',9,84,0],['r_pentomino',59,86,1]]]],
  A5_M02:[3,[[['r_pentomino',8,56,1]]]],
+ A5_M03:[3,[[['glider',9,108,0],['block',55,109,0]]]],
+ A5_M04:[3,[[['block',8,120,0],['glider',73,120,3]]]],
  A5_M05:[3,[[['r_pentomino',42,114,2]]]]
 };
 (async()=>{

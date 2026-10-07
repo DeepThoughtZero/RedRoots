@@ -425,7 +425,15 @@ Abnahme:
     - A5_M01: Gleiter und R-Pentomino, zwei Sterne, auch im Expertenmodus;
     - A5_M04: zwei R-Pentominos, drei Sterne im Normalmodus.
   - A5_M03: Jeder Sperrkorridor ist jetzt beidseitig von Felswänden mit wenigen offenen Toren eingefasst. Felsen sind keine Conway-Nachbarn, also gelangt Leben nur durch die Tore hinein (passend zum Titel „Die offenen Tore“). Ohne Eingriff übersteht die Mission jetzt die gesamte erste Runde.
-- Offen: A5_M03 (beide Modi) und das Expertenprotokoll von A5_M04 sind noch ohne nachgewiesene Lösung. Eine Prüfung der Akt-V-Lösbarkeit (zum Beispiel mit einem stärkeren Planer oder durch Anspielen) ist ein eigener Arbeitsschritt. Ihre Expertenprotokolle bleiben geschlossen (`expert.disabled`), bis eine Lösung nachgewiesen ist.
+- Ergebnis: Alle drei Missionen sind jetzt gegen die echte KI lösbar und in `tests/act5.test.cjs` bzw. `tests/expert.test.cjs` festgehalten.
+
+  | Mission | Normalmodus | Expertenmodus |
+  | --- | --- | --- |
+  | A5_M01 | 2 Sterne (Gleiter, R-Pentomino) | 2 Sterne (Gleiter, R-Pentomino) |
+  | A5_M03 | 2 Sterne (R-Pentomino, Block auf den Inseln) | 3 Sterne (Gleiter, Block) |
+  | A5_M04 | 3 Sterne (zwei R-Pentominos) | 3 Sterne (Block, Gleiter) |
+
+  Damit sind alle 13 Expertenprotokolle mit Gegnern geöffnet und belegt. Eine Prüfung der Akt-V-Lösbarkeit (zum Beispiel mit einem stärkeren Planer oder durch Anspielen) ist ein eigener Arbeitsschritt. Ihre Expertenprotokolle bleiben geschlossen (`expert.disabled`), bis eine Lösung nachgewiesen ist.
 
 ---
 
