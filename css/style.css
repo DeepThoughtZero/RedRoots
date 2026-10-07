@@ -543,17 +543,20 @@ body[data-phase="simulation"] .tool-section, body[data-turn="ai"] .tool-section 
 .route-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .route-lines line { stroke: #edb38a66; stroke-width: .3; stroke-dasharray: 1 1; }
 .route-lines line.explored { stroke: #7cffe0; stroke-width: .45; stroke-dasharray: none; }
-.sector-node { position: absolute; z-index: 3; transform: translate(-50%, -50%); width: 44px; height: 44px; border-radius: 50%; border: 1px solid #dab28d88; background: #322d2c; color: #f0d9cb; font: 600 15px/1 var(--font-mono); box-shadow: 0 4px 14px rgba(0, 0, 0, .5); transition: box-shadow var(--t-med), transform var(--t-med) var(--ease-out); }
+.sector-node { position: absolute; z-index: 3; transform: translate(-50%, -50%); display: grid; place-items: center; padding: 0; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #dab28d88; background: #322d2c; color: #f0d9cb; font: 600 15px/1 var(--font-mono); box-shadow: 0 4px 14px rgba(0, 0, 0, .5); transition: box-shadow var(--t-med), transform var(--t-med) var(--ease-out); }
 .sector-node:hover:not(:disabled) { transform: translate(-50%, -50%) scale(1.08); }
 .sector-node.conquered { background: #27594f; color: #b5ffe8; border-color: #72e7ce; box-shadow: 0 0 20px #55ffb944; }
 .sector-node:disabled { background: #202229; color: #8b807b; }
 .sector-node.selected, .sector-node.conquered.selected { z-index: 4; color: #15232b; background: #ffe1a3; border: 3px solid #fff4d5; outline: 3px solid #ffbd5f; outline-offset: 7px; box-shadow: 0 0 0 13px #ffca6430, 0 0 38px #ffbc6477; font-size: 18px; animation: sector-glow 2.4s ease-in-out infinite; }
+.sector-node .icon { width: 22px; height: 22px; stroke-width: 2.6; }
+.sector-node.selected .icon { width: 18px; height: 18px; fill: currentColor; stroke-width: 1.5; }
 @keyframes sector-glow { 50% { box-shadow: 0 0 0 18px #ffca6418, 0 0 48px #ffbc6499; } }
 .planet-label { position: absolute; color: #e6c9b6cc; font: 500 11px/1.4 var(--font-mono); letter-spacing: .1em; text-shadow: 0 1px 4px #000; }
 .planet-label small { display: block; margin-top: 5px; font-size: 10px; opacity: .85; }
 .label-tharsis { top: 40%; left: 14%; }
-.label-chryse { top: 23%; left: 52%; }
-.label-valles { top: 82%; left: 30%; }
+/* Above the highest and below the lowest sector node of every act, centred so no route node covers the text. */
+.label-chryse { top: 11%; left: 50%; transform: translateX(-50%); white-space: nowrap; text-align: center; }
+.label-valles { top: 86%; left: 50%; transform: translateX(-50%); white-space: nowrap; text-align: center; }
 .sector-list { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 20px; }
 .sector-list button { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border: 1px solid #ffffff22; border-radius: var(--r-md); background: rgba(20, 33, 41, .8); color: #d6e5e1; font-size: 16px; text-align: left; transition: background-color var(--t-fast), border-color var(--t-fast); }
 .sector-list button:hover:not(:disabled) { background: #1b2e37; border-color: #ffffff38; }
