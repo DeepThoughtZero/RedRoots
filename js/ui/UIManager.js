@@ -597,6 +597,7 @@ class UIManager {
         const [key, label] = PHASE_LABELS[phase] || ['setup', phase];
         this.setPhaseLabel(label, key);
         document.body.dataset.phase = key;
+        if (!this.gameState.scenario && phase !== CONSTANTS.PHASE_PLACEMENT) this.display?.setStatus(this.gameState.isSandbox ? 'Sandbox' : phase === CONSTANTS.PHASE_SIMULATION ? 'Evolution läuft' : 'Gefecht beendet');
         this.display?.apply();
         if (this.gameState.objectiveSystem) { this.campaign?.onPhaseChange(phase); this.syncSimControls(); }
 
@@ -691,7 +692,6 @@ class UIManager {
         }
         this.showPlayerCard(pId, this.gameState.isSandbox ? 'Sandbox' : isHuman ? 'Am Zug · Mensch' : 'Computer plant …');
         if (!scenario) this.display?.setStatus(this.gameState.isSandbox ? 'Sandbox' : `Am Zug: ${player.name} · ${isHuman ? 'Mensch' : 'Computer'}`);
-        this.display?.syncRail();
 
         if (!isHuman && this.gameState.phase === CONSTANTS.PHASE_PLACEMENT) {
             this.elBtnFinishTurn.disabled = true;
@@ -701,6 +701,7 @@ class UIManager {
                 this.ai.genome = this.aiGenomes[pId].params;
             }
 
+            this.display?.syncRail();
             if (scenario) this.ai.genome = this.ai.getDefaultGenome(this.gameState.playerStrengths[pId], this.gameState.aiProfiles?.[pId]?.doctrine);
             this.ai.takeTurn();
         } else {

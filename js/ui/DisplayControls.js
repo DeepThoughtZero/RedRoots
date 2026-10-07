@@ -39,7 +39,9 @@ class DisplayControls {
         return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled) && !!(root.requestFullscreen || root.webkitRequestFullscreen);
     }
 
+    // Cached on page load: while the Fullscreen API is active the browser also reports display-mode: fullscreen.
     static isStandalone() {
+        if (DisplayControls.standalone !== undefined) return DisplayControls.standalone;
         try {
             return matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
         } catch { return false; }
@@ -93,6 +95,8 @@ class DisplayControls {
     // Runs on every page (start, map, mission, result).
     static initPage() {
         DisplayControls.leaving = false;
+        DisplayControls.standalone = undefined;
+        DisplayControls.standalone = DisplayControls.isStandalone();
         DisplayControls.syncButtons();
         document.addEventListener('click', event => {
             if (event.target.closest?.('[data-fs]')) DisplayControls.toggleFullscreen();
@@ -132,18 +136,21 @@ class DisplayControls {
         this.layout = DisplayControls.readLayout();
         this.collapsed = false;
         this.rail = document.getElementById('sideRail');
-        this.status = document.createElement('button');
-        this.status.type = 'button';
+        // Not interactive: taps on the board below it still place cells; the rail opens the column.
+        this.status = document.createElement('div');
         this.status.className = 'board-status';
+        this.status.setAttribute('aria-hidden', 'true');
         this.status.hidden = true;
+        this.statusKey = '';
+        this.statusUntil = 0;
         ui.canvas.parentElement.append(this.status);
-        this.status.addEventListener('click', () => this.toggle());
         this.media = matchMedia(DisplayControls.COMPACT_QUERY);
         this.media.addEventListener?.('change', () => this.apply());
         document.getElementById('btnRailExpand')?.addEventListener('click', () => this.toggle());
         document.getElementById('btnRailPrimary')?.addEventListener('click', () => ui.elBtnFinishTurn.click());
         document.getElementById('btnRailMenu')?.addEventListener('click', () => ui.elBtnSettings.click());
         const auto = document.getElementById('optAutoRail');
+        this.autoRow = auto?.closest('label');
         if (auto) {
             auto.checked = this.layout.autoRail;
             auto.addEventListener('change', () => { this.layout.autoRail = auto.checked; DisplayControls.writeLayout({ autoRail: auto.checked }); this.apply(); });
@@ -158,6 +165,7 @@ class DisplayControls {
 
     apply() {
         const phase = this.phaseKey();
+        if (this.autoRow) this.autoRow.hidden = !this.compact;
         this.setCollapsed(this.compact && phase !== 'gameover' && DisplayControls.effective(this.layout.side, phase, this.layout.autoRail));
     }
 
@@ -180,8 +188,15 @@ class DisplayControls {
             el.setAttribute('aria-label', label);
             el.title = label;
         }
-        this.status.hidden = !collapsed || !this.status.textContent;
-        if (changed) this.syncRail();
+        if (changed) {
+            // Focus never stays inside a region that just disappeared.
+            const active = document.activeElement;
+            const hiddenRegion = collapsed ? active?.closest?.('.topbar, .mission-hud, #rightPanel') : active?.closest?.('#sideRail');
+            if (hiddenRegion) (collapsed ? document.getElementById('btnRailExpand') : document.querySelector('[data-side]'))?.focus({ preventScroll: true });
+            if (collapsed) this.statusUntil = performance.now() + 4000;
+            this.syncRail();
+        }
+        this.updateStatusVisibility();
     }
 
     // The rail mirrors the primary action, the budget and the round of the folded column.
@@ -189,7 +204,7 @@ class DisplayControls {
         if (!this.rail) return;
         const source = this.ui.elBtnFinishTurn, primary = document.getElementById('btnRailPrimary');
         if (primary) {
-            const label = source.textContent.replace(/→/g, '').replace(/\s+/g, ' ').trim();
+            const label = [...source.childNodes].map(n => n.textContent.replace(/→/g, '').trim()).filter(Boolean).join(' – ');
             primary.disabled = source.disabled;
             primary.classList.toggle('btn-stop', source.classList.contains('btn-stop'));
             primary.setAttribute('aria-label', label);
@@ -202,11 +217,21 @@ class DisplayControls {
     }
 
     // Most urgent mission line, shown on the board while the column is folded.
+    // Shown for a few seconds when its meaning changes (numbers alone do not count); alarms stay visible.
     setStatus(text, level = '') {
+        const key = `${level}|${(text || '').replace(/\d+/g, '#')}`;
+        if (key !== this.statusKey) { this.statusKey = key; this.statusUntil = performance.now() + 4000; }
         this.status.textContent = text || '';
         this.status.className = `board-status${level ? ` ${level}` : ''}`;
-        this.status.setAttribute('aria-label', text ? `Seitenleiste einblenden: ${text}` : 'Seitenleiste einblenden');
-        this.status.hidden = !this.collapsed || !text;
+        this.statusLevel = level;
+        this.updateStatusVisibility();
+    }
+
+    updateStatusVisibility() {
+        const show = this.collapsed && !!this.status.textContent && (this.statusLevel === 'alarm' || performance.now() < this.statusUntil);
+        this.status.hidden = !show;
+        clearTimeout(this.statusTimer);
+        if (show && this.statusLevel !== 'alarm') this.statusTimer = setTimeout(() => this.updateStatusVisibility(), Math.max(50, this.statusUntil - performance.now()));
     }
 }
 
