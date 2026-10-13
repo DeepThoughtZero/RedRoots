@@ -123,6 +123,13 @@ Validiert alle Missionslösungen und Spielstandsmechaniken:
   - Mission 14 (`collectZones` & `sterile`): Drei Archive unter gegnerischem Beschuss bergen; der rote Quarantänestreifen darf von keiner Zelle berührt werden.
   - Mission 15 (`holdZones` & `sterile`): Drei Relais 16 Generationen ununterbrochen halten; Trennstreifen steril halten.
   - Codes: `RR3`-Expeditionscodes mit 15 Bewertungen und 36-stelliger Prüfsumme.
+- **Akt VI (`tests/act6.test.cjs`):**
+  - Mission 26 (`oscillate` & `protect`): Ein Leuchtfeuer aus zwei Blöcken hält 80 Generationen den Zweitakt; ohne Abwehr bricht es bei Generation 44, ohne Vorbereitung auf die angekündigte Böe knapp bei 72 / 80.
+  - Mission 27 (`escort`): Saubere Gleitertreffer räumen die Fahrrinne für den verbündeten Hellas-Zug; der Eisabbruch zerstört einen ungeschützten Zug.
+  - Mission 28 (`clearZones` mit `minGenerations` & `sterile`): Fresser schlucken beide Gleiterströme, zwei Schüsse lassen die Saatkanonen verstummen; Fresser allein genügen nicht.
+  - Mission 29 (`exactCount`): Ein Gleiter in die obere Saatkapsel ergibt genau zwölf Zellen, ebenso drei getrennte Bahnen; zwei Bahnen messen acht.
+  - Mission 30 (`captureCamps` mit Zielbegriffen „Beete“): Drei Hochbeete wachsen an, zwei Blöcke fangen Schmelzflut und zweite Welle ab; ohne Abwehr werden Kinderhaus oder Trinkwasser verletzt.
+  - Codes mit 30 Bewertungen, Sektorpasswort `PALISADE-FRUEHLING`, Genome Leuchtfeuer und Fresser, Expertenbudgets.
 
 ---
 
@@ -168,7 +175,7 @@ Verifikation des Klang- und Narrationssystems:
 ```bash
 node tests/run-all.cjs
 ```
-Führt alle Testsuiten (derzeit vierzehn) nacheinander aus, misst die Laufzeiten und gibt einen übersichtlichen Erfolgs- oder Fehlerbericht aus.
+Führt alle Testsuiten (derzeit siebzehn) nacheinander aus, misst die Laufzeiten und gibt einen übersichtlichen Erfolgs- oder Fehlerbericht aus.
 
 ### Einzelne Suiten ausführen
 ```bash
@@ -178,6 +185,7 @@ node tests/ai.test.cjs         # KI-Verhalten & Budgetdisziplin
 node tests/campaign.test.cjs   # Akt I Szenarien & Codes
 node tests/act2.test.cjs       # Akt II Szenarien & Hold-Zonen
 node tests/act3.test.cjs       # Akt III Szenarien & Quarantäne
+node tests/act6.test.cjs       # Akt VI Leuchtfeuer, Geleitschutz, Saatkanonen, Kalibrierung, Gartenfinale
 node tests/audio.test.cjs      # GameAudio & Sprachausgabe
 ```
 

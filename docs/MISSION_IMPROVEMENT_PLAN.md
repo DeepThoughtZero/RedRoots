@@ -1,6 +1,6 @@
 # RedRoots – Verbesserungsplan: Spannendere Missionen
 
-Stand: Oktober 2026 · Grundlage: 25 spielbare Missionen in Akt I–V (`js/campaign/Missions.js`, `Act2.js` … `Act5.js`)
+Stand: Oktober 2026 · Grundlage: 30 spielbare Missionen in Akt I–VI (`js/campaign/Missions.js`, `Act2.js` … `Act6.js`). Akt VI setzt die Zieltypen aus C4 erstmals in Missionen ein (Leuchtfeuer, Geleitschutz, Eindämmung, Kalibrierung).
 
 Dieses Dokument beschreibt, wie das Spielen der Kampagnenmissionen spannender werden soll. Die Conway-Regeln bleiben dabei unverändert. Es ist ein Arbeitsplan und noch keine Spielerdokumentation. Umgesetzte Funktionen werden zusätzlich in der README beschrieben; Storyänderungen folgen `docs/CAMPAIGN_STORY.md`.
 
@@ -278,7 +278,7 @@ Grundsatz: HUD, Spielfeldanzeige, Hinweise und Boni dürfen in den Basismissione
 | A2_M03 Die letzte Fähre | Trivialer Tempobonus, keine Vorwarnung | Bonus → `margin` 4 Felder (A8/D1); Fähren-Countdown (A4); Bedrohungsanzeige (A2). Expertenprotokoll: angekündigte zweite Front ab Gen 48 (C1) |
 | A2_M04 Gestohlene Warnungen | Gesicherte Archive nicht sichtbar, Wache zufällig | Archive ✓ (A1); `aiSeed` (B4); Doktrin `raid` auf die Landefläche (C3) |
 | A2_M05 Netz aus Inseln | Unterbrochene Haltezähler bemerkt man nicht | Haltebalken und Toast „Kontakt verloren“ (A1/A3); Zeitlupe in den letzten 3 Generationen (B2) |
-| *neu in Akt II* | – | Für eine spätere Erweiterung: `oscillate`-Mission „Leuchtfeuer“ und `clearZones`-Mission „Eindämmung“ (C4) |
+| *neu in Akt II* | – | Für eine spätere Erweiterung: `oscillate`-Mission „Leuchtfeuer“ und `clearZones`-Mission „Eindämmung“ (C4) – umgesetzt in Akt VI (Sektoren 26 und 28) |
 
 ### Akt III – Das stille Netz
 

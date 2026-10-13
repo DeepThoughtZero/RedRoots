@@ -59,7 +59,7 @@ Das Spiel besteht aus purem HTML, CSS und JavaScript. Es werden keine externen S
 
 ## Kampagne: Das Gedächtnis des roten Bodens
 
-Fünf Akte mit fünfundzwanzig handgebauten Missionen sind spielbar. Akt I führt Haus Marineris durch Überleben, Expansion, ein Gleiterpass, ein Rennen um Wasser und eine Invasion. Missionsziele werden während der Evolution und nach der Gebietsauswertung geprüft. Gelbe Markierungen zeigen Ziele auf dem Spielfeld; der Funkkanal liefert konkrete taktische Hinweise.
+Sechs Akte mit dreißig handgebauten Missionen sind spielbar. Akt I führt Haus Marineris durch Überleben, Expansion, ein Gleiterpass, ein Rennen um Wasser und eine Invasion. Missionsziele werden während der Evolution und nach der Gebietsauswertung geprüft. Gelbe Markierungen zeigen Ziele auf dem Spielfeld; der Funkkanal liefert konkrete taktische Hinweise.
 
 Mission 1 beginnt ausschließlich mit Einzelzellen: Eine Anordnung, die zwölf Generationen überlebt, muss selbst gefunden werden. Die erste Mission läuft bewusst langsam (0,8 Sekunden je Generation) und zeigt den Endzustand kurz vor dem Ergebnis. Der Sieg schaltet die Block-Vorlage frei; nach Mission 2 folgen Gleiter und Blinker. Auch beim Wiederholen bleiben die missionsspezifischen Musterbeschränkungen bestehen.
 
@@ -76,7 +76,7 @@ Die Marskarte öffnet weitere Sektoren nach einem Sieg. Zwei optionale Herausfor
 Auf der Marskarte findest du unten **Expedition / Spielstand**:
 
 - **Code kopieren**: portabler, einprägsamer Expeditionscode mit allen bisher erreichten Sternwertungen (z. B. `LANDUNG-309`, `PASS-2145` oder fortgeschritten `STURMAUGE-…`). Auf einem anderen Gerät unter **Übernehmen** einlösen. Der Code spiegelt den erreichten Sektor wider und nutzt kompakte, leicht chiffrierte Ziffern mit Prüfsumme. Sektorpasswörter bleiben regulär als Einstiegspunkte einlösbar.
-- **Sektorpasswörter** öffnen Mission 1 bis 5; die Testcodes stehen in der Tabelle unten. Frühere Missionen erhalten mindestens einen Stern, samt Forschung und Archivfunden. Höhere lokale Wertungen bleiben bestehen.
+- **Sektorpasswörter** öffnen jeden der dreißig Sektoren; die Testcodes stehen in der Tabelle unten. Frühere Missionen erhalten mindestens einen Stern, samt Forschung und Archivfunden. Höhere lokale Wertungen bleiben bestehen.
 - **Kampagne zurücksetzen**: nach Bestätigung beginnt die Kampagne wieder bei Mission 1. Die Gefecht-Einstellungen bleiben erhalten. Mit einem vorher gesicherten Expeditionscode lässt sich der alte Stand wiederherstellen.
 
 ### Testcodes für den direkten Sektoreinstieg
@@ -103,13 +103,13 @@ Diese vollständige Testcodeliste steht nur in der README, nicht in der Kampagne
 
 Ein Code wird auch nach jeder erfolgreichen Mission angezeigt. Es gibt keine automatische Cloud-Synchronisierung. Browserspeicher ist je Browserprofil und Website-Adresse getrennt; unterschiedliche lokale Ports oder die veröffentlichte Website haben eigene Spielstände. Codes funktionieren zwischen diesen Installationen derselben Kampagnenversion.
 
-Das freie Gefecht bleibt mit allen 13 Mustern und den bisherigen Zufallskarten verfügbar. Die Sandbox ist jetzt direkt im Startmenü erreichbar. Es gibt keine Kampagnenbeschränkungen für diese Modi.
+Das freie Gefecht bleibt mit allen 15 Mustern (inklusive Leuchtfeuer und Fresser aus Akt VI) und den bisherigen Zufallskarten verfügbar. Die Sandbox ist jetzt direkt im Startmenü erreichbar. Es gibt keine Kampagnenbeschränkungen für diese Modi.
 
 - `js/campaign/Missions.js`: Szenariodaten und Karteninitialisierung, inklusive asymmetrischer Gebiete, Camps, Felsen, Zielzonen und vorgegebener Flora.
 - `js/campaign/ObjectiveSystem.js`: Sieg/Niederlage, Generationen, Materialverbrauch und Bonuswertung.
 - `js/campaign/Story.js`: Funkbriefings, Missionsberichte und freischaltbare Archivfunde.
 - `js/campaign/CampaignManager.js`: Marskarte, Missions-HUD, Ergebnisansicht und versionierter Fortschritt.
-- [Kampagnengeschichte](docs/CAMPAIGN_STORY.md): vollständiger Handlungsbogen der fünf spielbaren Akte.
+- [Kampagnengeschichte](docs/CAMPAIGN_STORY.md): vollständiger Handlungsbogen der sechs spielbaren Akte.
 - [Verbesserungsplan für Missionen](docs/MISSION_IMPROVEMENT_PLAN.md): geplante Maßnahmen für spannendere Missionen (Zielanzeigen, Neuversuch, angekündigte Ereignisse, neue Ziel- und Bonustypen).
 
 ### Prüfen und Qualitätssicherung
@@ -127,13 +127,14 @@ node tests/ai.test.cjs           # Ebene 3: KI-Budgetdisziplin & Grenzfälle
 node tests/campaign.test.cjs     # Ebene 4: Akt I Lösungswege, Reset & Codes
 node tests/act2.test.cjs         # Ebene 4: Akt II Versorgung & Hold-Zonen
 node tests/act3.test.cjs         # Ebene 4: Akt III Schalter, Pulse & Quarantäne
+node tests/act6.test.cjs         # Ebene 4: Akt VI Leuchtfeuer, Geleitschutz, Saatkanonen, Kalibrierung & Gartenfinale
 node tests/objectives.test.cjs   # Ebene 4: Bedrohungsabstand, Ereignisse, Niederlagenanalyse & Abstandsboni
 node tests/controls.test.cjs     # Ebene 4: Pause, Einzelschritt, Turbo, Zeitlupe, Checkpoints, Prognose, Rennuhr
 node tests/scenario.test.cjs     # Ebene 4: Ereignisse, Vorratskapseln, Doktrinen & neue Zieltypen
 node tests/mastery.test.cjs      # Ebene 4: Bonusvielfalt, Bestwerte, Expertenprotokolle, Funksprüche & Zeitleiste
 node tests/audio.test.cjs        # Ebene 5: GameAudio, Ducking, Tab-Pause & TTS
 node tests/audio-assets.test.cjs # Ebene 5: Audio-Aufnahmen & SHA-256 Integrität
-node tests/display.test.cjs      # Ebene 5: Vollbild-Wunsch & einklappbare Seitenspalte
+node tests/display.test.cjs      # Ebene 5: Vollbild-Modi, Taste F & einklappbare Seitenspalte
 
 # Git Pre-Push Hook aktivieren (verhindert Push bei Testfehlern):
 ./scripts/install-hooks.sh
@@ -143,7 +144,7 @@ node tests/display.test.cjs      # Ebene 5: Vollbild-Wunsch & einklappbare Seite
 
 Für den Browser: `python3 -m http.server 8765`, dann `http://localhost:8765/index.html`. Es gibt keinen Build-Schritt und keine CDN-Abhängigkeit: Stylesheet, Schriften (`assets/fonts/`, SIL Open Font License) und Oberflächenbilder (`assets/ui/`, WebP) liegen im Repository. Eine Offline-App (Service Worker) ist das Spiel dennoch nicht.
 
-Akt II setzt die Rettung der Hellas-Siedlungen fort: zwei Versorgungswege, gleichzeitige Schleusenkontrolle, Evakuierung unter Wildwuchs, drei Forschungsarchive und ein gemeinsamer Schutzgürtel. Akt III führt diese Geschichte unter Olympus mit sequenziellen Schaltern und Quarantänezonen fort. Akt IV ergänzt fünf schwere Gefechte gegen Tharsis und Viridion. Akt V schließt die Geschichte mit fünf planetaren Langzeitgefechten und einer verantwortbaren Zukunftsentscheidung ab.
+Akt II setzt die Rettung der Hellas-Siedlungen fort: zwei Versorgungswege, gleichzeitige Schleusenkontrolle, Evakuierung unter Wildwuchs, drei Forschungsarchive und ein gemeinsamer Schutzgürtel. Akt III führt diese Geschichte unter Olympus mit sequenziellen Schaltern und Quarantänezonen fort. Akt IV ergänzt fünf schwere Gefechte gegen Tharsis und Viridion. Akt V schließt die PALISADE-Geschichte mit fünf planetaren Langzeitgefechten und einer verantwortbaren Zukunftsentscheidung ab. Akt VI erzählt den ersten Frühling danach: Pflege statt Kampf.
 
 ## 🛠️ Architektur
 
@@ -166,7 +167,7 @@ Die fertigen MP3-Dateien unter `assets/audio/` werden mit der Website ausgeliefe
 
 Erzeugung: `python3 scripts/generate_audio.py` und `python3 scripts/generate_failure_audio.py` nutzen die lokalen AiStack-Dienste Qwen3-TTS (deutsche Erzählerstimme `uncle_fu`), Speaches und AudioGen. Der Speaches-Schlüssel wird aus der Umgebung oder der lokalen AiStack-Konfiguration gelesen und niemals in Assets gespeichert. Sprache wird auf −16 LUFS, die in acht Takes erzeugte Atmosphäre auf −23 LUFS normalisiert. `manifest.json` enthält die Texte; `verification.json` enthält die Transkriptprüfung. `node tests/audio.test.cjs` prüft die Audio-Steuerung ohne GPU.
 
-Alle 50 aktuellen Briefings und erfolgreichen Missionsberichte aus Akt I–V sowie die sechs Niederlagegründe sind als deutsche Qwen3-Aufnahmen enthalten und per Speaches geprüft. Die Browserstimme dient als Fallback für unbekannte Texte. Die Funkkennung lautet „Landefähre“. `verification.json` dokumentiert Transkripte und Prüfsummen; `mastering.json` enthält die Pegelmessungen. `node tests/audio-assets.test.cjs` prüft, dass Aufnahmen und aktuelle Sektortexte zusammenpassen. Versionierte Audio-URLs verhindern, dass alte Aufnahmen aus dem Browsercache abgespielt werden.
+Alle 50 aktuellen Briefings und erfolgreichen Missionsberichte aus Akt I–V sowie die sechs Niederlagegründe sind als deutsche Qwen3-Aufnahmen enthalten und per Speaches geprüft. Die zehn Texte von Akt VI liest vorerst die Browserstimme (`narration: 'browser'`): Beim Schreiben standen keine lokalen Sprachdienste zur Verfügung. Sie stehen bereits im Textmanifest; `python3 scripts/generate_audio.py` erzeugt und prüft sie auf der Workstation, danach werden die Missionen auf `narration: 'recorded'` mit neuer `audioRevision` umgestellt. Die Browserstimme dient als Fallback für unbekannte Texte. Die Funkkennung lautet „Landefähre“. `verification.json` dokumentiert Transkripte und Prüfsummen; `mastering.json` enthält die Pegelmessungen. `node tests/audio-assets.test.cjs` prüft, dass Aufnahmen und aktuelle Sektortexte zusammenpassen. Versionierte Audio-URLs verhindern, dass alte Aufnahmen aus dem Browsercache abgespielt werden.
 
 ### Missionsabhängige Atmosphäre und Abbrechen
 
@@ -176,7 +177,7 @@ Die Missionen aller drei Akte verwenden unterschiedliche Klangkulissen: Landewin
 
 ### Missionsbilder
 
-Alle 25 Missionen besitzen eigene Illustrationen im Stil der bisherigen Mars- und Häuserbilder. Im Briefing lässt sich das Motiv in voller Größe öffnen. Die WebP-Dateien liegen in `assets/missions/`; `manifest.json` dokumentiert die integrierte Bildgenerierung, Stilreferenzen und vollständigen Prompts. Der Integritätstest prüft eindeutige Zuordnungen und Dateiinhalte. Die Bilder illustrieren die Geschichte, nicht den exakten Aufbau des taktischen Spielfelds.
+Alle 30 Missionen besitzen eigene Illustrationen im Stil der bisherigen Mars- und Häuserbilder. Die fünf Bilder von Akt VI sind ein bewusster Übergang: `scripts/compose_act6_images.py` rahmt und färbt vorhandene Motive neu und malt das Missionsmotiv hinein (Leuchtfeuer, Wasserzug, Saatkanonen, die zwölf Lichter des Gewölbes, der erste Garten); `manifest.json` enthält die Prompts für eine spätere Erzeugung mit dem Bildwerkzeug. Im Briefing lässt sich das Motiv in voller Größe öffnen. Die WebP-Dateien liegen in `assets/missions/`; `manifest.json` dokumentiert die integrierte Bildgenerierung, Stilreferenzen und vollständigen Prompts. Der Integritätstest prüft eindeutige Zuordnungen und Dateiinhalte. Die Bilder illustrieren die Geschichte, nicht den exakten Aufbau des taktischen Spielfelds.
 
 ### Langsamere Genom-Forschung
 
@@ -191,6 +192,8 @@ Alle 25 Missionen besitzen eigene Illustrationen im Stil der bisherigen Mars- un
 | 8 | Diehard |
 | 9 | Acorn |
 | 10 | B-Heptomino |
+| 26 | Leuchtfeuer (zwei Blöcke Ecke an Ecke, blinkt im Zweitakt) |
+| 27 | Fresser (verschluckt anfliegende Gleiter und bleibt bestehen) |
 
 Akt III ergänzt Rabbits nach Sektor 12, Switch Engine nach Sektor 14 und Lidka nach Sektor 15. Die Gleiterkanone folgt erst nach Sektor 19. Frühere Missionen behalten beim Wiederholen ihre begrenzte Auswahl. Vorhandene Sterne und Sektorabschlüsse bleiben erhalten; die Forschung wird aus der neuen Staffelung abgeleitet. Freies Gefecht und Sandbox behalten sämtliche Figuren.
 
@@ -233,3 +236,25 @@ Weitere Testpasswörter (nur hier dokumentiert):
 | `PALISADE-TORE` | Mission 23 – Die offenen Tore |
 | `PALISADE-VERTEILER` | Mission 24 – Kein Haus allein |
 | `PALISADE-ERBE` | Mission 25 – Das Gedächtnis des Bodens |
+
+### Akt VI – Der erste Frühling
+
+Fünf Missionen nach der Entscheidung von Akt V (Sektoren 26–30). Kein Haus ist mehr Gegner; es geht um Pflege: Takt halten, sauber räumen, Hecken ziehen, genau bemessen. Jede Mission nutzt einen eigenen Zieltyp:
+
+- **Leuchtfeuer im Eissturm:** Eine eigene Kolonie muss im markierten Feld 80 Generationen im Zweitakt schwingen (Blinker oder zwei Blöcke Ecke an Ecke), während Gleiter und eine angekündigte Sturmböe aus Raumschiffen heranziehen. Nach der Evolution säst du nur nahe lebender Kolonien – Abfangblöcke für Runde 2 gehören deshalb schon in Runde 1 aufs Feld.
+- **Der Wasserzug:** Ein verbündetes, rosa Raumschiff von Hellas fährt durch den Schmelzkanal. Drei erstarrte Nester in der Fahrrinne müssen restlos verschwinden – auch eigene Reste lassen den Zug entgleisen. Es gibt für jedes Nest Gleiterbahnen, auf denen sich Gleiter und Nest gegenseitig auslöschen.
+- **Die verwaisten Saatkanonen:** Zwei automatische Gleiterkanonen feuern auf einen roten Trinkwasserkanal zu. Fresser (richtig gedreht) schlucken ganze Ströme, Treffer an der richtigen Stelle bringen die Kanonen zum Schweigen; der Kanal muss bis Generation 160 leer bleiben.
+- **Das Saatgutgewölbe:** Bei Generation 120 müssen genau zwölf eigene Zellen in der Keimkammer leben. Gleiter erstarren an Felswänden zu Blöcken aus vier Zellen, zwei Gleiter auf derselben Bahn löschen sich aus, Saatkapseln verwandeln einen Treffer in mehr eigene Zellen. Die Prognose rechnet hier bis zur Messung.
+- **Der erste Frühling:** Drei Hochbeete wachsen an, wenn darin 16 Generationen lang mindestens drei eigene Zellen und mehr eigene als wilde leben. Kinderhaus und Trinkwasserbecken bleiben bis Generation 160 geschützt, während Schmelzflut und zweite Welle (jeweils eine Runde vorher angekündigt) heranziehen.
+
+Angekündigte Raumschiffe und Gleiter aus Ereignissen zeigen in der Planungsphase ihrer Runde einen Richtungspfeil. Die Entscheidung aus Akt V klingt auf der Marskarte von Akt VI und im Epilog nach; wer sie noch nicht getroffen hat, kann sie im Abschluss von Akt V auf der Marskarte nachholen. Neue Genome: Leuchtfeuer nach Sektor 26, Fresser nach Sektor 27.
+
+Weitere Testpasswörter (nur hier dokumentiert):
+
+| Passwort | Einstieg |
+| --- | --- |
+| `PALISADE-LEUCHTFEUER` | Mission 26 – Leuchtfeuer im Eissturm |
+| `PALISADE-WASSERZUG` | Mission 27 – Der Wasserzug |
+| `PALISADE-SAATKANONEN` | Mission 28 – Die verwaisten Saatkanonen |
+| `PALISADE-GEWOELBE` | Mission 29 – Das Saatgutgewölbe |
+| `PALISADE-FRUEHLING` | Mission 30 – Der erste Frühling |

@@ -2,7 +2,7 @@
 
 ## Spielbarer Umfang
 
-Akt I–V bestehen aus je fünf implementierten Missionen. Das freie Gefecht und die Sandbox bleiben unabhängige Startoptionen mit ihrer bisherigen Genbibliothek und ihren bisherigen Regeln. Die Kampagne folgt Haus Marineris.
+Akt I–VI bestehen aus je fünf implementierten Missionen. Das freie Gefecht und die Sandbox bleiben unabhängige Startoptionen mit ihrer bisherigen Genbibliothek und ihren bisherigen Regeln. Die Kampagne folgt Haus Marineris.
 
 ## Prämisse
 
@@ -73,6 +73,18 @@ Das in Akt III gerettete Netz unter Olympus muss nun weitere Regionen versorgen.
 Anschließend stehen zwei verantwortbare Entscheidungen: **Ein gemeinsames Mars-Konsortium** bündelt Wartung und Wasserquoten, verlangt aber die Abgabe hausinterner Kontrolle. **Freie lokale Genome** geben den Siedlungen Autonomie und veröffentlichen die Archive, verlangen jedoch langfristige Kooperation zur Erhaltung der Sperrkorridore. Die Wahl wird im Kampagnenstand gespeichert; keine Option macht den Mars augenblicklich grün.
 
 Letzte Aufzeichnung Kesslers: „Die Flora erinnert sich an nichts. Aber jede Generation erbt die Folgen der vorherigen. Das ist genug.“ Letzte Szene: ein Block aus vier Zellen, wie bei der Landung – diesmal in einer gemeinsam erhaltenen Schutzzone.
+
+## Akt VI – Der erste Frühling (implementiert)
+
+Zwei Marsjahre nach dem Beschluss der Häuser. Der Nordfrühling lässt die Polkappe schrumpfen; zum ersten Mal kann Schmelzwasser durch die alten Kanäle nach Süden fließen. Kein Haus ist mehr Gegner. Die Hindernisse sind das Erbe automatischer Systeme und unvorsichtiger Aussaat – und die Frage, ob die Siedlungen Wachstum pflegen können, statt es nur zu bekämpfen. Jede Mission lehrt eine Technik der Pflege; das Finale verlangt alle zugleich.
+
+26. **Leuchtfeuer im Eissturm:** Die gemeinsame Eisexpedition ist im Sturm erblindet. Eine Kolonie im Zweitakt wird zum Leuchtfeuer; zwei angekündigte Sturmwellen müssen abgefangen werden. Unter dem Eis wartet eine PALISADE-Station mit Leuchtfeuern aus zwei Blöcken. Belohnung: das Leuchtfeuer.
+27. **Der Wasserzug:** Die Hellas-Kommandantin führt den ersten Wasserzug (ein verbündetes Raumschiff) durch den Schmelzkanal. Erstarrte Nester müssen restlos geräumt werden, ohne den Zug zu treffen. Zum Dank teilt Hellas den Bauplan seiner Leitungswachen: den Fresser.
+28. **Die verwaisten Saatkanonen:** Zwei automatische PALISADE-Kanonen feuern seit Jahrzehnten Wildwuchs-Gleiter. Fresser fangen die Ströme als Hecken, gezielte Treffer bringen die Kanonen zum Schweigen; der Trinkwasserkanal bleibt steril. In den Speichern liegt Kesslers Saatplan: Die Felder sollten sich über ein Jahrhundert langsam schließen; die beschleunigten Genome kamen erst später.
+29. **Das Saatgutgewölbe:** Direkt unter der ersten Landestelle liegt Kesslers Gewölbe. Sein biologisches Schloss verlangt genau zwölf lebende Zellen bei Generation 120 – so viele Generationen hielt die erste Kolonie. Darin lagern langsame Saatlinien, beschriftet für die Generation nach uns.
+30. **Der erste Frühling:** In Chryse entsteht der erste Garten unter offenem Himmel. Drei Hochbeete wachsen an, Kinderhaus und Trinkwasser werden gegen Schmelzflut und zweite Welle geschützt. Kinder aller vier Häuser zählen am Ende die Zellen. Kesslers Notiz im Saatgut: „Pflegt, was nach euch wächst.“
+
+Die Entscheidung aus Akt V verändert keine taktischen Bedingungen, klingt aber auf der Marskarte von Akt VI und im Epilog nach: Das Konsortium übernimmt die Pflege der Hecken und verteilt Schmelzwasser nach Quoten, oder jede Siedlung nimmt Saat mit, während der gemeinsame Vertrag die Hecken zwischen den Gärten schützt. Wer noch nicht entschieden hat, kann das auf der Marskarte im Abschluss von Akt V nachholen. Der Mars wird auch hier nicht augenblicklich grün – er hat einen ersten Frühling, den alle gemeinsam erhalten.
 
 ## Dramaturgische Regeln
 
