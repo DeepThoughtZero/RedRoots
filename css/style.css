@@ -531,6 +531,7 @@ body[data-phase="simulation"] .tool-section, body[data-turn="ai"] .tool-section 
 .campaign-completion h2 { margin-bottom: 8px; font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #c4f1df; }
 .campaign-completion p { margin: 6px 0; font-size: 16px; line-height: 1.6; color: #bdd1cb; }
 .campaign-completion .launch-button { margin-top: 12px; max-width: 420px; }
+.expedition-intro .act-choice { max-width: 640px; margin-top: 6px; padding-left: 12px; border-left: 2px solid rgba(255, 210, 134, .45); color: #e3c9a4; }
 .campaign-completion .quiet-button { display: block; width: 100%; margin-top: 10px; padding: 14px 16px; text-align: left; line-height: 1.55; }
 
 .expedition-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(390px, 1fr); border: 1px solid #ffffff18; border-radius: var(--r-xl); overflow: hidden; background: rgba(11, 18, 24, .66); box-shadow: var(--shadow-2); }

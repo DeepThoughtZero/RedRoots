@@ -44,11 +44,22 @@ const CONSTANTS = {
         'switch_engine': { name: 'Switch Engine', pattern: [[0, 1], [0, 3], [1, 0], [2, 1], [2, 4], [3, 3], [3, 4], [3, 5]] },
         'rabbits': { name: 'Rabbits', pattern: [[0, 0], [0, 4], [0, 5], [0, 6], [1, 0], [1, 1], [1, 2], [1, 5], [2, 1]] },
         'lidka': { name: 'Lidka', pattern: [[0, 1], [1, 0], [1, 2], [2, 1], [11, 8], [12, 6], [12, 8], [13, 5], [13, 6], [13, 8], [15, 4], [15, 5], [15, 6]] },
+        // Act VI: two blocks touching at a corner blink in a two-beat rhythm; the eater swallows gliders and stays.
+        'beacon': { name: 'Leuchtfeuer', pattern: [[0, 0], [0, 1], [1, 0], [2, 3], [3, 2], [3, 3]] },
+        'eater': { name: 'Fresser', pattern: [[0, 0], [0, 1], [1, 0], [1, 2], [2, 2], [3, 2], [3, 3]] },
         'glider_gun': {
             name: 'Gleiter-Kanone',
             pattern: [[0,24],[1,22],[1,24],[2,12],[2,13],[2,20],[2,21],[2,34],[2,35],[3,11],[3,15],[3,20],[3,21],[3,34],[3,35],[4,0],[4,1],[4,10],[4,16],[4,20],[4,21],[5,0],[5,1],[5,10],[5,14],[5,16],[5,17],[5,22],[5,24],[6,10],[6,16],[6,24],[7,11],[7,15],[8,12],[8,13]]
         }
     }
+};
+
+// Wild still lifes that missions may seed as nests or obstacles; they are no player genomes.
+CONSTANTS.FORMS = {
+    'beehive': { name: 'Bienenstock', pattern: [[0, 1], [0, 2], [1, 0], [1, 3], [2, 1], [2, 2]] },
+    'boat': { name: 'Boot', pattern: [[0, 0], [0, 1], [1, 0], [1, 2], [2, 1]] },
+    'loaf': { name: 'Laib', pattern: [[0, 1], [0, 2], [1, 0], [1, 3], [2, 1], [2, 3], [3, 2]] },
+    'tub': { name: 'Wanne', pattern: [[0, 1], [1, 0], [1, 2], [2, 1]] }
 };
 
 // Calculate cost dynamically based on number of cells

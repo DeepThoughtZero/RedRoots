@@ -18,8 +18,11 @@ class GameRenderer {
         // Until the player pans or zooms, a resize re-fits the whole board.
         this.userCamera = false;
         this.reducedMotion = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-        // Spaceships among predefined foreign flora get a direction arrow in the first planning phase.
-        this.seedArrows = (gameState.scenario?.map.seeds || []).filter(seed => seed.owner !== 1).map(seed => ({ seed, cells: MissionManager.seedCells(seed), motion: MissionManager.seedMotion(seed) })).filter(a => a.motion);
+        // Spaceships among predefined foreign flora get a direction arrow in the first planning phase;
+        // spaceships seeded by an announced round event get one in the planning phase of their round.
+        const eventSeeds = (gameState.scenario?.events || []).filter(e => e.round !== undefined).flatMap(e => [].concat(e.action).filter(a => a.type === 'seed').map(seed => ({ seed, round: e.round, eventId: e.id })));
+        this.seedArrows = [...(gameState.scenario?.map.seeds || []).map(seed => ({ seed, round: 1 })), ...eventSeeds].filter(a => a.seed.owner !== 1)
+            .map(a => ({ ...a, cells: MissionManager.seedCells(a.seed), motion: MissionManager.seedMotion(a.seed) })).filter(a => a.motion);
         this.resize();
         // The board also changes size when the mission HUD collapses or the device rotates.
         this.resizeObserver = new ResizeObserver(() => this.resize());
@@ -174,7 +177,10 @@ class GameRenderer {
             const prefix = st.state === 'done' ? '✓ ' : st.state === 'next' ? '▶ ' : st.state === 'protect' ? '⛨ ' : st.state === 'cache' ? '◆ ' : '';
             const suffix = st.state === 'locked' ? ' · WARTET' : st.state === 'cache' ? ` · +${z.cache} MATERIAL` : st.progressLabel && st.progress > 0 ? ` · ${st.progressLabel}` : '';
             const threat = st.threat !== 'calm' ? ` · ⚠ ${st.distance} F.` : '';
-            this.label(prefix + z.label + suffix + threat, x, y - 4, st.threat === 'alarm' || st.state === 'sterile' ? '#ff9fab' : st.threat === 'warning' ? '#ffc98a' : st.state === 'done' ? '#b8ffe0' : st.state === 'locked' ? '#b6c2cc' : '#ffe0ab');
+            // Zones at the right edge keep their label on the board.
+            ctx.font = this.labelFont().font;
+            const text = prefix + z.label + suffix + threat, lx = Math.max(0, Math.min(x, state.cols * size - ctx.measureText(text).width - 4));
+            this.label(text, lx, y - 4, st.threat === 'alarm' || st.state === 'sterile' ? '#ff9fab' : st.threat === 'warning' ? '#ffc98a' : st.state === 'done' ? '#b8ffe0' : st.state === 'locked' ? '#b6c2cc' : '#ffe0ab');
             ctx.restore();
         }
         // Announced scenario events: dashed outline of the affected area with the time of arrival.
@@ -219,10 +225,11 @@ class GameRenderer {
 
     drawSeedArrows() {
         const state = this.gameState;
-        if (!this.seedArrows.length || state.currentRound !== 1 || state.phase !== CONSTANTS.PHASE_PLACEMENT) return;
+        if (!this.seedArrows.length || state.phase !== CONSTANTS.PHASE_PLACEMENT) return;
         const ctx = this.ctx, size = this.cellSize;
         const names = { '-1,-1': 'links oben', '-1,0': 'oben', '-1,1': 'rechts oben', '0,-1': 'links', '0,1': 'rechts', '1,-1': 'links unten', '1,0': 'unten', '1,1': 'rechts unten' };
-        for (const { seed, cells, motion } of this.seedArrows) {
+        for (const { seed, cells, motion, round, eventId } of this.seedArrows) {
+            if (round !== state.currentRound || (eventId && !state.appliedEvents?.has(eventId))) continue;
             const cr = cells.reduce((s, p) => s + p[0], 0) / cells.length, cc = cells.reduce((s, p) => s + p[1], 0) / cells.length;
             const len = Math.hypot(motion.dr, motion.dc), ur = motion.dr / len, uc = motion.dc / len;
             const x0 = (cc + .5) * size, y0 = (cr + .5) * size, x1 = x0 + uc * 7 * size, y1 = y0 + ur * 7 * size;

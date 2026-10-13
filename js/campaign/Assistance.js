@@ -28,7 +28,17 @@ const MISSION_HINT_STAGES = {
     A5_M02: ['Jedes Habitat braucht eine eigene Abfangzone. Nach jeder Phase bestimmt das neue Einflussgebiet, wo du säen kannst.'],
     A5_M03: ['Felswände umschließen die roten Korridore; Leben gelangt nur durch die offenen Tore hinein. Bewache die Tore und erobere die Steuerlager von den Inseln neben ihnen.'],
     A5_M04: ['Neben beiden Kontrollstationen liegen Wartungsplattformen in deinem Gebiet. Von dort wachsen Kolonien in die Stationen; die zivilen Verteiler brauchen weiter Abstand zu fremder Flora.'],
-    A5_M05: ['Verteile Angriff, Schutz und Reserve auf drei Fronten. Der rote Ring bleibt immer leer.']
+    A5_M05: ['Verteile Angriff, Schutz und Reserve auf drei Fronten. Der rote Ring bleibt immer leer.'],
+    A6_M01: ['Ein Leuchtfeuer schwingt im Zweitakt: Was jetzt im Feld lebt, lebt zwei Generationen später genau wieder. Drei Zellen in einer Reihe tun das – oder zwei Blöcke, die sich nur an einer Ecke berühren. Wildwuchs darf das Feld nie erreichen.',
+        'Die Pfeile zeigen die Bahnen der Gleiter; ein Block auf der Bahn löscht einen Gleiter meist samt sich selbst aus. Die angekündigte Böe kommt waagerecht von beiden Seiten. Nach der Evolution säst du nur nahe lebender Kolonien – stelle ihre Abfangblöcke deshalb schon in Runde 1 auf.'],
+    A6_M02: ['Der rosa Zug fährt nach rechts, zwei Felder je vier Generationen. Jedes Nest in der Fahrrinne muss vorher verschwinden – ohne Reste, denn auch eigene Zellen bringen den Zug zum Entgleisen.',
+        'Gleiter erreichen die Rinne nur durch die Schleusen in den Uferwänden. Für jedes Nest gibt es Bahnen, auf denen Gleiter und Nest sich restlos auslöschen: Die Prognose zeigt sie. Gegen den Eisabbruch hilft ein Block, der schon in Runde 1 am Nordufer auf dessen Bahn wartet.'],
+    A6_M03: ['Die Kanonen stehen außerhalb deines Gebiets. Ein Gleiter, der eine Kanone an der richtigen Stelle trifft, zerstört sie – doch schon abgefeuerte Gleiter fliegen weiter auf den Kanal zu.',
+        'Ein Fresser schluckt einen ganzen Gleiterstrom, wenn sein Haken dem anfliegenden Gleiter zugewandt ist. Drehe ihn mit R und prüfe mit der Prognose, ob er unversehrt bleibt. Erst die Fresser, dann die Schüsse auf die Kanonen.'],
+    A6_M04: ['Zähle mit: Ein Gleiter, der an einer Wand der Kammer landet, erstarrt zu einem Block aus vier Zellen. Was zusammenstößt, verschwindet oft ganz. Nur eigene Zellen zählen.',
+        'Die grauen Saatkapseln sind Wildwuchs. Trifft sie ein Gleiter, wächst daraus ein größeres eigenes Muster. Die Prognose rechnet hier bis zur Messung und zeigt dir, wie viele Zellen eine Bahn ergibt. Bahnen, die nur die Kante eines Schlitzes streifen, liefern zwei Zellen.'],
+    A6_M05: ['Ein Beet wächst an, wenn darin 16 Generationen lang mindestens drei eigene Zellen leben – mehr eigene als wilde. Gleiter und Raumschiffe erstarren an der Beetwand; trifft ein Schuss die wilde Saat, wird sie zu deiner.',
+        'Schicke die drei Schüsse so, dass sich ihre Bahnen nicht kreuzen. Die Schmelzflut zieht in Runde 2 waagerecht zwischen Nord- und Ostbeet zum Kinderhaus, die zweite Welle in Runde 3 knapp über dem Becken. Angewachsene Beete geben dir Gebiet in ihrer Nähe – von dort fängt ein Block jede Welle ab.']
 };
 // In mission 1 the regular hint explains the rules; the extra stage follows it and still names no pattern.
 const MISSION_HINT_FOLLOWUPS = {
@@ -43,7 +53,7 @@ CAMPAIGN_MISSIONS.forEach(m => {
 
 // Expert protocols (after three stars): less own material, stronger opponents, no hints and no forecast.
 // Own material never drops below the spend of the original material bonus, so the known solutions stay affordable.
-const EXPERT_BUDGET_FLOOR = {A1_M01:4,A1_M02:8,A1_M03:5,A1_M04:10,A1_M05:15,A2_M01:24,A2_M02:10,A2_M03:8,A2_M04:15,A2_M05:14,A3_M01:15,A3_M02:7,A3_M03:12,A3_M04:15,A3_M05:15,A4_M01:18,A4_M02:22,A4_M03:20,A4_M04:24,A4_M05:36,A5_M01:72,A5_M02:90,A5_M03:82,A5_M04:108,A5_M05:124};
+const EXPERT_BUDGET_FLOOR = {A1_M01:4,A1_M02:8,A1_M03:5,A1_M04:10,A1_M05:15,A2_M01:24,A2_M02:10,A2_M03:8,A2_M04:15,A2_M05:14,A3_M01:15,A3_M02:7,A3_M03:12,A3_M04:15,A3_M05:15,A4_M01:18,A4_M02:22,A4_M03:20,A4_M04:24,A4_M05:36,A5_M01:72,A5_M02:90,A5_M03:82,A5_M04:108,A5_M05:124,A6_M01:24,A6_M02:19,A6_M03:24,A6_M04:15,A6_M05:28};
 // Expert protocols open only where a solution against the real AI is verified (tests/expert.test.cjs);
 // a mission without one gets expert: { disabled: true }. All thirteen missions with opponents are verified.
 function expertMission(m) {
@@ -75,6 +85,10 @@ const MISSION_RADIO = {
     A4_M03: [{ on: 'alarm:west', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Gleiter halten auf den westlichen Rettungsplatz zu!' }, { on: 'alarm:east', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Gleiter halten auf den östlichen Rettungsplatz zu!' }],
     A4_M04: [{ on: 'alarm:civilians', voice: 'UNSERE BIOLOGIN', text: 'Viridion zielt auf die Zivilstation!' }, { on: 'houseDefeated:2', voice: 'UNSERE BIOLOGIN', text: 'Viridion sät nicht mehr nach.' }],
     A4_M05: [{ on: 'scenario:storm', voice: 'GEMEINSAMER FUNKKANAL', text: 'Der Sturmstoß ist da. Schützt den Rettungsplatz!' }],
-    A5_M01: [{ on: 'cache:depot', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Notvorrat geborgen. Das hilft in der nächsten Phase.' }]
+    A5_M01: [{ on: 'cache:depot', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Notvorrat geborgen. Das hilft in der nächsten Phase.' }],
+    A6_M01: [{ on: 'holdHalf', voice: 'GEMEINSAMER FUNKKANAL', text: 'Wir sehen euer Licht! Haltet den Takt.' }, { on: 'holdLost', voice: 'UNSERE BIOLOGIN', text: 'Der Takt ist gebrochen. Das Feld muss neu schwingen.' }, { on: 'scenario:gust', voice: 'UNSERE BIOLOGIN', text: 'Die Böe kommt von den Seiten! Schützt das Licht.' }, { on: 'alarm:beacon', voice: 'UNSERE BIOLOGIN', text: 'Wildwuchs direkt am Leuchtfeuer!' }],
+    A6_M02: [{ on: 'announce:calving', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Das Nordufer bröckelt. In Runde drei rutscht Eis nach.' }, { on: 'scenario:calving', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Eisabbruch! Haltet die Rinne frei.' }],
+    A6_M03: [{ on: 'cleared:gunWest', voice: 'UNSERE BIOLOGIN', text: 'Die westliche Kanone schweigt.' }, { on: 'cleared:gunEast', voice: 'UNSERE BIOLOGIN', text: 'Die östliche Kanone schweigt.' }, { on: 'alarm:canal', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Flora am Trinkwasserkanal! Haltet sie auf!' }],
+    A6_M05: [{ on: 'captured:bedNorth', voice: 'GEMEINSAMER FUNKKANAL', text: 'Das Nordbeet ist angewachsen!' }, { on: 'scenario:flood', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Die Schmelzflut ist da. Schützt das Kinderhaus!' }, { on: 'scenario:surge', voice: 'UNSERE BIOLOGIN', text: 'Zweite Welle über dem Becken! Kein Wildwuchs ins Wasser.' }, { on: 'alarm:school', voice: 'DIE HELLAS-KOMMANDANTIN', text: 'Wildwuchs am Kinderhaus! Sofort abfangen!' }]
 };
 CAMPAIGN_MISSIONS.forEach(m => { m.radio = MISSION_RADIO[m.id] || []; });

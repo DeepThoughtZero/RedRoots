@@ -58,7 +58,8 @@ const CAMPAIGN_MISSIONS = [
 ];
 
 class MissionManager {
-    static seedCells(seed) { return CONSTANTS.PATTERNS[seed.pattern].pattern.map(([r, c]) => [seed.r + r, seed.c + (seed.mirror ? -c : c)]); }
+    static seedForm(key) { return CONSTANTS.PATTERNS[key] || CONSTANTS.FORMS?.[key]; }
+    static seedCells(seed) { return MissionManager.seedForm(seed.pattern).pattern.map(([r, c]) => [seed.r + r, seed.c + (seed.mirror ? -c : c)]); }
     static rect([rMin, cMin, rMax, cMax]) { return { rMin, cMin, rMax, cMax }; }
     // Scenario event actions: generic board and budget changes, no story logic.
     static applyAction(state, action) {

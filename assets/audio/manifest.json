@@ -248,5 +248,55 @@
     "id": "A5_M05_debriefing",
     "text": "Viertausend Generationen. Drei getrennte Pflanzenzonen. Im Schutzraum stehen vier cyanfarbene Zellen als stiller Block – dieselbe Form wie bei der Landung. Kesslers Stimme endet: „Das ist genug.“ Der Mars ist nicht gerettet, aber seine Siedlungen besitzen jetzt eine Ordnung, die sie gemeinsam weitertragen können.",
     "voice": "uncle_fu"
+  },
+  {
+    "id": "A6_M01_briefing",
+    "text": "Zwei Marsjahre nach dem Beschluss der Häuser lässt der Nordfrühling die Polkappe schrumpfen. Doch die gemeinsame Eisexpedition ist im Sturm erblindet; Funk und Ortung schweigen. Unsere Flora leuchtet, wenn sie sich erneuert. Halte im markierten Feld achtzig Generationen lang eine Kolonie im Zweitakt. Wildwuchs aus alten Versuchsfeldern treibt heran.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A6_M01_debriefing",
+    "text": "Die Raupen der Expedition folgen dem Takt und erreichen das Lager. Unter dem Eis wartet eine Station von PALISADE. Kesslers Team setzte hier Leuchtfeuer aus zwei Blöcken, Ecke an Ecke, als Wegweiser für Menschen. Dann meldet die Hellas-Kommandantin: Das erste Schmelzwasser fließt nach Süden. Ihr Wasserzug steht bereit.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A6_M02_briefing",
+    "text": "Die Hellas-Kommandantin führt den ersten Wasserzug selbst durch den Schmelzkanal; auf der Karte zieht er als rosa Raumschiff nach Osten. Drei erstarrte Wildwuchsnester liegen in der Fahrrinne, jedes würde ihn zerreißen. Räume sie mit sauberen Treffern, bevor er sie erreicht, und triff niemals den Zug. In Runde drei bricht Eis ab.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A6_M02_debriefing",
+    "text": "Der Wasserzug erreicht das Speicherbecken, kein Tropfen geht verloren. Zum Dank übergibt uns die Hellas-Kommandantin den Bauplan, mit dem ihre Wachen jahrzehntelang die Leitungen schützten: den Fresser. Er verschluckt anfliegende Gleiter und bleibt selbst bestehen. Im Süden feuern derweil zwei vergessene Saatkanonen von PALISADE.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A6_M03_briefing",
+    "text": "Zwei automatische Saatkanonen von PALISADE feuern seit Jahrzehnten Wildwuchs-Gleiter über Acidalia, eine Ebene im Norden. Jetzt zielen ihre Bahnen auf den neuen Trinkwasserkanal. Bring beide Kanonen mit gezielten Treffern zum Schweigen und halte den roten Kanal bis Generation hundertsechzig frei von jeder Flora. Der Fresser fängt Gleiterströme ab, ohne zu wachsen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A6_M03_debriefing",
+    "text": "Die Kanonen schweigen, der Kanal bleibt klar. In ihren Speichern liegt Kesslers Saatplan: Die Felder sollten sich in einem Jahrhundert langsam schließen, nicht in einem Jahrzehnt. Die beschleunigten Genome kamen erst später. Die Karte endet unter Chryse – genau unter unserer ersten Landestelle liegt ein versiegeltes Saatgutgewölbe.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A6_M04_briefing",
+    "text": "Genau unter unserer ersten Landestelle liegt Kesslers Saatgutgewölbe. Sein Schloss ist biologisch: Bei Generation hundertzwanzig müssen genau zwölf eigene Zellen in der Keimkammer leben. Gleiter erstarren an der Kammerwand zu Blöcken; zwei auf derselben Bahn löschen sich aus. Die alten Saatkapseln verändern jede Rechnung.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A6_M04_debriefing",
+    "text": "Zwölf Zellen – so viele Generationen hielt einst unsere erste Kolonie. Das Gewölbe öffnet sich. In langen Reihen lagern Kesslers langsame Saatlinien, beschriftet für die Generation nach uns. Sie brauchen Jahrzehnte statt Jahre, und genau das macht sie sicher. Die Häuser beschließen, mit ihnen in Chryse den ersten Garten unter offenem Himmel anzulegen.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A6_M05_briefing",
+    "text": "In Chryse, wo alles begann, entsteht der erste Garten unter offenem Himmel. Lass Kesslers langsame Saat in drei Hochbeeten anwachsen, schütze das Kinderhaus vor Wildwuchs und halte das Trinkwasserbecken völlig frei. Schmelzflut und eine zweite Welle sind angekündigt. Alles, was dieser Frühling dich lehrte – Takt, Treffer, Hecken, Maß –, zählt jetzt.",
+    "voice": "uncle_fu"
+  },
+  {
+    "id": "A6_M05_debriefing",
+    "text": "Hundertsechzig Generationen später blühen drei Beete. Kinder aus Marineris, Hellas, Viridion und Tharsis stehen am Rand und zählen die Zellen. Dem Saatgut lag eine Notiz Kesslers bei: „Pflegt, was nach euch wächst.“ Der Mars ist noch nicht grün. Aber zum ersten Mal hat er einen Frühling, den alle gemeinsam erhalten.",
+    "voice": "uncle_fu"
   }
 ]

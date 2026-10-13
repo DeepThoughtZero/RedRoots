@@ -1,7 +1,7 @@
 // Expert protocols of all missions with opponents: each has a verified solution against the real seeded AI.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const ctx=vm.createContext({console:{log(){},warn:console.warn},setTimeout:fn=>{queueMicrotask(fn);return 1},requestAnimationFrame:()=>1,cancelAnimationFrame(){},localStorage:{getItem(){},setItem(){}}});
-for(const f of ['utils/Constants','core/Grid','core/Territory','core/AI','campaign/Missions','campaign/Story','campaign/Act2','campaign/Act3','campaign/Act4','campaign/Act5','campaign/Assistance','campaign/ObjectiveSystem','core/GameState'])vm.runInContext(fs.readFileSync('js/'+f+'.js','utf8'),ctx);
+for(const f of ['utils/Constants','core/Grid','core/Territory','core/AI','campaign/Missions','campaign/Story','campaign/Act2','campaign/Act3','campaign/Act4','campaign/Act5','campaign/Act6','campaign/Assistance','campaign/ObjectiveSystem','core/GameState'])vm.runInContext(fs.readFileSync('js/'+f+'.js','utf8'),ctx);
 const {GameState,MissionManager,missions,C,AI,expertMission}=vm.runInContext('({GameState,MissionManager,missions:CAMPAIGN_MISSIONS,C:CONSTANTS,AI,expertMission})',ctx);
 const rot=(k,n)=>{let p=C.PATTERNS[k].pattern;for(let i=0;i<n;i++)p=p.map(([r,c])=>[c,-r]);return p;};
 const houses=s=>s.scenario.enemies?s.scenario.enemies.map(e=>e.house):s.scenario.enemy?[1]:[];

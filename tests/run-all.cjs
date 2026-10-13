@@ -62,6 +62,11 @@ const suites = [
         desc: 'Langzeitziele, Großkarten, Sperrkorridore, Codes und finale Entscheidung'
     },
     {
+        name: 'Ebene 4e2: Kampagne Akt VI (Missionen 26–30)',
+        file: 'tests/act6.test.cjs',
+        desc: 'Leuchtfeuer, Geleitschutz, Saatkanonen, Kalibrierung und Gartenfinale mit echter Simulation'
+    },
+    {
         name: 'Ebene 4f: Missionsrückmeldung & Spannung',
         file: 'tests/objectives.test.cjs',
         desc: 'Bedrohungsabstand, Ereignisse, Zonenstatus, Niederlagenanalyse, Abstandsboni'
@@ -94,12 +99,12 @@ const suites = [
     {
         name: 'Ebene 5b: Audio-Aufnahmen & Story-Integrität',
         file: 'tests/audio-assets.test.cjs',
-        desc: '50 Qwen3-Aufnahmen gegen Storytexte & SHA-256 Prüfsummen'
+        desc: 'Qwen3-Aufnahmen gegen Storytexte & SHA-256 Prüfsummen, Textmanifest für alle Missionen'
     },
     {
         name: 'Ebene 5c: Vollbild & Seitenspalte',
         file: 'tests/display.test.cjs',
-        desc: 'Einklappregeln der Seitenspalte, gespeicherte Wahl, blockierter Speicher'
+        desc: 'Vollbild-Modi, Taste F, Einklappregeln der Seitenspalte, gespeicherte Wahl, blockierter Speicher'
     }
 ];
 

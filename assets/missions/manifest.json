@@ -174,6 +174,61 @@
       "file": "A5_M05.webp",
       "source": "exec-efb484a3-6df7-407c-b54f-6a46cdcb2dcb.png",
       "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use the two input images as STYLE REFERENCES ONLY. Realistic cinematic science fiction, vast layered copper-red Martian geology, weathered dark industrial water infrastructure, tangible waxy succulent flora with branching luminous lattice structures, restrained cyan Marineris versus yellow Tharsis and green Viridion light, atmospheric depth, dramatic natural lighting, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: Finale at the colossal heart of the Olympus network, three separated regional nodes across an immense volcanic caldera, a visibly empty protective corridor around the central infrastructure, cyan, green and yellow plant zones held apart. In the near foreground exactly four small cyan cells form a quiet square-like living cluster beside weathered machinery; solemn hopeful sunrise."
+    },
+    {
+      "id": "A6_M01",
+      "title": "Leuchtfeuer im Eissturm",
+      "file": "A6_M01.webp",
+      "source": "assets/missions/A1_M04.webp",
+      "method": "Derived fallback: re-framed and re-graded with painted motif by scripts/compose_act6_images.py (no image model available); replace with a generated image from the prompt.",
+      "derivedFrom": [
+        "A1_M04.webp"
+      ],
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use Mars_Terraforming01.png and Marineris_Cyan.png as STYLE REFERENCES ONLY. Realistic cinematic science fiction, layered copper-red Martian geology, weathered dark industrial habitats, tangible waxy succulent flora with branching luminous lattice structures, restrained bioluminescence, atmospheric depth, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: Northern spring at the edge of the Martian polar ice cap during a white ice-dust storm. Terraced blue-white ice canyons, snow streaks in the wind. In the middle ground a small living beacon of eight cyan cells, two square clusters touching at one corner, pulses with soft light rays through the storm; far away two tiny crawler headlights follow it. Hopeful, cold, quiet."
+    },
+    {
+      "id": "A6_M02",
+      "title": "Der Wasserzug",
+      "file": "A6_M02.webp",
+      "source": "assets/missions/A2_M02.webp",
+      "method": "Derived fallback: re-framed and re-graded with painted motif by scripts/compose_act6_images.py (no image model available); replace with a generated image from the prompt.",
+      "derivedFrom": [
+        "A2_M02.webp"
+      ],
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use Mars_Terraforming01.png and Marineris_Cyan.png as STYLE REFERENCES ONLY. Realistic cinematic science fiction, layered copper-red Martian geology, weathered dark industrial habitats, tangible waxy succulent flora with branching luminous lattice structures, restrained bioluminescence, atmospheric depth, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: A meltwater channel through a red canyon with old lock gates and waterfalls at dawn. A pink glowing convoy of light shaped like a small spaceship of cells travels upstream along the water, leaving a pink wake; ahead, pale grey frozen wild growth in the channel. Teal Marineris flora on the cliffs, tiny helmeted figures on the walls."
+    },
+    {
+      "id": "A6_M03",
+      "title": "Die verwaisten Saatkanonen",
+      "file": "A6_M03.webp",
+      "source": "assets/missions/A2_M04.webp",
+      "method": "Derived fallback: re-framed and re-graded with painted motif by scripts/compose_act6_images.py (no image model available); replace with a generated image from the prompt.",
+      "derivedFrom": [
+        "A2_M04.webp"
+      ],
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use Mars_Terraforming01.png and Marineris_Cyan.png as STYLE REFERENCES ONLY. Realistic cinematic science fiction, layered copper-red Martian geology, weathered dark industrial habitats, tangible waxy succulent flora with branching luminous lattice structures, restrained bioluminescence, atmospheric depth, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: Dusk over the Acidalia plain with two weathered automated seed cannon towers of an abandoned expedition, still firing diagonal streams of small grey luminous seed clusters across the land. At the foot of the cliffs a narrow drinking water canal glows faintly red as a forbidden boundary. Dusty amber light."
+    },
+    {
+      "id": "A6_M04",
+      "title": "Das Saatgutgewölbe",
+      "file": "A6_M04.webp",
+      "source": "assets/missions/A3_M01.webp",
+      "method": "Derived fallback: re-framed and re-graded with painted motif by scripts/compose_act6_images.py (no image model available); replace with a generated image from the prompt.",
+      "derivedFrom": [
+        "A3_M01.webp"
+      ],
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use Mars_Terraforming01.png and Marineris_Cyan.png as STYLE REFERENCES ONLY. Realistic cinematic science fiction, layered copper-red Martian geology, weathered dark industrial habitats, tangible waxy succulent flora with branching luminous lattice structures, restrained bioluminescence, atmospheric depth, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: A massive sealed circular vault door set into layered rock beneath an old landing site, warm golden dust, cyan root-like flora growing across the door. Exactly twelve small warm lights form a ring around the door; tiny helmeted explorers stand on a bridge in front of it. Rows of sealed seed capsules glimmer below."
+    },
+    {
+      "id": "A6_M05",
+      "title": "Der erste Frühling",
+      "file": "A6_M05.webp",
+      "source": "assets/missions/A1_M01.webp",
+      "method": "Derived fallback: re-framed and re-graded with painted motif by scripts/compose_act6_images.py (no image model available); replace with a generated image from the prompt.",
+      "derivedFrom": [
+        "A1_M01.webp"
+      ],
+      "prompt": "Use case: stylized-concept. Asset type: wide 16:9 mission illustration for the RedRoots strategy game. Use Mars_Terraforming01.png and Marineris_Cyan.png as STYLE REFERENCES ONLY. Realistic cinematic science fiction, layered copper-red Martian geology, weathered dark industrial habitats, tangible waxy succulent flora with branching luminous lattice structures, restrained bioluminescence, atmospheric depth, crisp readable silhouettes at small banner size. Create a new unique landscape. No text, letters, labels, logos, UI, watermark, guns, fantasy creatures, or large planets in the sky. Any humans are tiny fully helmeted explorers. Scene: Morning at the original landing plain of Chryse: the first garden under the open sky. Teal succulent colonies in red soil, between the stones tiny glowing seedlings in the four house colours cyan, magenta, green and yellow. A helmeted gardener kneels in the soft sunrise, the old landing habitat behind. Gentle, warm, hopeful."
     }
   ]
 }

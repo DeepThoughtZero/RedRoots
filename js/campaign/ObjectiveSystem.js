@@ -13,6 +13,12 @@ class ObjectiveSystem {
         this.timeline = { stride: 1, generation: [], own: [], foreign: [] };
     }
     zone(id) { return this.mission.map.zones.find(z => z.id === id); }
+    // Wording of the target zones; a mission may rename camps to beds or nests to cannons.
+    terms() { return ObjectiveSystem.termsOf(this.mission.objective); }
+    static termsOf(o) {
+        const base = o.type === 'clearZones' ? { unit: 'Herde', one: 'Herd', done: 'beseitigt', progress: 'Räumung', best: 'beste Räumung', guard: 'Schützen' } : { unit: 'Camps', one: 'Camp', done: 'erobert', progress: 'Eroberung', best: 'beste Eroberung', guard: 'Rückweg schützen' };
+        return { ...base, ...(o.terms || {}) };
+    }
     emit(event) { this.events.push(event); this.log.push(event); }
     // Identifies a placed pattern by its shape in any rotation.
     static patternKey(cells) {
@@ -174,7 +180,7 @@ class ObjectiveSystem {
         if (o.type === 'survive') return { label: 'Überleben noch', remaining: Math.max(0, o.value - this.streak) };
         if (o.type === 'pulse') return g < o.aliveAt ? { label: 'Lebensnachweis in', remaining: o.aliveAt - g } : g < o.emptyAfter ? { label: 'Kammer leer ab', remaining: o.emptyAfter - g } : { label: 'Testende in', remaining: Math.max(0, this.mission.steps - g) };
         if (o.type === 'holdZones' && this.hold > 0) return { label: 'Halten noch', remaining: Math.max(0, o.value - this.hold) };
-        if (o.type === 'captureCamps' && o.minGenerations > g) return { label: 'Rückweg schützen noch', remaining: o.minGenerations - g };
+        if (['captureCamps', 'clearZones'].includes(o.type) && o.minGenerations > g) return { label: `${this.terms().guard} noch`, remaining: o.minGenerations - g };
         if (o.type === 'exactCount' && g < o.at) return { label: 'Messung in', remaining: o.at - g };
         if (o.type === 'oscillate' && this.beacon > 0) return { label: 'Takt halten noch', remaining: Math.max(0, o.value - this.beacon) };
         if (o.type === 'race' && this.raceArrival > g) return { label: 'Hellas am Ziel in ca.', remaining: this.raceArrival - g };
@@ -293,17 +299,21 @@ class ObjectiveSystem {
                     if (!this.defeatedSeen.has(enemy.house)) { this.defeatedSeen.add(enemy.house); this.emit({ type: 'houseDefeated', house: enemy.house, generation: this.generations }); }
                 }
             }
-            this.progressText = `${this.collected.size} / ${targets.length} Camps erobert`;
-            if (this.collected.size === targets.length && this.generations < (o.minGenerations || 0)) this.progressText = `Camps gesichert · ${o.minGenerations-this.generations} Generationen Rückweg schützen`;
+            const t = this.terms();
+            this.progressText = `${this.collected.size} / ${targets.length} ${t.unit} ${t.done}`;
+            if (this.collected.size === targets.length && this.generations < (o.minGenerations || 0)) this.progressText = `${t.unit} gesichert · ${o.minGenerations-this.generations} Generationen ${t.guard}`;
             won = this.collected.size === targets.length && this.generations >= (o.minGenerations || 0) && population > 0;
         }
         let lostObjective = null;
         if (o.type === 'clearZones') {
             const owners = o.owners || [CONSTANTS.OWNER_NEUTRAL];
+            const before = this.cleared, t = this.terms();
             this.cleared = new Set(targets.filter(z => !owners.some(owner => this.inZone(state, z, owner))).map(z => z.id));
+            if (event === 'generation') for (const z of targets) if (this.cleared.has(z.id) && !before.has(z.id)) this.emit({ type: 'cleared', zoneId: z.id, label: z.label, generation: this.generations });
             this.bestCleared = Math.max(this.bestCleared, this.cleared.size);
-            this.progressText = `${this.cleared.size} / ${targets.length} Herde beseitigt`;
-            won = this.cleared.size === targets.length;
+            this.progressText = `${this.cleared.size} / ${targets.length} ${t.unit} ${t.done}`;
+            won = this.cleared.size === targets.length && this.generations >= (o.minGenerations || 0);
+            if (this.cleared.size === targets.length && !won) this.progressText = `Alle ${t.unit} ${t.done} · ${o.minGenerations - this.generations} Generationen ${t.guard}`;
         }
         if (o.type === 'oscillate') {
             if (event === 'generation') {
@@ -371,11 +381,11 @@ class ObjectiveSystem {
             case 'holdZones': return `Bester Haltewert: ${this.bestHold} / ${o.value} Generationen.`;
             case 'evacuate': return `Durchgehalten bis Generation ${Math.min(this.generations, o.value)} von ${o.value}.`;
             case 'pulse': return `Lebensnachweis bei Generation ${o.aliveAt}: ${this.pulseAlive ? 'erbracht' : 'verfehlt'}. Letzte eigene Zelle lebte bis Generation ${this.lastAlive}.`;
-            case 'clearZones': return `Höchstens ${this.bestCleared} / ${n} Herde gleichzeitig beseitigt.`;
+            case 'clearZones': return `Höchstens ${this.bestCleared} / ${n} ${this.terms().unit} gleichzeitig ${this.terms().done}.`;
             case 'oscillate': return `Längster gleichmäßiger Takt: ${this.bestBeacon} / ${o.value} Generationen.`;
             case 'escort': return Number.isFinite(this.closestToTarget) ? `Der Geleitzug kam bis auf ${this.closestToTarget} Felder an das Ziel heran.` : null;
             case 'exactCount': return `Gemessen: ${this.measured ?? 'keine Messung'} statt ${o.value} eigener Zellen.`;
-            case 'captureCamps': return `${this.collected.size} / ${n} Camps erobert${this.collected.size < n ? ` · beste Eroberung ${Math.min(this.bestCapture, o.hold)} / ${o.hold} Generationen gehalten` : ''}.`;
+            case 'captureCamps': { const t = this.terms(); return `${this.collected.size} / ${n} ${t.unit} ${t.done}${this.collected.size < n ? ` · ${t.best} ${Math.min(this.bestCapture, o.hold)} / ${o.hold} Generationen gehalten` : ''}.`; }
             default: return null;
         }
     }

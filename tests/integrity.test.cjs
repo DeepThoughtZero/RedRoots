@@ -24,6 +24,7 @@ const jsFiles = [
     'js/campaign/Act3.js',
     'js/campaign/Act4.js',
     'js/campaign/Act5.js',
+    'js/campaign/Act6.js',
     'js/campaign/Assistance.js',
     'js/campaign/ObjectiveSystem.js',
     'js/campaign/CampaignManager.js',
@@ -69,6 +70,7 @@ const expectedScripts = [
     'js/campaign/Act3.js',
     'js/campaign/Act4.js',
     'js/campaign/Act5.js',
+    'js/campaign/Act6.js',
     'js/campaign/Assistance.js',
     'js/campaign/ObjectiveSystem.js',
     'js/campaign/CampaignManager.js',
@@ -97,13 +99,14 @@ for (const file of [
     'js/campaign/Act3.js',
     'js/campaign/Act4.js',
     'js/campaign/Act5.js',
+    'js/campaign/Act6.js',
     'js/campaign/Assistance.js'
 ]) {
     vm.runInContext(fs.readFileSync(file, 'utf8'), ctx);
 }
 const { CAMPAIGN_MISSIONS, CONSTANTS } = vm.runInContext('({CAMPAIGN_MISSIONS, CONSTANTS})', ctx);
 
-assert.equal(CAMPAIGN_MISSIONS.length, 25, 'Fünf Akte mit je fünf Kampagnenmissionen sind deklariert');
+assert.equal(CAMPAIGN_MISSIONS.length, 30, 'Sechs Akte mit je fünf Kampagnenmissionen sind deklariert');
 
 const validObjectiveTypes = new Set([
     'survive', 'reachZone', 'race', 'territoryZone', 'territoryZones',
@@ -113,7 +116,7 @@ const validObjectiveTypes = new Set([
 
 CAMPAIGN_MISSIONS.forEach((m, idx) => {
     assert.ok(m.id, `Mission ${idx}: ID vorhanden`);
-    assert.ok([1, 2, 3, 4, 5].includes(m.act), `Mission ${m.id}: Gültiger Akt 1 bis 5`);
+    assert.ok([1, 2, 3, 4, 5, 6].includes(m.act), `Mission ${m.id}: Gültiger Akt 1 bis 6`);
     assert.ok(m.title, `Mission ${m.id}: Titel vorhanden`);
     assert.ok(m.briefing && m.briefing.length > 20, `Mission ${m.id}: Ausführliches Briefing vorhanden`);
     assert.ok(m.debriefing && m.debriefing.length > 20, `Mission ${m.id}: Ausführliches Debriefing vorhanden`);
@@ -133,8 +136,9 @@ CAMPAIGN_MISSIONS.forEach((m, idx) => {
         for (const a of [].concat(e.action)) {
             assert.ok(['seed', 'clearRocks', 'addRocks', 'budget'].includes(a.type), `Mission ${m.id}: Ereignisaktion ${a.type} bekannt`);
             if (a.type === 'seed') {
-                assert.ok(CONSTANTS.PATTERNS[a.pattern], `Mission ${m.id}: Ereignismuster ${a.pattern} existiert`);
-                CONSTANTS.PATTERNS[a.pattern].pattern.forEach(([r, c]) => assert.ok(inBounds([a.r + r, a.c + (a.mirror ? -c : c), a.r + r, a.c + (a.mirror ? -c : c)]), `Mission ${m.id}: Ereignissaat ${e.id} liegt im Feld`));
+                const form = CONSTANTS.PATTERNS[a.pattern] || CONSTANTS.FORMS[a.pattern];
+                assert.ok(form, `Mission ${m.id}: Ereignismuster ${a.pattern} existiert`);
+                form.pattern.forEach(([r, c]) => assert.ok(inBounds([a.r + r, a.c + (a.mirror ? -c : c), a.r + r, a.c + (a.mirror ? -c : c)]), `Mission ${m.id}: Ereignissaat ${e.id} liegt im Feld`));
             }
             if (a.rect) assert.ok(inBounds(a.rect), `Mission ${m.id}: Ereignisbereich ${e.id} liegt im Feld`);
         }
@@ -166,6 +170,14 @@ CAMPAIGN_MISSIONS.forEach((m, idx) => {
     if (m.reward) {
         assert.ok(CONSTANTS.PATTERNS[m.reward], `Mission ${m.id}: Belohnungsmuster ${m.reward} existiert`);
     }
+    for (const seed of m.map.seeds || []) {
+        const form = CONSTANTS.PATTERNS[seed.pattern] || CONSTANTS.FORMS[seed.pattern];
+        assert.ok(form, `Mission ${m.id}: Startmuster ${seed.pattern} existiert`);
+        form.pattern.forEach(([r, c]) => assert.ok(inBounds([seed.r + r, seed.c + (seed.mirror ? -c : c), seed.r + r, seed.c + (seed.mirror ? -c : c)]), `Mission ${m.id}: Startmuster ${seed.pattern} liegt vollständig im Feld`));
+    }
+    if (m.objective.terms) assert.ok(['captureCamps', 'clearZones'].includes(m.objective.type) && m.objective.terms.unit && m.objective.terms.done, `Mission ${m.id}: Zielbegriffe nur für Eroberung oder Räumung`);
+    if (m.objective.minGenerations !== undefined) assert.ok(m.objective.minGenerations <= m.rounds * m.steps, `Mission ${m.id}: Mindestdauer innerhalb der Mission`);
+    if (m.epilogue) assert.ok(['consortium', 'open_genomes', 'none'].every(k => typeof m.epilogue[k] === 'string' && m.epilogue[k].length > 20), `Mission ${m.id}: Epilog für jede Entscheidung`);
 
     assert.ok(validObjectiveTypes.has(m.objective.type), `Mission ${m.id}: Zieltyp ${m.objective.type} ist zulässig`);
 
