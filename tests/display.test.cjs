@@ -44,4 +44,27 @@ assert.deepEqual({ ...D.readLayout() }, { side: 'auto', autoRail: true });
 assert.equal(D.writeLayout({ side: 'open' }), false);
 blocked = false;
 
-console.log('PASS: Seitenspalte faltet nur bei Bedarf, manuelle Wahl bleibt, Speicherfehler werden abgefangen');
+// Vollbild: real full screen where the API exists, an explanation instead of a missing button elsewhere.
+ctx.document.documentElement = { requestFullscreen() {} };
+ctx.document.fullscreenEnabled = true;
+assert.equal(D.fsMode(), 'api');
+ctx.document.fullscreenEnabled = false;
+ctx.navigator.userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1';
+assert.equal(D.fsMode(), 'homescreen', 'iPhone: the button explains the home screen instead of disappearing');
+assert.match(D.fsHintText('homescreen'), /Home-Bildschirm/);
+ctx.navigator.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) Firefox/140.0';
+assert.equal(D.fsMode(), 'unsupported');
+assert.match(D.fsHintText('unsupported'), /F11/);
+D.standalone = true;
+assert.equal(D.fsMode(), 'standalone', 'launched from the home screen: no button needed');
+D.standalone = undefined;
+// F toggles full screen, but never while typing an expedition code or with modifier keys.
+assert.equal(D.isFsShortcut({ key: 'f', target: { tagName: 'CANVAS' } }), true);
+assert.equal(D.isFsShortcut({ key: 'F', target: { tagName: 'BUTTON' } }), true);
+assert.equal(D.isFsShortcut({ key: 'f', target: { tagName: 'INPUT' } }), false);
+assert.equal(D.isFsShortcut({ key: 'f', target: { isContentEditable: true } }), false);
+assert.equal(D.isFsShortcut({ key: 'f', ctrlKey: true, target: {} }), false);
+assert.equal(D.isFsShortcut({ key: 'f', repeat: true, target: {} }), false);
+assert.equal(D.isFsShortcut({ key: 'r', target: {} }), false);
+
+console.log('PASS: Seitenspalte faltet nur bei Bedarf, manuelle Wahl bleibt, Speicherfehler werden abgefangen; Vollbild oben rechts mit Erklärung ohne API und Taste F');

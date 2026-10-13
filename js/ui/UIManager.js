@@ -278,7 +278,7 @@ class UIManager {
         document.getElementById('btnHelp')?.addEventListener('click', showHelp);
         document.getElementById('btnMenuHelp')?.addEventListener('click', () => { this.closeDialog(this.elSettingsOverlay); showHelp(); });
         const homeHint = document.getElementById('homeScreenHint');
-        if (homeHint) homeHint.hidden = DisplayControls.fsSupported() || DisplayControls.isStandalone() || !matchMedia('(pointer: coarse)').matches;
+        if (homeHint) homeHint.hidden = DisplayControls.fsMode() !== 'homescreen';
         document.getElementById('btnShowBriefing')?.addEventListener('click', showHelp);
         document.getElementById('btnHelpClose')?.addEventListener('click', () => this.closeDialog(this.helpOverlay));
 

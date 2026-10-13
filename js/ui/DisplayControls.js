@@ -49,6 +49,61 @@ class DisplayControls {
 
     static isFullscreen() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
 
+    // iPhone Safari offers no full screen for web pages; iPadOS reports itself as a Mac with touch.
+    static isAppleMobile() {
+        try {
+            const ua = navigator.userAgent || '';
+            return /iPhone|iPod|iPad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        } catch { return false; }
+    }
+
+    // 'api': real full screen; 'standalone': already launched from the home screen (no button);
+    // 'homescreen' / 'unsupported': the button stays visible and explains the alternative.
+    static fsMode() {
+        if (DisplayControls.isStandalone()) return 'standalone';
+        if (DisplayControls.fsSupported()) return 'api';
+        return DisplayControls.isAppleMobile() ? 'homescreen' : 'unsupported';
+    }
+
+    // F toggles full screen, except while typing (expedition codes) or with modifier keys.
+    static isFsShortcut(event) {
+        if (!event || event.repeat || event.ctrlKey || event.metaKey || event.altKey || !['f', 'F'].includes(event.key)) return false;
+        const target = event.target;
+        return !(target?.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName));
+    }
+
+    static fsHintText(mode) {
+        return mode === 'homescreen'
+            ? 'Auf dem iPhone erlaubt Safari kein Vollbild für Webseiten. Tippe auf Teilen → „Zum Home-Bildschirm“: Von dort startet RedRoots ohne Browserleiste.'
+            : 'Dieser Browser erlaubt hier kein Vollbild. Am PC hilft F11, auf Tablet und Handy „Zum Startbildschirm hinzufügen“.';
+    }
+
+    // Short explanation beside the top right corner, for browsers without a full screen for web pages.
+    static showFsHint(mode) {
+        let hint = document.getElementById('fsHint');
+        if (!hint) {
+            hint = document.createElement('div');
+            hint.id = 'fsHint';
+            hint.className = 'fs-hint';
+            hint.setAttribute('role', 'status');
+            hint.innerHTML = '<p></p><button type="button" class="btn btn-icon btn-ghost" aria-label="Hinweis schließen"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>';
+            hint.querySelector('button').addEventListener('click', () => { hint.hidden = true; });
+            document.body.append(hint);
+        }
+        hint.querySelector('p').textContent = DisplayControls.fsHintText(mode);
+        hint.hidden = false;
+        clearTimeout(DisplayControls.hintTimer);
+        DisplayControls.hintTimer = setTimeout(() => { hint.hidden = true; }, 9000);
+    }
+
+    // One entry point for every Vollbild button and the F key.
+    static requestToggle() {
+        const mode = DisplayControls.fsMode();
+        if (mode === 'api') return DisplayControls.toggleFullscreen();
+        if (mode !== 'standalone') DisplayControls.showFsHint(mode);
+        return Promise.resolve(false);
+    }
+
     static enter() {
         const root = document.documentElement;
         let request;
@@ -78,10 +133,10 @@ class DisplayControls {
     }
 
     static syncButtons() {
-        const on = DisplayControls.isFullscreen(), available = DisplayControls.fsSupported() && !DisplayControls.isStandalone();
+        const on = DisplayControls.isFullscreen(), mode = DisplayControls.fsMode();
         document.documentElement.classList.toggle('is-fullscreen', on);
         document.querySelectorAll('[data-fs]').forEach(button => {
-            button.hidden = !available;
+            button.hidden = mode === 'standalone';
             const label = on ? 'Vollbild beenden' : 'Vollbild';
             button.setAttribute('aria-pressed', String(on));
             button.setAttribute('aria-label', label);
@@ -99,7 +154,12 @@ class DisplayControls {
         DisplayControls.standalone = DisplayControls.isStandalone();
         DisplayControls.syncButtons();
         document.addEventListener('click', event => {
-            if (event.target.closest?.('[data-fs]')) DisplayControls.toggleFullscreen();
+            if (event.target.closest?.('[data-fs]')) DisplayControls.requestToggle();
+        });
+        document.addEventListener('keydown', event => {
+            if (!DisplayControls.isFsShortcut(event)) return;
+            event.preventDefault();
+            DisplayControls.requestToggle();
         });
         const onChange = () => {
             // Leaving with Esc, the back gesture or the button is a decision: do not come back on the next tap.
@@ -122,7 +182,7 @@ class DisplayControls {
         const handler = event => {
             if (!event.isTrusted) return;
             if (event.type === 'pointerup' && event.pointerType === 'mouse') return;
-            if (event.type === 'keydown' && event.key === 'Escape') return;
+            if (event.type === 'keydown' && (event.key === 'Escape' || DisplayControls.isFsShortcut(event))) return;
             stop();
             // A tap on a Vollbild button toggles on its own.
             if (event.target.closest?.('[data-fs]')) return;
